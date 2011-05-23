@@ -1,0 +1,22 @@
+<table>
+	<thead>
+		<tr>
+			{% for column in columns %}
+			<th>
+				{{ column.getLabel() }}
+			</th>
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for record in records %}
+		<tr>
+			{% for column in columns %}
+			<td>
+				{{ column.format(record) }}
+			</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
