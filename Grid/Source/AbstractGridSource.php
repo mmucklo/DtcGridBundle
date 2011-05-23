@@ -1,7 +1,8 @@
 <?php
 namespace Dtc\GridBundle\Grid\Source;
 
-use Dtc\GridBundle\Grid\Pager\Pager;
+use Dtc\GridBundle\Grid\Pager\GridSourcePager;
+use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractGridSource 
 	implements GridSourceInterface
@@ -11,11 +12,41 @@ abstract class AbstractGridSource
 	protected $filter = array();
 	protected $orderBy = array();
 	protected $pager = array();
+	protected $id = 'grid';
+	protected $columns;
+
+	public function bind(Request $request) {
+		// Change limit, offset
+		if ($limit = $request->get('limit'))
+		{
+			$this->limit = $limit;
+		}
+		
+		if ($offset = $request->get('offset')) {
+			$this->offset = $offset;
+		}
+	}
+	
+	public function getId() {
+		return $this->id;
+	}
+	
+	public function setId($value) {
+		$this->id = $value;
+	}
+	
+	public function getColumns() {
+		return $this->columns;
+	}
+	
+	public function setColumns($value) {
+		$this->columns = $value;
+	}
 	
 	public function getPager() {
 		if (!$this->pager)
 		{
-			$this->pager = new Pager();
+			$this->pager = new GridSourcePager($this);
 		}
 		
 		return $this->pager;

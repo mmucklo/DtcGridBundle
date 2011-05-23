@@ -15,8 +15,9 @@ class JQueryGridRenderer
 		'total' => 'total',
 		'records' => 'records',
 		'cell' => '',
+		'width' => '840',
 		'height' => '500',
-		'loadui' => 'block',
+		'loadui' => 'disable',
 		'altRows' => true,
 		'viewrecords' => true,
 		'multiselect' => true,
@@ -38,7 +39,7 @@ class JQueryGridRenderer
 	);
 	
 	protected function afterBind() {
-		$id = $this->grid->getId();
+		$id = $this->gridSource->getId();
 		
 		$this->options['prmNames'] = array(
 			'page' => "{$id}_page",
@@ -49,9 +50,13 @@ class JQueryGridRenderer
 		
 		$this->options['pager'] = "{$id}-pager";
 		
-		foreach ($this->grid->getColumns() as $column) {
-			$info['name'] = $column->getLabel();
-			$info['field'] = $column->getField();
+		$params = array('id' => $id);
+		$url = $this->router->generate('dtc_grid_grid_data', $params);
+		$this->options['url'] = $url;
+		
+		foreach ($this->gridSource->getColumns() as $column) {
+			$info['label'] = $column->getLabel();
+			$info['name'] = $column->getField();
 			
 			$this->options['colModel'][] = $info;
 		}
@@ -62,16 +67,15 @@ class JQueryGridRenderer
 	}
 	
 	public function getData() {
-		$columns = $this->grid->getColumns();
-		$gridSource = $this->grid->getGridSource();
+		$columns = $this->gridSource->getColumns();
+		$gridSource = $this->gridSource;
 		$records = $gridSource->getRecords();
 		
 		$retVal = array(
 			'page' => $gridSource->getPager()->getCurrentPage(),
 			'total' => $gridSource->getPager()->getTotalPages(),
 			'records' => count($records),
-			'id' => 'name',		// unique id
-			
+			'id' => '0',		// unique id
 		);
 		
 		foreach ($records as $record)
@@ -84,6 +88,8 @@ class JQueryGridRenderer
 			$retVal['rows'][] = $info;
 		}
 		
+		$retVal['records'] = count($retVal['rows']);
+		
 		return $retVal;
 	}
 	
@@ -91,7 +97,7 @@ class JQueryGridRenderer
 		
 		$params = array(
 			'options' => $this->options,
-			'id' => $this->grid->getId()
+			'id' => $this->gridSource->getId()
 		);
 		
 		$template = 'DtcGridBundle:Grid:jquery_grid.html.twig';

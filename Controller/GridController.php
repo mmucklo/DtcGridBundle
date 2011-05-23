@@ -1,6 +1,8 @@
 <?php
 namespace Dtc\GridBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Dtc\GridBundle\Grid\Renderer\TwigGridRenderer;
 use Dtc\GridBundle\Grid\Renderer\JQueryGridRenderer;
 use Dtc\GridBundle\Grid\Grid;
@@ -18,17 +20,10 @@ class GridController
 	public function test() {
 		$dm = $this->get('doctrine.odm.mongodb.default_document_manager');
 		$documentName = 'Odl\ShadowBundle\Documents\Character';
-		$template = $this->get('templating');
+		$renderer = $this->get('grid.renderer.jq_grid');
 		
 		$gridSource = new DocumentGridSource($dm, $documentName);
-		$renderer = new TwigGridRenderer($template);
-		$renderer = new JQueryGridRenderer($template);
-		
-		$grid = new Grid($gridSource);
-		$grid->setColumns($gridSource->getReflectionColumns());
-		$grid->bindRenderer($renderer);
-		
-		$content = $grid->render();
+		$content = $renderer->bind($gridSource)->render();
 		echo $content;
 		exit();
 		
@@ -39,6 +34,21 @@ class GridController
 		
 		v($count);
 		ve(count($arr));
+	}
+	
+	/**
+	 * @Route("/data/{id}", 
+	 * 	defaults={"id"="Odl\ShadowBundle\Documents\Character"}
+	 * )
+	 */
+	public function dataAction($id) {
+		$dm = $this->get('doctrine.odm.mongodb.default_document_manager');
+		$documentName = 'Odl\ShadowBundle\Documents\Character';
+		$renderer = $this->get('grid.renderer.jq_grid');
+		
+		$gridSource = new DocumentGridSource($dm, $documentName);
+		$data = $renderer->bind($gridSource)->getData();
+		return new Response(json_encode($data));
 	}
 	
 

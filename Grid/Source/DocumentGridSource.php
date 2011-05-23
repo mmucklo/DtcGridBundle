@@ -17,6 +17,9 @@ class DocumentGridSource
 		$this->dm = $dm;
 		$this->repository = $dm->getRepository($documentName);
 		$this->documentName = $documentName;
+		
+		// Auto set columns
+		$this->setColumns($this->getReflectionColumns());
 	}
 	
 	protected function getCursor() {

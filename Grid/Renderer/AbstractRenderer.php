@@ -1,15 +1,17 @@
 <?php
 namespace Dtc\GridBundle\Grid\Renderer;
 
-use Dtc\GridBundle\Grid\Grid;
+use Dtc\GridBundle\Grid\Source\GridSourceInterface;
 
 abstract class AbstractRenderer 
 {
-	protected $grid;
+	protected $gridSource;
 	
-	public function bind(Grid $grid) {
-		$this->grid = $grid;
+	public function bind(GridSourceInterface $gridSource) {
+		$this->gridSource = $gridSource;
 		$this->afterBind();
+		
+		return $this;
 	}
 	
 	protected function afterBind() {

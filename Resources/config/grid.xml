@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+	
+    <services>
+    	<!-- Register asset extension so that user could use jumbo filter -->
+        
+        <!-- Validators -->
+        <service id="grid.renderer.html" class="Dtc\GridBundle\Grid\Renderer\TwigGridRenderer">
+		    <argument type="service" id="templating" /> 
+		    <argument type="service" id="router" />
+		</service>
+		
+        <service id="grid.renderer.jq_grid" class="Dtc\GridBundle\Grid\Renderer\JQueryGridRenderer">
+		    <argument type="service" id="templating" />
+		    <argument type="service" id="router" />
+		</service>
+    </services>
+</container>
