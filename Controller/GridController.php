@@ -18,7 +18,7 @@ class GridController
 	extends Controller
 {
 	/**
-	 * @Route("/test");
+	 * @Route("/test")
 	 */
 	public function test() {
 		$dm = $this->get('doctrine.odm.mongodb.default_document_manager');
@@ -40,23 +40,19 @@ class GridController
 	}
 
 	/**
-	 * @Route("/data/{id}",
-	 * 	defaults={"id"="Odl\ShadowBundle\Documents\Character"}
-	 * )
+	 * @Route("/data/{id}")
 	 */
 	public function dataAction($id) {
-		$dm = $this->get('doctrine.odm.mongodb.default_document_manager');
-		$documentName = 'Odl\ShadowBundle\Documents\Character';
+	    $id = base64_decode($id);
 		$renderer = $this->get('grid.renderer.jq_grid');
+		$gridSource = $this->get($id);
 
-		$gridSource = new DocumentGridSource($dm, $documentName);
 		$data = $renderer->bind($gridSource)->getData();
 		return new Response(json_encode($data));
 	}
 
-
 	/**
-	 * @Route("/game-create");
+	 * @Route("/game-create")
 	 */
 	public function render($alias) {
 
