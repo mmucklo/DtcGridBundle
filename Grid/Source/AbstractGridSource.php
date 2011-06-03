@@ -118,5 +118,7 @@ abstract class AbstractGridSource
 		$this->orderBy = $orderBy;
 	}
 
-
+    public function getLastModified() {
+        return new \DateTime();
+    }
 }

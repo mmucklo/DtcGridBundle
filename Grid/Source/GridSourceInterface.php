@@ -6,4 +6,5 @@ interface GridSourceInterface {
 	public function getRecords();
 	public function getLimit();
 	public function getOffset();
+	public function getLastModified();
 }

@@ -18,43 +18,26 @@ class GridController
 	extends Controller
 {
 	/**
-	 * @Route("/test")
-	 */
-	public function test() {
-		$dm = $this->get('doctrine.odm.mongodb.default_document_manager');
-		$documentName = 'Odl\ShadowBundle\Documents\Character';
-		$renderer = $this->get('grid.renderer.jq_grid');
-
-		$gridSource = new DocumentGridSource($dm, $documentName);
-		$content = $renderer->bind($gridSource)->render();
-		echo $content;
-		exit();
-
-
-		$col = new GridColumn('test', 'test');
-		v($char);
-		v($col->format($char));
-
-		v($count);
-		ve(count($arr));
-	}
-
-	/**
 	 * @Route("/data/{id}")
 	 */
 	public function dataAction($id) {
-	    $id = base64_decode($id);
+		$request = $this->get('request');
 		$renderer = $this->get('grid.renderer.jq_grid');
+
+	    $id = base64_decode($id);
 		$gridSource = $this->get($id);
 
-		$data = $renderer->bind($gridSource)->getData();
-		return new Response(json_encode($data));
-	}
+		$response = new Response();
+		$response->setLastModified($gridSource->getLastModified());
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+        else {
+    		$data = $renderer->bind($gridSource)->getData();
+    		$content = json_encode($data);
+		    $response->setContent($content);
+		}
 
-	/**
-	 * @Route("/game-create")
-	 */
-	public function render($alias) {
-
+		return $response;
 	}
 }
