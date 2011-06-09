@@ -28,7 +28,13 @@ class JQueryGridRenderer
 			'page' => "page",
 			'rows' => "limit",
 			'sort' => "sort_column",
-			'order' => "sort_order"
+			'order' => "sort_order",
+		    'nd' => null
+		),
+
+		'ajaxOptions' => array(
+		    'cache' => false,
+		    'ifModified' => false,
 		),
 
 		// Pager Config
@@ -41,14 +47,6 @@ class JQueryGridRenderer
 
 	protected function afterBind() {
 		$id = $this->gridSource->getId();
-
-/*		$this->options['prmNames'] = array(
-			'page' => "{$id}_page",
-			'rows' => "{$id}_limit",
-			'sort' => "{$id}_sort_column",
-			'order' => "{$id}_sort_order"
-		); */
-
 		$this->options['pager'] = "{$id}-pager";
 
 		$params = array('id' => $id);
@@ -58,6 +56,7 @@ class JQueryGridRenderer
 		foreach ($this->gridSource->getColumns() as $column) {
 			$info['label'] = $column->getLabel();
 			$info['name'] = $column->getField();
+			$info['index'] = $column->getField();
 
 			$this->options['colModel'][] = $info;
 		}
@@ -76,7 +75,7 @@ class JQueryGridRenderer
 			'page' => $gridSource->getPager()->getCurrentPage(),
 			'total' => $gridSource->getPager()->getTotalPages(),
 			'records' => $gridSource->getCount(),
-			'id' => '0',		// unique id
+			'id' => $gridSource->getId(),		// unique id
 		);
 
 		foreach ($records as $record)

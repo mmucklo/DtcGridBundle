@@ -4,127 +4,156 @@ namespace Dtc\GridBundle\Grid\Source;
 use Dtc\GridBundle\Grid\Pager\GridSourcePager;
 use Symfony\Component\HttpFoundation\Request;
 
-abstract class AbstractGridSource
-	implements GridSourceInterface
+abstract class AbstractGridSource implements GridSourceInterface
 {
-	protected $limit = 25;
-	protected $offset = 0;
-	protected $filter = array();
-	protected $orderBy = array();
-	protected $pager = array();
-	protected $id = 'grid';
-	protected $columns;
 
-	public function bind(Request $request) {
-		// Change limit, offset
-		if ($limit = $request->get('limit'))
-		{
-			$this->limit = $limit;
-		}
+    protected $limit = 25;
 
-		if ($page = $request->get('page')) {
-		    $this->offset = $this->limit * ($page -1);
-		}
+    protected $offset = 0;
 
-		if ($offset = $request->get('offset')) {
-			$this->offset = $offset;
-		}
+    protected $filter = array();
 
-		if ($sortColumn = $request->get('sort_column')) {
+    protected $orderBy = array();
 
-		}
-	}
+    protected $pager = array();
 
-	public function getId() {
-		return $this->id;
-	}
+    protected $id = 'grid';
 
-	public function setId($value) {
-		$this->id = $value;
-	}
+    protected $columns;
 
-	public function getColumns() {
-		return $this->columns;
-	}
+    public function bind(Request $request)
+    {
+        // Change limit, offset
+        if ($limit = $request->get('limit'))
+        {
+            $this->limit = $limit;
+        }
 
-	public function setColumns($value) {
-		$this->columns = $value;
-	}
+        if ($page = $request->get('page'))
+        {
+            $this->offset = $this->limit * ($page - 1);
+        }
 
-	public function removeColumn($field) {
-	    $this->removeColumns(func_get_args());
-	}
+        if ($offset = $request->get('offset'))
+        {
+            $this->offset = $offset;
+        }
 
-	public function removeColumns(array $fields) {
-	    foreach ($fields as $field) {
-	        unset($this->columns[$field]);
-	    }
-	}
+        if ($sortColumn = $request->get('sort_column'))
+        {
+            $sortOrder = $request->get('sort_order');
+            $sortOrder = strtoupper($sortOrder);
 
-	public function getPager() {
-		if (!$this->pager)
-		{
-			$this->pager = new GridSourcePager($this);
-		}
+            $this->orderBy[$sortColumn] = $sortOrder;
+        }
+    }
 
-		return $this->pager;
-	}
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @return the $limit
-	 */
-	public function getLimit() {
-		return $this->limit;
-	}
+    public function setId($value)
+    {
+        $this->id = $value;
+    }
 
-	/**
-	 * @param field_type $limit
-	 */
-	public function setLimit($limit) {
-		$this->limit = $limit;
-	}
+    public function getColumns()
+    {
+        return $this->columns;
+    }
 
-	/**
-	 * @return the $offset
-	 */
-	public function getOffset() {
-		return $this->offset;
-	}
+    public function setColumns($value)
+    {
+        $this->columns = $value;
+    }
 
-	/**
-	 * @param field_type $offset
-	 */
-	public function setOffset($offset) {
-		$this->offset = $offset;
-	}
+    public function removeColumn($field)
+    {
+        $this->removeColumns(func_get_args());
+    }
 
-	/**
-	 * @return the $filter
-	 */
-	public function getFilter() {
-		return $this->filter;
-	}
+    public function removeColumns(array $fields)
+    {
+        foreach ( $fields as $field )
+        {
+            unset($this->columns[$field]);
+        }
+    }
 
-	/**
-	 * @param field_type $filter
-	 */
-	public function setFilter($filter) {
-		$this->filter = $filter;
-	}
+    public function getPager()
+    {
+        if (!$this->pager)
+        {
+            $this->pager = new GridSourcePager($this);
+        }
 
-	/**
-	 * @return the $orderBy
-	 */
-	public function getOrderBy() {
-		return $this->orderBy;
-	}
+        return $this->pager;
+    }
 
-	/**
-	 * @param field_type $orderBy
-	 */
-	public function setOrderBy($orderBy) {
-		$this->orderBy = $orderBy;
-	}
+    /**
+     * @return the $limit
+     */
+    public function getLimit()
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @param field_type $limit
+     */
+    public function setLimit($limit)
+    {
+        $this->limit = $limit;
+    }
+
+    /**
+     * @return the $offset
+     */
+    public function getOffset()
+    {
+        return $this->offset;
+    }
+
+    /**
+     * @param field_type $offset
+     */
+    public function setOffset($offset)
+    {
+        $this->offset = $offset;
+    }
+
+    /**
+     * @return the $filter
+     */
+    public function getFilter()
+    {
+        return $this->filter;
+    }
+
+    /**
+     * @param field_type $filter
+     */
+    public function setFilter($filter)
+    {
+        $this->filter = $filter;
+    }
+
+    /**
+     * @return the $orderBy
+     */
+    public function getOrderBy()
+    {
+        return $this->orderBy;
+    }
+
+    /**
+     * @param field_type $orderBy
+     */
+    public function setOrderBy($orderBy)
+    {
+        $this->orderBy = $orderBy;
+    }
 
     public function getLastModified() {
         return null;
