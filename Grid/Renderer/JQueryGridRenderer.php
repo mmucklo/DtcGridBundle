@@ -7,13 +7,14 @@ class JQueryGridRenderer
 	private $options = array(
 		'datatype' => 'json',
 		'jsonReader' => array(
+    		'root' => 'rows',
+    		'total' => 'total',
+    		'records' => 'records',
+	        'page' => 'page',
 			'repeatitems' => false
 		),
 
 		'url' => null,
-		'root' => 'rows',
-		'total' => 'total',
-		'records' => 'records',
 		'cell' => '',
 		'width' => '840',
 		'height' => '500',
@@ -24,10 +25,10 @@ class JQueryGridRenderer
 
 		// Paging params
 		'prmNames' => array(
-			'page' => "grid_page",
-			'rows' => "grid_limit",
-			'sort' => "grid_sort_column",
-			'order' => "grid_sort_order"
+			'page' => "page",
+			'rows' => "limit",
+			'sort' => "sort_column",
+			'order' => "sort_order"
 		),
 
 		// Pager Config
@@ -41,12 +42,12 @@ class JQueryGridRenderer
 	protected function afterBind() {
 		$id = $this->gridSource->getId();
 
-		$this->options['prmNames'] = array(
+/*		$this->options['prmNames'] = array(
 			'page' => "{$id}_page",
 			'rows' => "{$id}_limit",
 			'sort' => "{$id}_sort_column",
 			'order' => "{$id}_sort_order"
-		);
+		); */
 
 		$this->options['pager'] = "{$id}-pager";
 
@@ -74,7 +75,7 @@ class JQueryGridRenderer
 		$retVal = array(
 			'page' => $gridSource->getPager()->getCurrentPage(),
 			'total' => $gridSource->getPager()->getTotalPages(),
-			'records' => count($records),
+			'records' => $gridSource->getCount(),
 			'id' => '0',		// unique id
 		);
 
@@ -87,8 +88,6 @@ class JQueryGridRenderer
 
 			$retVal['rows'][] = $info;
 		}
-
-		$retVal['records'] = count($retVal['rows']);
 
 		return $retVal;
 	}

@@ -6,7 +6,7 @@
 <script>
 (function($) {
 	var options = {{ options | json_encode | raw }};
-	
+	$.ajaxSetup({ifModified: true});		// Enable cache control
 	$('#{{ id }}').jqGrid(options);
 })(jQuery);
 </script>

@@ -22,8 +22,16 @@ abstract class AbstractGridSource
 			$this->limit = $limit;
 		}
 
+		if ($page = $request->get('page')) {
+		    $this->offset = $this->limit * ($page -1);
+		}
+
 		if ($offset = $request->get('offset')) {
 			$this->offset = $offset;
+		}
+
+		if ($sortColumn = $request->get('sort_column')) {
+
 		}
 	}
 
@@ -119,6 +127,6 @@ abstract class AbstractGridSource
 	}
 
     public function getLastModified() {
-        return new \DateTime();
+        return null;
     }
 }
