@@ -53,6 +53,15 @@ abstract class AbstractGridSource implements GridSourceInterface
         return $this->id;
     }
 
+    private $divId = null;
+    public function getDivId() {
+        if (!$this->divId) {
+            $this->divId = preg_replace('/[^a-zA-Z0-9\-]/','',$this->id);
+        }
+
+        return $this->divId;
+    }
+
     public function setId($value)
     {
         $this->id = $value;

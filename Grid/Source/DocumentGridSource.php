@@ -17,7 +17,7 @@ class DocumentGridSource
 		$this->dm = $dm;
 		$this->repository = $dm->getRepository($documentName);
 		$this->documentName = $documentName;
-		$this->id = base64_encode($serviceId);
+		$this->id = $serviceId;
 
 		// Auto set columns
 		$this->setColumns($this->getReflectionColumns());

@@ -1,105 +1,115 @@
 <?php
 namespace Dtc\GridBundle\Grid\Renderer;
 
-class JQueryGridRenderer
-	extends TwigGridRenderer
+class JQueryGridRenderer extends TwigGridRenderer
 {
-	private $options = array(
-		'datatype' => 'json',
-		'jsonReader' => array(
-    		'root' => 'rows',
-    		'total' => 'total',
-    		'records' => 'records',
-	        'page' => 'page',
-			'repeatitems' => false
-		),
+    private $options = array(
+            'datatype' => 'json',
+            'jsonReader' => array(
+                    'root' => 'rows',
+                    'total' => 'total',
+                    'records' => 'records',
+                    'page' => 'page',
+                    'repeatitems' => false
+            ),
 
-		'url' => null,
-		'cell' => '',
-		'width' => '840',
-		'height' => '500',
-		'loadui' => 'disable',
-		'altRows' => true,
-		'viewrecords' => true,
-		'multiselect' => true,
+            'url' => null,
+            'cell' => '',
+            'width' => '840',
+            'height' => '400',
+            'loadui' => 'disable',
+            'altRows' => true,
+            'viewrecords' => true,
+            'multiselect' => true,
 
-		// Paging params
-		'prmNames' => array(
-			'page' => "page",
-			'rows' => "limit",
-			'sort' => "sort_column",
-			'order' => "sort_order",
-		    'nd' => null
-		),
+            // Paging params
+            'prmNames' => array(
+                    'page' => "page",
+                    'rows' => "limit",
+                    'sort' => "sort_column",
+                    'order' => "sort_order",
+                    'nd' => null
+            ),
 
-		'ajaxOptions' => array(
-		    'cache' => false,
-		    'ifModified' => false,
-		),
+            'ajaxGridOptions' => array(
+                    'cache' => false,
+                    'ifModified' => false
+            ),
 
-		// Pager Config
-		'pager' => "grid-pager",
-		'recordtext' => "View {0} - {1} of {2}",
-		'emptyrecords'=> "No records to view",
-		'loadtext' => "Loading...",
-		'pgtext' => "Page {0} of {1}"
-	);
+            // Pager Config
+            'pager' => "grid-pager",
+            'recordtext' => "View {0} - {1} of {2}",
+            'emptyrecords' => "No records to view",
+            'loadtext' => "Loading...",
+            'pgtext' => "Page {0} of {1}"
+    );
 
-	protected function afterBind() {
-		$id = $this->gridSource->getId();
-		$this->options['pager'] = "{$id}-pager";
+    protected function afterBind()
+    {
+        $id = $this->gridSource->getDivId();
+        $this->options['pager'] = "{$id}-pager";
 
-		$params = array('id' => $id);
-		$url = $this->router->generate('dtc_grid_grid_data', $params);
-		$this->options['url'] = $url;
+        $params = array(
+                'id' => $this->gridSource->getId()
+        );
 
-		foreach ($this->gridSource->getColumns() as $column) {
-			$info['label'] = $column->getLabel();
-			$info['name'] = $column->getField();
-			$info['index'] = $column->getField();
+        $url = $this->router->generate('dtc_grid_grid_data', $params);
+        $this->options['url'] = $url;
 
-			$this->options['colModel'][] = $info;
-		}
-	}
+        foreach ( $this->gridSource->getColumns() as $column )
+        {
+            $info['label'] = $column->getLabel();
+            $info['name'] = $column->getField();
+            $info['index'] = $column->getField();
 
-	public function getGridOptions() {
-		return $this->options;
-	}
+            $this->options['colModel'][] = $info;
+        }
+    }
 
-	public function getData() {
-		$columns = $this->gridSource->getColumns();
-		$gridSource = $this->gridSource;
-		$records = $gridSource->getRecords();
+    public function getGridOptions()
+    {
+        return $this->options;
+    }
 
-		$retVal = array(
-			'page' => $gridSource->getPager()->getCurrentPage(),
-			'total' => $gridSource->getPager()->getTotalPages(),
-			'records' => $gridSource->getCount(),
-			'id' => $gridSource->getId(),		// unique id
-		);
+    public function getData()
+    {
+        $columns = $this->gridSource->getColumns();
+        $gridSource = $this->gridSource;
+        $records = $gridSource->getRecords();
 
-		foreach ($records as $record)
-		{
-			$info = array();
-			foreach ($columns as $column) {
-				$info[$column->getField()] = $column->format($record);
-			}
+        $retVal = array(
+                'page' => $gridSource->getPager()
+                    ->getCurrentPage(),
+                'total' => $gridSource->getPager()
+                    ->getTotalPages(),
+                'records' => $gridSource->getCount(),
+                'id' => $gridSource->getId() // unique id
+        );
 
-			$retVal['rows'][] = $info;
-		}
+        foreach ( $records as $record )
+        {
+            $info = array();
+            foreach ( $columns as $column )
+            {
+                $info[$column->getField()] = $column->format($record);
+            }
 
-		return $retVal;
-	}
+            $retVal['rows'][] = $info;
+        }
 
-	public function render() {
-		$id = $this->gridSource->getId();
+        return $retVal;
+    }
 
-		$params = array(
-			'options' => $this->options,
-			'id' => $id
-		);
+    public function render()
+    {
+        $id = $this->gridSource->getDivId();
 
-		$template = 'DtcGridBundle:Grid:jquery_grid.html.twig';
-		return $this->twigEngine->render($template, $params);
-	}
+        $params = array(
+                'options' => $this->options,
+                'id' => $id
+        );
+
+        $template = 'DtcGridBundle:Grid:jquery_grid.html.twig';
+        return $this->twigEngine->render($template, $params);
+    }
 }

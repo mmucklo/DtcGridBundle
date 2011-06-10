@@ -14,38 +14,40 @@ use Dtc\GridBundle\Grid\Source\DocumentGridSource;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-class GridController
-	extends Controller
+class GridController extends Controller
 {
-	/**
-	 * @Route("/data/{id}")
-	 */
-	public function dataAction($id) {
-		$request = $this->get('request');
-		$renderer = $this->get('grid.renderer.jq_grid');
 
-	    $id = base64_decode($id);
-		$gridSource = $this->get($id);
+    /**
+     * @Route("/data/")
+     */
+    public function dataAction()
+    {
+        $request = $this->get('request');
+        $renderer = $this->get('grid.renderer.jq_grid');
+        $gridSource = $this->get($request->get('id'));
 
-		$response = new Response();
-		$gridSource->bind($request);        // Sets limit, offset, sort, filter, etc
-    	$renderer->bind($gridSource);       // Sets grid to renderer
+        $response = new Response();
+        $gridSource->bind($request); // Sets limit, offset, sort, filter, etc
+        $renderer->bind($gridSource); // Sets grid to renderer
 
-    	$content = null;
-    	// If changes to data is kept track using update_time, then we
-    	//   can skip querying for all data.
-    	if ($lastModified = $gridSource->getLastModified()) {
-		    $response->setLastModified($lastModified);
 
-		    // Etag should be a function of url (sort, limit, offset, filters)
-		    //    Best implementation would requires GridSourceRequest object ->hash()
-		    // $eTag = hash('sha256', $content);
-    	}
-    	else {
-    	    // generate etag from data
-    	    $data = $renderer->getData();
-    		$content = json_encode($data);
-    		$eTag = hash('sha256', $content);
+        $content = null;
+        // If changes to data is kept track using update_time, then we
+        //   can skip querying for all data.
+        if ($lastModified = $gridSource->getLastModified())
+        {
+            $response->setLastModified($lastModified);
+
+     // Etag should be a function of url (sort, limit, offset, filters)
+        //    Best implementation would requires GridSourceRequest object ->hash()
+        // $eTag = hash('sha256', $content);
+        }
+        else
+        {
+            // generate etag from data
+            $data = $renderer->getData();
+            $content = json_encode($data);
+            $eTag = hash('sha256', $content);
     		$response->setEtag($eTag);
     	}
 
