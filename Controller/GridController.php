@@ -30,16 +30,13 @@ class GridController extends Controller
         $gridSource->bind($request); // Sets limit, offset, sort, filter, etc
         $renderer->bind($gridSource); // Sets grid to renderer
 
+
         $content = null;
         // If changes to data is kept track using update_time, then we
         //   can skip querying for all data.
         if ($lastModified = $gridSource->getLastModified())
         {
             $response->setLastModified($lastModified);
-
-     // Etag should be a function of url (sort, limit, offset, filters)
-        //    Best implementation would requires GridSourceRequest object ->hash()
-        // $eTag = hash('sha256', $content);
         }
         else
         {
@@ -47,22 +44,24 @@ class GridController extends Controller
             $data = $renderer->getData();
             $content = json_encode($data);
             $eTag = hash('sha256', $content);
-    		$response->setEtag($eTag);
-    	}
+            $response->setEtag($eTag);
+        }
 
-    	$response->setPublic();
-		if ($response->isNotModified($request)) {
+        $response->setPublic();
+        if ($response->isNotModified($request))
+        {
             return $response;
         }
-        else {
+        else
+        {
             if (!$content)
             {
-        	    $data = $renderer->getData();
-        		$content = json_encode($data);
+                $data = $renderer->getData();
+                $content = json_encode($data);
             }
             $response->setContent($content);
-		}
+        }
 
-		return $response;
-	}
+        return $response;
+    }
 }

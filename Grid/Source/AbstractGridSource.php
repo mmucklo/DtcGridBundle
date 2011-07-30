@@ -54,9 +54,12 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     private $divId = null;
-    public function getDivId() {
-        if (!$this->divId) {
-            $this->divId = preg_replace('/[^a-zA-Z0-9\-]/','',$this->id);
+
+    public function getDivId()
+    {
+        if (!$this->divId)
+        {
+            $this->divId = preg_replace('/[^a-zA-Z0-9\-]/', '', $this->id);
         }
 
         return $this->divId;
@@ -80,6 +83,20 @@ abstract class AbstractGridSource implements GridSourceInterface
     public function removeColumn($field)
     {
         $this->removeColumns(func_get_args());
+    }
+
+    public function selectColums(array $fields)
+    {
+        $selectedCols = array();
+        foreach ( $fields as $field )
+        {
+            if (isset($this->columns[$field]))
+            {
+                $selectedCols[] = $this->columns[$field];
+            }
+        }
+
+        $this->columns = $selectedCols;
     }
 
     public function removeColumns(array $fields)
