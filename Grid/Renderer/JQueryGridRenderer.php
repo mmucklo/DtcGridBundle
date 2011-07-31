@@ -44,6 +44,14 @@ class JQueryGridRenderer extends TwigGridRenderer
             'pgtext' => "Page {0} of {1}"
     );
 
+    public function setOptions(array $values) {
+        $this->options = $values;
+    }
+
+    public function setOption($key, $value) {
+        $this->options[$key] = $value;
+    }
+
     protected function afterBind()
     {
         $id = $this->gridSource->getDivId();
