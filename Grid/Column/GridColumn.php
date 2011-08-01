@@ -2,6 +2,7 @@
 namespace Dtc\GridBundle\Grid\Column;
 
 class GridColumn
+    extends AbstractGridColumn
 {
     protected $formatter;
     protected $field;
@@ -70,43 +71,11 @@ class GridColumn
     }
 
     /**
-     * @return the $field
-     */
-    public function getField()
-    {
-        return $this->field;
-    }
-
-    /**
-     * @return the $label
-     */
-    public function getLabel()
-    {
-        return $this->label;
-    }
-
-    /**
      * @param field_type $formatter
      */
     public function setFormatter($formatter)
     {
         $this->formatter = $formatter;
-    }
-
-    /**
-     * @param field_type $field
-     */
-    public function setField($field)
-    {
-        $this->field = $field;
-    }
-
-    /**
-     * @param field_type $label
-     */
-    public function setLabel($label)
-    {
-        $this->label = $label;
     }
 
     public function toArray()
