@@ -39,6 +39,10 @@ abstract class AbstractGridSource implements GridSourceInterface
             $this->offset = $offset;
         }
 
+        if ($filter = $request->get('filter')) {
+            $this->filter = $filter;
+        }
+
         if ($sortColumn = $request->get('sort_column'))
         {
             $sortOrder = $request->get('sort_order');
