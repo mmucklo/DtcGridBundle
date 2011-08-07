@@ -66,9 +66,11 @@ class JQueryGridRenderer extends TwigGridRenderer
 
         foreach ( $this->gridSource->getColumns() as $column )
         {
+            $info = array();
             $info['label'] = $column->getLabel();
             $info['name'] = $column->getField();
             $info['index'] = $column->getField();
+            $info = array_merge($info, $column->getOptions());
 
             $this->options['colModel'][] = $info;
         }

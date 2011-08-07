@@ -5,8 +5,29 @@ abstract class AbstractGridColumn
 {
     protected $field;
     protected $label;
+    protected $options = array();
 
     abstract function format($object);
+
+    public function setOption($key, $value) {
+        $this->options[$key] = $value;
+    }
+
+    public function getOption($key) {
+        if (isset($this->options[$key])) {
+            return $this->options[$key];
+        }
+
+        return null;
+    }
+
+    public function setOptions(array $options) {
+        $this->options = $options;
+    }
+
+    public function getOptions() {
+        return $this->options;
+    }
 
     /**
      * @return the $field
