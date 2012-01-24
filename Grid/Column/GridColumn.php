@@ -8,9 +8,14 @@ class GridColumn
     protected $field;
     protected $label;
 
-    public function __construct($field, $label, $formatter = null)
+    public function __construct($field, $label = null, $formatter = null)
     {
         $this->field = $field;
+
+        if (!$label) {
+            $label = ucwords($field);
+        }
+
         $this->label = $label;
         $this->formatter = $formatter;
     }

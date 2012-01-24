@@ -24,11 +24,20 @@ class EntityGridSource
     protected function getQuery()
     {
         $qb = $this->em->createQueryBuilder();
+        $orderBy = array();
+        foreach ($this->orderBy as $key => $value) {
+            $orderBy[] = "u.{$key} {$value}";
+        }
+
         $qb->add('select', 'u')
             ->add('from', "{$this->entityName} u")
-            //->add('orderBy', 'u.name ASC')
             ->setFirstResult( $this->offset )
             ->setMaxResults( $this->limit );
+
+        if ($this->orderBy) {
+            $orderByStr = implode(',', $orderBy);
+            $qb->add('orderBy', $orderByStr);
+        }
 
         return $qb->getQuery();
     }
