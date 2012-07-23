@@ -1,4 +1,4 @@
-<table>
+<table {{ _self.render_attb(options['table_attr']) }}>
 	<thead>
 		<tr>
 			{% for column in columns %}
@@ -20,3 +20,11 @@
 		{% endfor %}
 	</tbody>
 </table>
+
+{% macro render_attb(attributes) %}
+{% spaceless %}
+{% for attb, value in attributes %}
+    {{ attb }}="{{ value }}"
+{% endfor %}
+{% endspaceless %}
+{% endmacro %}

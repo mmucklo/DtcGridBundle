@@ -3,7 +3,7 @@ namespace Dtc\GridBundle\Grid\Renderer;
 
 class JQueryGridRenderer extends TwigGridRenderer
 {
-    private $options = array(
+    protected $options = array(
             'datatype' => 'json',
             'jsonReader' => array(
                     'root' => 'rows',
@@ -44,14 +44,6 @@ class JQueryGridRenderer extends TwigGridRenderer
             'pgtext' => "Page {0} of {1}"
     );
 
-    public function setOptions(array $values) {
-        $this->options = $values;
-    }
-
-    public function setOption($key, $value) {
-        $this->options[$key] = $value;
-    }
-
     protected function afterBind()
     {
         $id = $this->gridSource->getDivId();
@@ -74,11 +66,6 @@ class JQueryGridRenderer extends TwigGridRenderer
 
             $this->options['colModel'][] = $info;
         }
-    }
-
-    public function getGridOptions()
-    {
-        return $this->options;
     }
 
     public function getData()
