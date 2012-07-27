@@ -1,4 +1,4 @@
-<table {{ _self.render_attb(options['table_attr']) }}>
+<table id="{{ id }}" {{ _self.render_attb(table_attr) }} data-jqtable="{{ options | json_encode }}">
 	<thead>
 		<tr>
 			{% for column in columns %}
@@ -8,17 +8,6 @@
 			{% endfor %}
 		</tr>
 	</thead>
-	<tbody>
-		{% for record in records %}
-		<tr>
-			{% for column in columns %}
-			<td>
-				{{ column.format(record) | raw }}
-			</td>
-			{% endfor %}
-		</tr>
-		{% endfor %}
-	</tbody>
 </table>
 
 {% macro render_attb(attributes) %}

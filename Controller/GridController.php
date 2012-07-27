@@ -23,7 +23,8 @@ class GridController extends Controller
     public function dataAction()
     {
         $request = $this->get('request');
-        $renderer = $this->get('grid.renderer.jq_grid');
+        $rendererService = $request->get('renderer', 'grid.renderer.jq_grid');
+        $renderer = $this->get($rendererService);
         $gridSource = $this->get($request->get('id'));
 
         $response = new Response();
