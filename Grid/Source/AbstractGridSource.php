@@ -50,6 +50,11 @@ abstract class AbstractGridSource implements GridSourceInterface
 
             $this->orderBy[$sortColumn] = $sortOrder;
         }
+
+        if ($orderBy = $request->get('order'))
+        {
+            $this->orderBy = $orderBy;
+        }
     }
 
     public function getId()

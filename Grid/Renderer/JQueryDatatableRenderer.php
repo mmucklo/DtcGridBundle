@@ -14,11 +14,11 @@ class JQueryDatatableRenderer
             "oLanguage" => array(
                 "sLengthMenu" => "_MENU_ records per page"
             ),
-            "aoColumnDefs" => array(
+            "aoColumnDefs" => array(array(
                 "bSortable" => false,
                 "sWidth" => "20%",
                 "aTargets" => array(-1)
-            )
+            ))
         );
 
 
@@ -40,7 +40,8 @@ class JQueryDatatableRenderer
         $params = array(
                'id' => $this->gridSource->getId(),
                'renderer' => 'grid.renderer.jq_table_grid',
-               'filter' => $this->gridSource->getFilter()
+               'filter' => $this->gridSource->getFilter(),
+               'order' => $this->gridSource->getOrderBy()
         );
 
         $url = $this->router->generate('dtc_grid_grid_data', $params);
