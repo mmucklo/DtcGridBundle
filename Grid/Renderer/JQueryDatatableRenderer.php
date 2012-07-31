@@ -36,9 +36,11 @@ class JQueryDatatableRenderer
         $id = $this->gridSource->getDivId();
         $this->options['pager'] = "{$id}-pager";
 
+        // We need to pass filter information here.
         $params = array(
                'id' => $this->gridSource->getId(),
-               'renderer' => 'grid.renderer.jq_table_grid'
+               'renderer' => 'grid.renderer.jq_table_grid',
+               'filter' => $this->gridSource->getFilter()
         );
 
         $url = $this->router->generate('dtc_grid_grid_data', $params);
