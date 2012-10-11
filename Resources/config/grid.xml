@@ -1,50 +1,23 @@
 <?xml version="1.0"?>
 <container xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://symfony.com/schema/dic/services"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd" >
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-
         <!-- Users -->
-
-        <service
-            id="grid.renderer.html"
-            class="Dtc\GridBundle\Grid\Renderer\TwigGridRenderer" >
-
-            <argument
-                id="templating"
-                type="service" />
-
-            <argument
-                id="router"
-                type="service" />
+        <service id="grid.renderer.html" class="Dtc\GridBundle\Grid\Renderer\TwigGridRenderer">
+            <argument id="templating" type="service" />
+            <argument id="router" type="service" />
         </service>
 
-        <service
-            id="grid.renderer.jq_grid"
-            class="Dtc\GridBundle\Grid\Renderer\JQueryGridRenderer" >
-
-            <argument
-                id="templating"
-                type="service" />
-
-            <argument
-                id="router"
-                type="service" />
+        <service id="grid.renderer.jq_grid" class="Dtc\GridBundle\Grid\Renderer\JQueryGridRenderer">
+            <argument id="templating" type="service" />
+            <argument id="router" type="service" />
         </service>
 
-        <service
-            id="grid.renderer.jq_table_grid"
-            class="Dtc\GridBundle\Grid\Renderer\JQueryDatatableRenderer" >
-
-            <argument
-                id="templating"
-                type="service" />
-
-            <argument
-                id="router"
-                type="service" />
+        <service id="grid.renderer.jq_table_grid" class="Dtc\GridBundle\Grid\Renderer\JQueryDatatableRenderer">
+            <argument id="templating" type="service" />
+            <argument id="router" type="service" />
         </service>
     </services>
-
 </container>
