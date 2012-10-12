@@ -6,19 +6,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractGridSource implements GridSourceInterface
 {
-
     protected $limit = 25;
-
     protected $offset = 0;
-
     protected $filter = array();
-
     protected $orderBy = array();
-
     protected $pager = array();
-
     protected $id = 'grid';
-
     protected $columns;
 
     public function bind(Request $request)

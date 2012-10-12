@@ -19,5 +19,8 @@
             <argument id="templating" type="service" />
             <argument id="router" type="service" />
         </service>
+
+        <service id="dtc_grid.manager.source" class="Dtc\GridBundle\Manager\GridSourceManager">
+        </service>
     </services>
 </container>

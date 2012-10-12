@@ -10,11 +10,10 @@ class EntityGridSource
     protected $em;
     protected $entityName;
 
-    public function __construct(EntityManager $em, $entityName, $serviceId)
+    public function __construct(EntityManager $em, $entityName)
     {
         $this->em = $em;
         $this->entityName = $entityName;
-        $this->id = $serviceId;
     }
 
     public function autoDiscoverColumns() {

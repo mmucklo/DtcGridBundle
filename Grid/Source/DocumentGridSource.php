@@ -12,12 +12,11 @@ class DocumentGridSource
     protected $documentName;
     protected $repository;
 
-    public function __construct(DocumentManager $dm, $documentName, $serviceId)
+    public function __construct(DocumentManager $dm, $documentName)
     {
         $this->dm = $dm;
         $this->repository = $dm->getRepository($documentName);
         $this->documentName = $documentName;
-        $this->id = $serviceId;
     }
 
     public function autoDiscoverColumns() {
