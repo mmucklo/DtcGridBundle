@@ -1,8 +1,10 @@
 $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         fnCallback, bStandingRedraw) {
+
     if (typeof sNewSource != 'undefined' && sNewSource != null) {
         oSettings.sAjaxSource = sNewSource;
     }
+
     this.oApi._fnProcessingDisplay(oSettings, true);
     var that = this;
     var iStart = oSettings._iDisplayStart;
@@ -46,6 +48,9 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
     }, oSettings);
 };
 
+/**
+ * Require purl.js for filter
+ */
 (function($) {
     var methods = {};
 
@@ -75,6 +80,27 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             $table.dataTable(options);
         });
     };
+
+    methods.filter = function(filters, keepState) {
+        return this.each(function() {
+            var $table = $(this);
+            var jqTable = $table.dataTable();
+
+            var settings = jqTable.fnSettings();
+            var url = settings.sAjaxSource;
+
+            if (!url) {
+            	return;
+            }
+
+            var newUrl = $.url(url).attr('path');
+            var params = $.url(url).param();
+            params.filter = filters;
+
+            newUrl += '?' + $.param(params);
+            jqTable.fnReloadAjax(newUrl);
+        });
+    }
 
     $.fn.jqtable = function(method) {
         // Method calling logic
