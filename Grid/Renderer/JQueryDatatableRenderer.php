@@ -11,6 +11,7 @@ class JQueryDatatableRenderer
                 ),
             "sDom" => "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span4'i><'span8'p>>",
             "sPaginationType" => "bootstrap",
+            "bServerSide" => true,
             "oLanguage" => array(
                 "sLengthMenu" => "_MENU_ records per page"
             ),
@@ -68,9 +69,10 @@ class JQueryDatatableRenderer
         $retVal = array(
                 'page' => $gridSource->getPager()
                     ->getCurrentPage(),
-                'total' => $gridSource->getPager()
+                'total_pages' => $gridSource->getPager()
                     ->getTotalPages(),
-                'records' => $gridSource->getCount(),
+                'iTotalRecords' => (int) $gridSource->getCount(),
+                'iTotalDisplayRecords' => $gridSource->getCount(),
                 'id' => $gridSource->getId() // unique id
         );
 

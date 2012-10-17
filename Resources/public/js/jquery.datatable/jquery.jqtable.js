@@ -18,8 +18,10 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         that.oApi._fnClearTable(oSettings);
 
         /* Got the data - add it to the table */
+        log('before fn server data...');
         var aData = (oSettings.sAjaxDataProp !== "") ? that.oApi
                 ._fnGetObjectDataFn(oSettings.sAjaxDataProp)(json) : json;
+            log('after fn server data...');
 
         for ( var i = 0; i < aData.length; i++) {
             that.oApi._fnAddData(oSettings, aData[i]);
@@ -48,6 +50,23 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
     }, oSettings);
 };
 
+(function($) {
+    $.fn.dataTableExt.oApi.fnDtcGrid = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty ) {
+        log('grid override...');
+        log(oSettings);
+    }
+
+    if ( typeof $.fn.dataTable === 'function')
+    {
+        $.fn.dataTableExt.aoFeatures.push( {
+            'fnInit': function( oDTSettings ) {
+                log('on init...');
+                log(oDTSettings);
+            }
+        });
+    }
+})(jQuery);
+
 /**
  * Require purl.js for filter
  */
@@ -72,10 +91,43 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
                 options = $.parseJSON(options);
             }
 
+            options.sServerMethod = 'POST';
+            options.bServerSide = true;
             options.fnInitComplete = function() {
                 //$('.timeago').timeago();
                 //$table.find('[data-form-url]').dialogForm();
             };
+
+            // Override Server Data, we want to use the format Grids support!
+            options.fnServerData = function(sUrl, aoData, fnCallback, oSettings) {
+                var data = {
+                    limit: oSettings._iDisplayLength,
+                    offset: oSettings._iDisplayStart
+                };
+
+                // Set filters if there are any
+                $.ajax({
+                    url: sUrl,
+                    data: data,
+                    dataType: "json",
+                    cache: false,
+                    type: 'POST',
+                    success: function(json) {
+                        if ( json.sError ) {
+                            oSettings.oApi._fnLog( oSettings, 0, json.sError );
+                        }
+
+                        $(oSettings.oInstance).trigger('xhr', [oSettings, json]);
+                        fnCallback( json );
+                    },
+                    error: function (xhr, error, thrown) {
+                        if ( error == "parsererror" ) {
+                            oSettings.oApi._fnLog( oSettings, 0, "DataTables warning: JSON data from "+
+                                "server could not be parsed. This is caused by a JSON formatting error." );
+                        }
+                    }
+                });
+            }
 
             $table.dataTable(options);
         });
@@ -90,7 +142,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             var url = settings.sAjaxSource;
 
             if (!url) {
-            	return;
+                return;
             }
 
             var newUrl = $.url(url).attr('path');
