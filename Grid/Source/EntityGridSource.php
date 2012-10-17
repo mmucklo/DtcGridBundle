@@ -20,7 +20,7 @@ class EntityGridSource
         $this->setColumns($this->getReflectionColumns());
     }
 
-    protected function getQuery()
+    protected function getQueryBuilder()
     {
         $qb = $this->em->createQueryBuilder();
         $orderBy = array();
@@ -38,7 +38,11 @@ class EntityGridSource
             $qb->add('orderBy', $orderByStr);
         }
 
-        return $qb->getQuery();
+        if ($this->filter) {
+            // Handle basic filter
+        }
+
+        return $qb;
     }
 
     /**
@@ -94,9 +98,8 @@ class EntityGridSource
 
     public function getCount()
     {
-        $qb = $this->em->createQueryBuilder();
-        $qb->add('select', $qb->expr()->count('u.id'))
-            ->add('from', "{$this->entityName} u");
+        $qb = $this->getQueryBuilder();
+        $qb->add('select', 'count(u)');
 
         return $qb->getQuery()
             ->getSingleScalarResult();
@@ -104,7 +107,7 @@ class EntityGridSource
 
     public function getRecords()
     {
-        return $this->getQuery()
+        return $this->getQueryBuilder()->getQuery()
             ->getResult();
     }
 }
