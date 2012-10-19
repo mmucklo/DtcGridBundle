@@ -99,7 +99,9 @@ class EntityGridSource
     public function getCount()
     {
         $qb = $this->getQueryBuilder();
-        $qb->add('select', 'count(u)');
+        $qb->add('select', 'count(u)')
+            ->setFirstResult(null)
+            ->setMaxResults(null);
 
         return $qb->getQuery()
             ->getSingleScalarResult();
