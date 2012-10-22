@@ -18,10 +18,8 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         that.oApi._fnClearTable(oSettings);
 
         /* Got the data - add it to the table */
-        log('before fn server data...');
         var aData = (oSettings.sAjaxDataProp !== "") ? that.oApi
                 ._fnGetObjectDataFn(oSettings.sAjaxDataProp)(json) : json;
-            log('after fn server data...');
 
         for ( var i = 0; i < aData.length; i++) {
             that.oApi._fnAddData(oSettings, aData[i]);
@@ -49,23 +47,6 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
 
     }, oSettings);
 };
-
-(function($) {
-    $.fn.dataTableExt.oApi.fnDtcGrid = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty ) {
-        log('grid override...');
-        log(oSettings);
-    }
-
-    if ( typeof $.fn.dataTable === 'function')
-    {
-        $.fn.dataTableExt.aoFeatures.push( {
-            'fnInit': function( oDTSettings ) {
-                log('on init...');
-                log(oDTSettings);
-            }
-        });
-    }
-})(jQuery);
 
 /**
  * Require purl.js for filter
@@ -102,13 +83,36 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             options.fnServerData = function(sUrl, aoData, fnCallback, oSettings) {
                 var data = {
                     limit: oSettings._iDisplayLength,
-                    offset: oSettings._iDisplayStart
+                    offset: oSettings._iDisplayStart,
+                    test: 'one',
+                    filters: {
+                        "*": aoData.sSearch
+                    }
                 };
+
+                var url = oSettings.sAjaxSource;
+
+                if (!url) {
+                    return;
+                }
+
+                var baseUrl = $.url(url).attr('path');
+                var params = $.url(url).param();
+                if (!params.filter) {
+                   params.filter = {};
+                }
+
+                if (oSettings.oPreviousSearch.sSearch) {
+                   params.filter['*'] = oSettings.oPreviousSearch.sSearch;
+                }
+
+                params.limit = oSettings._iDisplayLength;
+                params.offset = oSettings._iDisplayStart;
 
                 // Set filters if there are any
                 $.ajax({
-                    url: sUrl,
-                    data: data,
+                    url: baseUrl,
+                    data: $.param(params),
                     dataType: "json",
                     cache: false,
                     type: 'POST',
