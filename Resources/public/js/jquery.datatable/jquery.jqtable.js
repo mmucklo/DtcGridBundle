@@ -41,6 +41,79 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
  * Require purl.js for filter
  */
 (function($) {
+    var _fnServerData = function(sUrl, aoData, fnCallback, oSettings) {
+        var data = {
+            limit: oSettings._iDisplayLength,
+            offset: oSettings._iDisplayStart,
+            test: 'one',
+            filters: {
+                "*": aoData.sSearch
+            }
+        };
+
+        var url = oSettings.sAjaxSource;
+
+        if (!url) {
+            return;
+        }
+
+        var baseUrl = $.url(url).attr('path');
+        var params = $.url(url).param();
+        if (!params.filter) {
+           params.filter = {};
+        }
+
+        if (oSettings.oPreviousSearch.sSearch) {
+           params.filter['*'] = oSettings.oPreviousSearch.sSearch;
+        }
+
+        params.limit = oSettings._iDisplayLength;
+        params.offset = oSettings._iDisplayStart;
+
+        params.order = {};
+        // Set up sorting
+        if ( oSettings.oFeatures.bSort !== false )
+        {
+            var currentSorting = ( oSettings.aaSortingFixed !== null ) ?
+                oSettings.aaSortingFixed.concat( oSettings.aaSorting ) :
+                oSettings.aaSorting.slice();
+
+            for (var index in currentSorting) {
+                var sortedDirection = currentSorting[index][1];
+                var sortedColIndex = currentSorting[index][0];
+                var sortedCol = oSettings.aoColumns[sortedColIndex];
+                var fieldName = $(sortedCol.nTh).data('column-field');
+
+                params.order[fieldName] = sortedDirection;
+            }
+        }
+
+        // Set filters if there are any
+        $.ajax({
+            url: baseUrl,
+            data: $.param(params),
+            dataType: "json",
+            cache: false,
+            type: 'POST',
+            success: function(json) {
+                if ( json.sError ) {
+                    oSettings.oApi._fnLog( oSettings, 0, json.sError );
+                }
+
+                $(oSettings.oInstance).trigger('xhr', [oSettings, json]);
+                fnCallback( json );
+            },
+            error: function (xhr, error, thrown) {
+                bootbox.alert("Error parsing the results");
+
+                if ( error == "parsererror" ) {
+                    oSettings.oApi._fnLog( oSettings, 0, "DataTables warning: JSON data from "+
+                        "server could not be parsed. This is caused by a JSON formatting error." );
+                }
+            }
+        });
+    }
+
     var methods = {};
 
     /**
@@ -70,58 +143,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             options.bServerSide = true;
 
             // Override Server Data, we want to use the format Grids support!
-            options.fnServerData = function(sUrl, aoData, fnCallback, oSettings) {
-                var data = {
-                    limit: oSettings._iDisplayLength,
-                    offset: oSettings._iDisplayStart,
-                    test: 'one',
-                    filters: {
-                        "*": aoData.sSearch
-                    }
-                };
-
-                var url = oSettings.sAjaxSource;
-
-                if (!url) {
-                    return;
-                }
-
-                var baseUrl = $.url(url).attr('path');
-                var params = $.url(url).param();
-                if (!params.filter) {
-                   params.filter = {};
-                }
-
-                if (oSettings.oPreviousSearch.sSearch) {
-                   params.filter['*'] = oSettings.oPreviousSearch.sSearch;
-                }
-
-                params.limit = oSettings._iDisplayLength;
-                params.offset = oSettings._iDisplayStart;
-
-                // Set filters if there are any
-                $.ajax({
-                    url: baseUrl,
-                    data: $.param(params),
-                    dataType: "json",
-                    cache: false,
-                    type: 'POST',
-                    success: function(json) {
-                        if ( json.sError ) {
-                            oSettings.oApi._fnLog( oSettings, 0, json.sError );
-                        }
-
-                        $(oSettings.oInstance).trigger('xhr', [oSettings, json]);
-                        fnCallback( json );
-                    },
-                    error: function (xhr, error, thrown) {
-                        if ( error == "parsererror" ) {
-                            oSettings.oApi._fnLog( oSettings, 0, "DataTables warning: JSON data from "+
-                                "server could not be parsed. This is caused by a JSON formatting error." );
-                        }
-                    }
-                });
-            }
+            options.fnServerData = _fnServerData;
 
             $table.dataTable(options);
         });

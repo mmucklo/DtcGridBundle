@@ -2,7 +2,7 @@
 	<thead>
 		<tr>
 			{% for column in columns %}
-			<th>
+			<th data-column-field="{{ column.field }}">
 				{{ column.getLabel() }}
 			</th>
 			{% endfor %}
