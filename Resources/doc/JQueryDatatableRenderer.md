@@ -147,3 +147,22 @@ to define custom query.
 
 You can change the filters via ajax.
 
+### Registering event listeners
+
+You can set any options supported by jquery Data Table:
+
+    $('[data-jqtable]').each(function() {
+        var options = {};
+        if (this.id == 'adminusergrid') {
+            options.fnRowCallback = function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                var $row = $(nRow);
+                $row.find('button.btn.remove').click(function() {
+                    var id = $(this).data('id');
+                    alert('remove item ' + id +' button clicked');
+                    $('#admingridsourceskn').jqtable('reload');
+                });
+            };
+        }
+        $(this).jqtable(options);
+    });
+

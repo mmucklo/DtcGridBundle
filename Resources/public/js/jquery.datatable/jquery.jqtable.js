@@ -1,6 +1,11 @@
+log = function(value) {
+    if (console && console.log) {
+        console.log(value);
+    }
+};
+
 $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         fnCallback, bStandingRedraw) {
-
     if (typeof sNewSource != 'undefined' && sNewSource != null) {
         oSettings.sAjaxSource = sNewSource;
     }
@@ -10,30 +15,12 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
     var iStart = oSettings._iDisplayStart;
     var aData = [];
 
+    // Override ajax update draw function
+
     this.oApi._fnServerParams(oSettings, aData);
-
-    // Custom data function
-    oSettings.fnServerData(oSettings.sAjaxSource, aData, function(json) {
+    var ajaxCallBack = function(json) {
         /* Clear the old information from the table */
-        that.oApi._fnClearTable(oSettings);
-
-        /* Got the data - add it to the table */
-        var aData = (oSettings.sAjaxDataProp !== "") ? that.oApi
-                ._fnGetObjectDataFn(oSettings.sAjaxDataProp)(json) : json;
-
-        for ( var i = 0; i < aData.length; i++) {
-            that.oApi._fnAddData(oSettings, aData[i]);
-        }
-
-        oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
-        that.fnDraw();
-
-        if (typeof bStandingRedraw != 'undefined' && bStandingRedraw === true) {
-            oSettings._iDisplayStart = iStart;
-            that.fnDraw(false);
-        }
-
-        that.oApi._fnProcessingDisplay(oSettings, false);
+        that.oApi._fnAjaxUpdateDraw( oSettings, json );
 
         /* Callback user function - for event handlers etc */
         if (typeof fnCallback == 'function' && fnCallback != null) {
@@ -44,8 +31,10 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         if (typeof fnCallback == 'function' && fnCallback != null) {
             fnCallback(oSettings);
         }
+    }
 
-    }, oSettings);
+    // Fetch data from server
+    oSettings.fnServerData(oSettings.sAjaxSource, aData, ajaxCallBack, oSettings);
 };
 
 /**
@@ -63,21 +52,22 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
     methods.init = function(options) {
         return this.each(function() {
             var $table = $(this);
-            var options = $table.attr('data-jqtable');
+            var tableOptions = $table.data('jqtable');
+
+            if (!options) {
+                options = tableOptions;
+            }
+            else {
+                options = $.extend(tableOptions, options);
+                options = tableOptions;
+            }
 
             if (!options) {
                 return;
             }
-            else {
-                options = $.parseJSON(options);
-            }
 
             options.sServerMethod = 'POST';
             options.bServerSide = true;
-            options.fnInitComplete = function() {
-                //$('.timeago').timeago();
-                //$table.find('[data-form-url]').dialogForm();
-            };
 
             // Override Server Data, we want to use the format Grids support!
             options.fnServerData = function(sUrl, aoData, fnCallback, oSettings) {
@@ -136,6 +126,14 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             $table.dataTable(options);
         });
     };
+
+    methods.reload = function(keepState) {
+        return this.each(function() {
+            var $table = $(this);
+            var jqTable = $table.dataTable();
+            jqTable.fnReloadAjax();
+        });
+    }
 
     methods.filter = function(filters, keepState) {
         return this.each(function() {
