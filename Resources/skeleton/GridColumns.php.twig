@@ -1,0 +1,33 @@
+<?php
+namespace {{ namespace }};
+
+use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
+
+use Dtc\GridBundle\Grid\Source\DocumentGridSource;
+use Dtc\GridBundle\Grid\Column\TwigBlockGridColumn;
+
+use Twig_Environment;
+use ArrayObject;
+
+class {{ class }}
+	extends ArrayObject
+{
+	public function __construct(Twig_Environment $twig, GlobalVariables $globals = null)
+	{
+		$columns = array();
+
+		$template = $twig->loadTemplate('{{ template_name }}');
+
+		$env = array(
+			'app' => $globals
+		);
+
+		{% for field, title in fields -%}
+		$col = new TwigBlockGridColumn('{{ field }}', '{{ title }}', $template, $env);
+		$col->setOption('width', 75);
+		$columns[] = $col;
+
+		{% endfor -%}
+		parent::__construct($columns);
+	}
+}

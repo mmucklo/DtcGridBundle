@@ -94,7 +94,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             data: $.param(params),
             dataType: "json",
             cache: false,
-            type: 'POST',
+            type: 'GET',
             success: function(json) {
                 if ( json.sError ) {
                     oSettings.oApi._fnLog( oSettings, 0, json.sError );

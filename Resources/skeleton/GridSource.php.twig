@@ -1,0 +1,14 @@
+<?php
+namespace {{ namespace }};
+
+use Doctrine\ORM\EntityManager;
+use Dtc\GridBundle\Grid\Source\EntityGridSource;
+
+class {{ class }}
+	extends EntityGridSource
+{
+	public function __construct(EntityManager $em) {
+		$entityName = '{{ entity_class }}';
+		parent::__construct($em, $entityName);
+	}
+}

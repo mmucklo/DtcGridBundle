@@ -22,5 +22,9 @@
 
         <service id="dtc_grid.manager.source" class="Dtc\GridBundle\Manager\GridSourceManager">
         </service>
+
+        <service id="dtc_grid.twig.extension" class="Dtc\GridBundle\Twig\Extension\TwigExtension">
+            <tag name="twig.extension" />
+        </service>
     </services>
 </container>

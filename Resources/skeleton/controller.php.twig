@@ -1,0 +1,57 @@
+The following files are generated:
+{% for file in files %}
+	{{ file }}
+{% endfor %}
+
+Add the following code to your controller:
+
+	$renderer = $this->get('grid.renderer.jq_table_grid');
+	$gridSource = $this->get('{{ gridsource_id }}');
+	$renderer->bind($gridSource);
+
+	return array('grid' => $renderer);
+
+Add the following code to your Bundle Extension if you haven't:
+
+	$yamlLoader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+	$yamlLoader->load('grid.yml');
+
+Use the following template (optional):
+{% raw %}
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            {% stylesheets
+                'bundles/dtcgrid/lib/DataTables/media/jquery.dataTables*.css'
+                'bundles/dtcgrid/css/datatable.bootstrap.css'
+
+                combine=false
+                filter='cssrewrite, lessphp'
+                output="generated/css/grid_*.css"
+            %}
+                <link rel="stylesheet" href="{{ asset_url }}" />
+            {% endstylesheets %}
+
+            {% javascripts
+                'bundles/dtcgrid/lib/purl.js'
+                'bundles/dtcgrid/lib/DataTables/media/js/jquery.dataTables.min.js'
+                'bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js'
+                'bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'
+
+                combine=false
+                output="generated/js/grid_*.js"
+            %}
+                <script type="text/javascript" src="{{ asset_url }}"></script>
+            {% endjavascripts %}
+        </head>
+        <body>
+            {{ grid.render | raw }}
+            <script>
+            $(document).ready(function() {
+                $('[data-jqtable]').jqtable();
+            })
+            </script>
+        </body>
+    </html>
+{% endraw %}

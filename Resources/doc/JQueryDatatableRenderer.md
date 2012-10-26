@@ -41,11 +41,10 @@ In your template file:
     <html>
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-            <title>{% block title %}Shadow Hunters Stats Tracker{% endblock %}</title>
+            <title>JQuery Data Table Grid</title>
             {% stylesheets
                 'bundles/dtcgrid/lib/DataTables/media/jquery.dataTables*.css'
                 'bundles/dtcgrid/css/datatable.bootstrap.css'
-
                 combine=false
                 filter='cssrewrite, lessphp'
                 output="generated/css/grid_*.css"
@@ -58,14 +57,11 @@ In your template file:
                 'bundles/dtcgrid/lib/DataTables/media/js/jquery.dataTables.min.js'
                 'bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js'
                 'bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'
-
                 combine=false
                 output="generated/js/grid_*.js"
             %}
                 <script type="text/javascript" src="{{ asset_url }}"></script>
             {% endjavascripts %}
-
-            <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
         </head>
         <body>
             {{ grid.render | raw }}

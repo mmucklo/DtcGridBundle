@@ -13,8 +13,6 @@ class DtcGridExtension
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('grid.xml');
-
-        // Lets set up
     }
 
     public function getAlias()
