@@ -1,8 +1,7 @@
 <?php
 namespace Dtc\GridBundle\Command;
 
-use Dtc\GridBundle\Generator\GridColumnGenerator;
-use Dtc\GridBundle\Generator\GridConfigGenerator;
+use Dtc\GridBundle\Generator\GridSourceGenerator;
 
 use Asc\PlatformBundle\Documents\Profile\UserProfile;
 use Asc\PlatformBundle\Documents\UserAuth;
@@ -26,7 +25,7 @@ class GenerateGridSourceCommand
         ->setName('dtc:grid:source:generate')
             ->setDefinition(array(
                 new InputArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)'),
-            	new InputArgument('class_name', InputArgument::REQUIRED, 'Name of GridSource - camel case, no space.')
+            	new InputArgument('class_name', InputArgument::OPTIONAL, 'Name of GridSource - camel case, no space.')
             ))
         ->setDescription('Generate a class for GridSource, GridColumn and template file')
         ;
@@ -42,20 +41,9 @@ class GenerateGridSourceCommand
         $bundle   = $this->getApplication()->getKernel()->getBundle($bundle);
 
         $skeletonDir = __DIR__.'/../Resources/skeleton';
-        $columnGenerator = new GridColumnGenerator($skeletonDir, $this->getContainer());
+        $columnGenerator = new GridSourceGenerator($skeletonDir, $this->getContainer());
 
         $columnGenerator->generate($bundle, $entity, $metadata[0]);
-        ve('generated');
-
-        $configGenerator = new GridConfigGenerator();
-        $configGenerator->generate($bundle, $entity, $metadata[0]);
-
-
-        $output->writeln(sprintf(
-            'The new %s.php class file has been created under %s.',
-            $generator->getClassName(),
-            $generator->getClassPath()
-        ));
     }
 
     protected function parseShortcutNotation($shortcut)
@@ -72,7 +60,6 @@ class GenerateGridSourceCommand
     protected function getEntityMetadata($entity)
     {
         $factory = new MetadataFactory($this->getContainer()->get('doctrine'));
-
         return $factory->getClassMetadata($entity)->getMetadata();
     }
 }

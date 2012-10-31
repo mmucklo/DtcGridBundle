@@ -1,6 +1,9 @@
 <?php
 namespace Dtc\GridBundle\Grid\Column;
 
+/**
+ * Standard options
+ */
 abstract class AbstractGridColumn
 {
     protected $field;
