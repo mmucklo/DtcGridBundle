@@ -39,7 +39,25 @@ class EntityGridSource
         }
 
         if ($this->filter) {
-            // Handle basic filter
+            $validFilters = array();
+            $classMetaData = $this->getClassMetadata();
+            $classFields = $classMetaData->fieldMappings;
+
+            $validFilters = array_intersect_key($this->filter, $classFields);
+
+            $query = array();
+            foreach ($validFilters as $key => $value) {
+                if (is_array($value)) {
+                    $query[] = "u.{$key} IN :{$key}";
+                }
+                else {
+                    $query[] = "u.{$key} = :{$key}";
+                }
+
+                $qb->setParameter($key, $value);
+            }
+
+            $qb->add('where', implode('and', $query));
         }
 
         return $qb;
