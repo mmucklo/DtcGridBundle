@@ -1,6 +1,8 @@
 <?php
 namespace Dtc\GridBundle\Grid\Column;
 
+use Dtc\GridBundle\Grid\Source\AbstractGridSource;
+
 use Twig_Template;
 
 class TwigBlockGridColumn
@@ -40,7 +42,7 @@ class TwigBlockGridColumn
         return $this->template;
     }
 
-	/**
+    /**
      * @return the $blockName
      */
     public function getBlockName()
@@ -48,10 +50,11 @@ class TwigBlockGridColumn
         return $this->blockName;
     }
 
-	public function format($object) {
+    public function format($object, AbstractGridSource $gridSource) {
         if ($this->template->hasBlock($this->blockName))
         {
             $this->env['obj'] = $object;
+            $this->env['source'] = $gridSource;
             return $this->template->renderBlock($this->blockName, $this->env);
         }
         else {

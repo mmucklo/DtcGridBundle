@@ -42,6 +42,7 @@ class JQueryDatatableRenderer
                'id' => $this->gridSource->getId(),
                'renderer' => 'grid.renderer.jq_table_grid',
                'filter' => $this->gridSource->getFilter(),
+               'parameters' => $this->gridSource->getParameters(),
                'order' => $this->gridSource->getOrderBy()
         );
 
@@ -82,7 +83,7 @@ class JQueryDatatableRenderer
             $info = array();
             foreach ( $columns as $column )
             {
-                $info[] = $column->format($record);
+                $info[] = $column->format($record, $gridSource);
             }
 
             $data[] = $info;

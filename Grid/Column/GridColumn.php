@@ -1,6 +1,8 @@
 <?php
 namespace Dtc\GridBundle\Grid\Column;
 
+use Dtc\GridBundle\Grid\Source\AbstractGridSource;
+
 class GridColumn
     extends AbstractGridColumn
 {
@@ -20,7 +22,7 @@ class GridColumn
         $this->formatter = $formatter;
     }
 
-    public function format($object)
+    public function format($object, AbstractGridSource $gridsource)
     {
         if ($this->formatter)
         {

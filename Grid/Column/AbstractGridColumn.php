@@ -1,6 +1,8 @@
 <?php
 namespace Dtc\GridBundle\Grid\Column;
 
+use Dtc\GridBundle\Grid\Source\AbstractGridSource;
+
 /**
  * Standard options
  */
@@ -10,7 +12,7 @@ abstract class AbstractGridColumn
     protected $label;
     protected $options = array();
 
-    abstract function format($object);
+    abstract function format($object, AbstractGridSource $gridsource);
 
     public function setOption($key, $value) {
         $this->options[$key] = $value;

@@ -13,6 +13,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     protected $pager = array();
     protected $id = 'grid';
     protected $columns;
+    protected $parameters;
 
     public function bind(Request $request)
     {
@@ -185,5 +186,29 @@ abstract class AbstractGridSource implements GridSourceInterface
 
     public function getLastModified() {
         return null;
+    }
+
+    public function getParameter($key) {
+        return $this->parameters[$key];
+    }
+
+    public function setParameter($key, $value) {
+        $this->parameters[$key] = $value;
+    }
+
+    /**
+     * @return the $parameters
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param field_type $parameters
+     */
+    public function setParameters($parameters)
+    {
+        $this->parameters = $parameters;
     }
 }
