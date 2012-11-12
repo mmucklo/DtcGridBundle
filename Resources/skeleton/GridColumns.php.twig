@@ -17,10 +17,7 @@ class {{ class }}
 		$columns = array();
 
 		$template = $twig->loadTemplate('{{ template_name }}');
-
-		$env = array(
-			'app' => $globals
-		);
+		$env = $twig->getGlobals();
 
 		{% for field, title in fields -%}
 		$col = new TwigBlockGridColumn('{{ field }}', '{{ title }}', $template, $env);
