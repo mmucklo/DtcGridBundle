@@ -157,7 +157,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         });
     }
 
-    methods.filter = function(filters, keepState) {
+    methods.filter = function(filters, resetPage) {
         return this.each(function() {
             var $table = $(this);
             var jqTable = $table.dataTable();
@@ -172,6 +172,10 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             var newUrl = $.url(url).attr('path');
             var params = $.url(url).param();
             params.filter = filters;
+
+            if (resetPage) {
+                params.page = 1;
+            }
 
             newUrl += '?' + $.param(params);
             jqTable.fnReloadAjax(newUrl);
