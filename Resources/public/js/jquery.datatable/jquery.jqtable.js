@@ -104,7 +104,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
                 fnCallback( json );
             },
             error: function (xhr, error, thrown) {
-                bootbox.alert("Error parsing the results");
+                //bootbox.alert("Error parsing the results");
 
                 if ( error == "parsererror" ) {
                     oSettings.oApi._fnLog( oSettings, 0, "DataTables warning: JSON data from "+
