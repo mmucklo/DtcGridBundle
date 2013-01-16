@@ -49,16 +49,23 @@ class JQueryDatatableRenderer
         $url = $this->router->generate('dtc_grid_grid_data', $params);
         $this->options['sAjaxSource'] = $url;
 
-        /* foreach ( $this->gridSource->getColumns() as $column )
+        $columnsDef = array();
+        foreach ( $this->gridSource->getColumns() as $index => $column )
         {
             $info = array();
-            $info['sTitle'] = $column->getLabel();
-            $info['name'] = $column->getField();
-            $info['index'] = $column->getField();
-            $info = array_merge($info, $column->getOptions());
+            $info['bSortable'] = $column->getOption('sortable') ? true : false;
+            $info['sName'] = $column->getField();
 
-            $this->options['aoColumns'][] = $info;
-        } */
+            if ($width = $column->getOption('width')) {
+                $info['sWidth'] = $width;
+            }
+
+            $info['aTargets'] = array($index);
+            $info = array_merge($info, $column->getOptions());
+            $columnsDef[] = $info;
+        }
+
+        $this->options['aoColumnDefs'] = $columnsDef;
     }
 
     public function getData()
