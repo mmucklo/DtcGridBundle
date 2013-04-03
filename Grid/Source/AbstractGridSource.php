@@ -80,7 +80,9 @@ abstract class AbstractGridSource implements GridSourceInterface
 
     public function setColumns($value)
     {
-        $this->columns = $value;
+        foreach ($value as $col) {
+            $this->columns[$col->getField()] = $col;
+        }
     }
 
     public function removeColumn($field)
@@ -95,7 +97,7 @@ abstract class AbstractGridSource implements GridSourceInterface
         {
             if (isset($this->columns[$field]))
             {
-                $selectedCols[] = $this->columns[$field];
+                $selectedCols[$field] = $this->columns[$field];
             }
         }
 

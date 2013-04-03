@@ -31,6 +31,11 @@ class GridController extends Controller
         $gridSource->bind($request); // Sets limit, offset, sort, filter, etc
         $renderer->bind($gridSource); // Sets grid to renderer
 
+        $fields = $request->get('fields', null);
+        if ($fields && is_array($fields)) {
+            $gridSource->selectColums($fields);
+        }
+
         $content = null;
         // If changes to data is kept track using update_time, then we
         //   can skip querying for all data.
