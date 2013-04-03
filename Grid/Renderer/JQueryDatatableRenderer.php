@@ -15,7 +15,7 @@ class JQueryDatatableRenderer
             "oLanguage" => array(
                 "sLengthMenu" => "_MENU_ records per page"
             ),
-            "aoColumnDefs" => array(array(
+            "aoColumns" => array(array(
                 "bSortable" => false,
                 "sWidth" => "20%",
                 "aTargets" => array(-1)
@@ -68,7 +68,7 @@ class JQueryDatatableRenderer
             $columnsDef[] = $info;
         }
 
-        $this->options['aoColumnDefs'] = $columnsDef;
+        $this->options['aoColumns'] = $columnsDef;
     }
 
     public function getData()
@@ -76,14 +76,15 @@ class JQueryDatatableRenderer
         $columns = $this->gridSource->getColumns();
         $gridSource = $this->gridSource;
         $records = $gridSource->getRecords();
+        $count = $gridSource->getCount();
 
         $retVal = array(
                 'page' => $gridSource->getPager()
                     ->getCurrentPage(),
                 'total_pages' => $gridSource->getPager()
                     ->getTotalPages(),
-                'iTotalRecords' => (int) $gridSource->getCount(),
-                'iTotalDisplayRecords' => $gridSource->getCount(),
+                'iTotalRecords' => (int) $count,
+                'iTotalDisplayRecords' => $count,
                 'id' => $gridSource->getId() // unique id
         );
 
