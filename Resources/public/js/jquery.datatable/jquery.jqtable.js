@@ -157,6 +157,12 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         });
     }
 
+    /**
+     * Filter takes jqTable's settings, then modifies
+     *  the 'sAjaxSource' with new filter params, if resetPage is
+     *  set, then modifies '_iDisplayStart' to 0 to kick the
+     *  page back to page 1.
+     */
     methods.filter = function(filters, resetPage) {
         return this.each(function() {
             var $table = $(this);
@@ -174,11 +180,12 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             params.filter = filters;
 
             if (resetPage) {
-                params.page = 1;
+                settings._iDisplayStart = 0;
             }
 
             newUrl += '?' + $.param(params);
-            jqTable.fnReloadAjax(newUrl);
+            settings.sAjaxSource = newUrl;
+            jqTable.fnReloadAjax();
         });
     }
 
