@@ -17,13 +17,21 @@ class GridSourcePager
 	public function getCurrentPage() {
 		$limit = $this->gridSource->getLimit();
 		$offset = $this->gridSource->getOffset();
-		
+
+        if (!$limit) {
+            return $offset;
+        }
+
 		return ceil(($offset / $limit) + 1);
 	}
 	
 	public function getTotalPages() {
 		$limit = $this->gridSource->getLimit();
-		return ceil($this->gridSource->getCount() / $limit);
+        if (!$limit) {
+            return $this->gridSource->getCount();
+        }
+
+        return ceil($this->gridSource->getCount() / $limit);
 	}
 	
 	public function getRange($delta) {
