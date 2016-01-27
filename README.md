@@ -25,7 +25,7 @@ You can also use a build in console command to help generate grid related files:
 
 License
 -------
-This bundle is under the MIT license (see LICENSE file under [meta/Resources/LICENSE](meta/Resources/LICENSE)).
+This bundle is under the MIT license (see LICENSE file under [Resources/meta/LICENSE](Resources/meta/LICENSE)).
 
 Credit
 ------
