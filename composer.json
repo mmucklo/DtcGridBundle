@@ -1,5 +1,5 @@
 {
-    "name": "dtc/grid",
+    "name": "mmucklo/grid-bundle",
     "description": "Datagrid for symfony2.",
     "keywords": ["grid", "jQGrid", "table"],
     "type": "symfony-bundle",
