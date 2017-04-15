@@ -1,23 +1,16 @@
 <?php
+
 namespace Dtc\GridBundle\Command;
 
 use Dtc\GridBundle\Generator\GridSourceGenerator;
-
-use Asc\PlatformBundle\Documents\Profile\UserProfile;
-use Asc\PlatformBundle\Documents\UserAuth;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use Doctrine\Bundle\DoctrineBundle\Mapping\MetadataFactory;
-
 use Sensio\Bundle\GeneratorBundle\Command\Validators;
 
-class GenerateGridSourceCommand
-    extends ContainerAwareCommand
+class GenerateGridSourceCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
@@ -25,7 +18,7 @@ class GenerateGridSourceCommand
         ->setName('dtc:grid:source:generate')
             ->setDefinition(array(
                 new InputArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)'),
-            	new InputArgument('class_name', InputArgument::OPTIONAL, 'Name of GridSource - camel case, no space.')
+                new InputArgument('class_name', InputArgument::OPTIONAL, 'Name of GridSource - camel case, no space.'),
             ))
         ->setDescription('Generate a class for GridSource, GridColumn and template file')
         ;
@@ -38,7 +31,7 @@ class GenerateGridSourceCommand
 
         $entityClass = $this->getContainer()->get('doctrine')->getEntityNamespace($bundle).'\\'.$entity;
         $metadata = $this->getEntityMetadata($entityClass);
-        $bundle   = $this->getApplication()->getKernel()->getBundle($bundle);
+        $bundle = $this->getApplication()->getKernel()->getBundle($bundle);
 
         $skeletonDir = __DIR__.'/../Resources/skeleton';
         $columnGenerator = new GridSourceGenerator($skeletonDir, $this->getContainer());
@@ -60,6 +53,7 @@ class GenerateGridSourceCommand
     protected function getEntityMetadata($entity)
     {
         $factory = new MetadataFactory($this->getContainer()->get('doctrine'));
+
         return $factory->getClassMetadata($entity)->getMetadata();
     }
 }

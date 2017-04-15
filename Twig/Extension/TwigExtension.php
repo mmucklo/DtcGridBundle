@@ -1,12 +1,11 @@
 <?php
-namespace Dtc\GridBundle\Twig\Extension;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+namespace Dtc\GridBundle\Twig\Extension;
 
 class TwigExtension extends \Twig_Extension
 {
-    public function getFunction() {
+    public function getFunction()
+    {
         $names = array(
                 'format_cell' => 'format_cell',
         );
@@ -19,7 +18,8 @@ class TwigExtension extends \Twig_Extension
         return $funcs;
     }
 
-    public function getFilters() {
+    public function getFilters()
+    {
         $names = array(
                 'format_cell' => 'format_cell',
         );
@@ -37,18 +37,17 @@ class TwigExtension extends \Twig_Extension
         return 'dtc_grid';
     }
 
-    public function format_cell($value) {
+    public function format_cell($value)
+    {
         if (is_object($value)) {
             if ($value instanceof \DateTime) {
                 return $value->format(\DateTime::ISO8601);
             }
 
-            return 'object: ' . get_class($value);
-        }
-        else if (is_scalar($value)) {
+            return 'object: '.get_class($value);
+        } elseif (is_scalar($value)) {
             return $value;
-        }
-        else if (is_array($value)) {
+        } elseif (is_array($value)) {
             return 'array';
         }
     }

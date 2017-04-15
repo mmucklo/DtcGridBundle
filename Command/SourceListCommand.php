@@ -1,17 +1,12 @@
 <?php
+
 namespace Dtc\GridBundle\Command;
 
-use Asc\PlatformBundle\Documents\Profile\UserProfile;
-use Asc\PlatformBundle\Documents\UserAuth;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SourceListCommand
-    extends ContainerAwareCommand
+class SourceListCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
@@ -27,9 +22,9 @@ class SourceListCommand
         $gridSourceManager = $container->get('dtc_grid.manager.source');
         $gridSources = $gridSourceManager->all();
 
-        $output->writeln("Avaliable Grid Sources: ");
+        $output->writeln('Avaliable Grid Sources: ');
         foreach ($gridSources as $id => $source) {
-            $output->writeln("{$id} => " . get_class($source));
+            $output->writeln("{$id} => ".get_class($source));
         }
     }
 }

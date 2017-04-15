@@ -1,5 +1,7 @@
 <?php
+
 namespace Dtc\GridBundle\Grid\Renderer;
+
 use Dtc\GridBundle\Grid\Source\GridSourceInterface;
 
 abstract class AbstractRenderer
@@ -30,7 +32,9 @@ abstract class AbstractRenderer
         return $this->options;
     }
 
-    protected function afterBind() {}
+    protected function afterBind()
+    {
+    }
 
-    public abstract function render();
+    abstract public function render();
 }

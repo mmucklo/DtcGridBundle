@@ -1,4 +1,5 @@
 <?php
+
 namespace Dtc\GridBundle\Grid\Source;
 
 use Dtc\GridBundle\Grid\Pager\GridSourcePager;
@@ -18,18 +19,15 @@ abstract class AbstractGridSource implements GridSourceInterface
     public function bind(Request $request)
     {
         // Change limit, offset
-        if ($limit = $request->get('limit'))
-        {
+        if ($limit = $request->get('limit')) {
             $this->limit = $limit;
         }
 
-        if ($page = $request->get('page'))
-        {
+        if ($page = $request->get('page')) {
             $this->offset = $this->limit * ($page - 1);
         }
 
-        if ($offset = $request->get('offset'))
-        {
+        if ($offset = $request->get('offset')) {
             $this->offset = $offset;
         }
 
@@ -37,16 +35,14 @@ abstract class AbstractGridSource implements GridSourceInterface
             $this->filter = $filter;
         }
 
-        if ($sortColumn = $request->get('sort_column'))
-        {
+        if ($sortColumn = $request->get('sort_column')) {
             $sortOrder = $request->get('sort_order');
             $sortOrder = strtoupper($sortOrder);
 
             $this->orderBy[$sortColumn] = $sortOrder;
         }
 
-        if ($orderBy = $request->get('order'))
-        {
+        if ($orderBy = $request->get('order')) {
             $this->orderBy = $orderBy;
         }
     }
@@ -60,8 +56,7 @@ abstract class AbstractGridSource implements GridSourceInterface
 
     public function getDivId()
     {
-        if (!$this->divId)
-        {
+        if (!$this->divId) {
             $this->divId = preg_replace('/[^a-zA-Z0-9\-]/', '', $this->id);
         }
 
@@ -93,10 +88,8 @@ abstract class AbstractGridSource implements GridSourceInterface
     public function selectColums(array $fields)
     {
         $selectedCols = array();
-        foreach ( $fields as $field )
-        {
-            if (isset($this->columns[$field]))
-            {
+        foreach ($fields as $field) {
+            if (isset($this->columns[$field])) {
                 $selectedCols[$field] = $this->columns[$field];
             }
         }
@@ -106,16 +99,14 @@ abstract class AbstractGridSource implements GridSourceInterface
 
     public function removeColumns(array $fields)
     {
-        foreach ( $fields as $field )
-        {
+        foreach ($fields as $field) {
             unset($this->columns[$field]);
         }
     }
 
     public function getPager()
     {
-        if (!$this->pager)
-        {
+        if (!$this->pager) {
             $this->pager = new GridSourcePager($this);
         }
 
@@ -186,15 +177,18 @@ abstract class AbstractGridSource implements GridSourceInterface
         $this->orderBy = $orderBy;
     }
 
-    public function getLastModified() {
+    public function getLastModified()
+    {
         return null;
     }
 
-    public function getParameter($key) {
+    public function getParameter($key)
+    {
         return $this->parameters[$key];
     }
 
-    public function setParameter($key, $value) {
+    public function setParameter($key, $value)
+    {
         $this->parameters[$key] = $value;
     }
 

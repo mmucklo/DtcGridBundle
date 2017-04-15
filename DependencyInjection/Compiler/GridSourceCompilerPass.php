@@ -1,4 +1,5 @@
 <?php
+
 namespace Dtc\GridBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;

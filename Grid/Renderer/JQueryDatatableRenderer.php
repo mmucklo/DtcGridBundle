@@ -1,34 +1,34 @@
 <?php
+
 namespace Dtc\GridBundle\Grid\Renderer;
 
-class JQueryDatatableRenderer
-    extends TwigGridRenderer
+class JQueryDatatableRenderer extends TwigGridRenderer
 {
     protected $options = array(
             'bProcessing' => true,
             'table_attr' => array(
-                    'class' => 'display table table-striped table-bordered small-font'
+                    'class' => 'display table table-striped table-bordered small-font',
                 ),
-            "sDom" => "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span4'i><'span8'p>>",
-            "sPaginationType" => "bootstrap",
-            "bServerSide" => true,
-            "oLanguage" => array(
-                "sLengthMenu" => "_MENU_ records per page"
+            'sDom' => "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span4'i><'span8'p>>",
+            'sPaginationType' => 'bootstrap',
+            'bServerSide' => true,
+            'oLanguage' => array(
+                'sLengthMenu' => '_MENU_ records per page',
             ),
-            "aoColumns" => array(array(
-                "bSortable" => false,
-                "sWidth" => "20%",
-                "aTargets" => array(-1)
-            ))
+            'aoColumns' => array(array(
+                'bSortable' => false,
+                'sWidth' => '20%',
+                'aTargets' => array(-1),
+            )),
         );
-
 
     const MODE_AJAX = 1;
     const MODE_SERVER = 2;
 
     protected $mode = 1;
 
-    public function setMode($mode) {
+    public function setMode($mode)
+    {
         $this->mode = $mode;
     }
 
@@ -46,15 +46,14 @@ class JQueryDatatableRenderer
                'filter' => $this->gridSource->getFilter(),
                'parameters' => $this->gridSource->getParameters(),
                'order' => $this->gridSource->getOrderBy(),
-               'fields' => $fields
+               'fields' => $fields,
         );
 
         $url = $this->router->generate('dtc_grid_grid_data', $params);
         $this->options['sAjaxSource'] = $url;
 
         $columnsDef = array();
-        foreach ( $this->gridSource->getColumns() as $index => $column )
-        {
+        foreach ($this->gridSource->getColumns() as $index => $column) {
             $info = array();
             $info['bSortable'] = $column->getOption('sortable') ? true : false;
             $info['sName'] = $column->getField();
@@ -85,15 +84,13 @@ class JQueryDatatableRenderer
                     ->getTotalPages(),
                 'iTotalRecords' => (int) $count,
                 'iTotalDisplayRecords' => $count,
-                'id' => $gridSource->getId() // unique id
+                'id' => $gridSource->getId(), // unique id
         );
 
         $data = array();
-        foreach ( $records as $record )
-        {
+        foreach ($records as $record) {
             $info = array();
-            foreach ( $columns as $column )
-            {
+            foreach ($columns as $column) {
                 $info[] = $column->format($record, $gridSource);
             }
 
@@ -101,6 +98,7 @@ class JQueryDatatableRenderer
         }
 
         $retVal['aaData'] = $data;
+
         return $retVal;
     }
 
@@ -115,10 +113,11 @@ class JQueryDatatableRenderer
                 'options' => $options,
                 'table_attr' => $this->options['table_attr'],
                 'columns' => $this->gridSource->getColumns(),
-                'id' => $id
+                'id' => $id,
         );
 
         $template = 'DtcGridBundle:Grid:jquery_datatable.html.twig';
+
         return $this->twigEngine->render($template, $params);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Dtc\GridBundle\Grid\Renderer;
 
 use Symfony\Component\Routing\Router;
@@ -10,8 +11,8 @@ class TwigGridRenderer extends AbstractRenderer
     protected $router;
     protected $options = array(
             'table_attr' => array(
-                    'class' => 'display table table-striped table-bordered small-font'
-                )
+                    'class' => 'display table table-striped table-bordered small-font',
+                ),
         );
 
     public function __construct(TwigEngine $twigEngine, Router $router)
@@ -25,10 +26,11 @@ class TwigGridRenderer extends AbstractRenderer
         $params = array(
                 'records' => $this->gridSource->getRecords(),
                 'columns' => $this->gridSource->getColumns(),
-                'options' => $this->options
+                'options' => $this->options,
         );
 
         $template = 'DtcGridBundle:Grid:grid.html.twig';
+
         return $this->twigEngine->render($template, $params);
     }
 }

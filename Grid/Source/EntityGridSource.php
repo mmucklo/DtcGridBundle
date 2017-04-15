@@ -1,11 +1,11 @@
 <?php
+
 namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\ORM\EntityManager;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 
-class EntityGridSource
-    extends AbstractGridSource
+class EntityGridSource extends AbstractGridSource
 {
     protected $em;
     protected $entityName;
@@ -16,7 +16,8 @@ class EntityGridSource
         $this->entityName = $entityName;
     }
 
-    public function autoDiscoverColumns() {
+    public function autoDiscoverColumns()
+    {
         $this->setColumns($this->getReflectionColumns());
     }
 
@@ -30,8 +31,8 @@ class EntityGridSource
 
         $qb->add('select', 'u')
             ->add('from', "{$this->entityName} u")
-            ->setFirstResult( $this->offset )
-            ->setMaxResults( $this->limit );
+            ->setFirstResult($this->offset)
+            ->setMaxResults($this->limit);
 
         if ($this->orderBy) {
             $orderByStr = implode(',', $orderBy);
@@ -49,8 +50,7 @@ class EntityGridSource
             foreach ($validFilters as $key => $value) {
                 if (is_array($value)) {
                     $query[] = "u.{$key} IN :{$key}";
-                }
-                else {
+                } else {
                     $query[] = "u.{$key} = :{$key}";
                 }
 
@@ -64,7 +64,6 @@ class EntityGridSource
     }
 
     /**
-     *
      * @return ClassMetadata
      */
     public function getClassMetadata()
@@ -76,22 +75,18 @@ class EntityGridSource
     }
 
     /**
-     * Generate Columns based on document's Metadata
+     * Generate Columns based on document's Metadata.
      */
     public function getReflectionColumns()
     {
         $metaClass = $this->getClassMetadata();
 
         $columns = array();
-        foreach ( $metaClass->fieldMappings as $fieldInfo )
-        {
+        foreach ($metaClass->fieldMappings as $fieldInfo) {
             $field = $fieldInfo['fieldName'];
-            if (isset($fieldInfo['options']) && isset($fieldInfo['options']['label']))
-            {
+            if (isset($fieldInfo['options']) && isset($fieldInfo['options']['label'])) {
                 $label = $fieldInfo['options']['label'];
-            }
-            else
-            {
+            } else {
                 $label = $this->fromCamelCase($field);
             }
 
@@ -103,9 +98,8 @@ class EntityGridSource
 
     protected function fromCamelCase($str)
     {
-        $func = function ($str)
-        {
-            return ' ' . $str[0];
+        $func = function ($str) {
+            return ' '.$str[0];
         };
 
         $value = preg_replace_callback('/([A-Z])/', $func, $str);

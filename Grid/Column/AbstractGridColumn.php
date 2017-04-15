@@ -1,10 +1,11 @@
 <?php
+
 namespace Dtc\GridBundle\Grid\Column;
 
 use Dtc\GridBundle\Grid\Source\AbstractGridSource;
 
 /**
- * Standard options
+ * Standard options.
  */
 abstract class AbstractGridColumn
 {
@@ -12,13 +13,15 @@ abstract class AbstractGridColumn
     protected $label;
     protected $options = array();
 
-    abstract function format($object, AbstractGridSource $gridsource);
+    abstract public function format($object, AbstractGridSource $gridsource);
 
-    public function setOption($key, $value) {
+    public function setOption($key, $value)
+    {
         $this->options[$key] = $value;
     }
 
-    public function getOption($key) {
+    public function getOption($key)
+    {
         if (isset($this->options[$key])) {
             return $this->options[$key];
         }
@@ -26,11 +29,13 @@ abstract class AbstractGridColumn
         return null;
     }
 
-    public function setOptions(array $options) {
+    public function setOptions(array $options)
+    {
         $this->options = $options;
     }
 
-    public function getOptions() {
+    public function getOptions()
+    {
         return $this->options;
     }
 

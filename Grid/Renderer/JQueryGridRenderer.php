@@ -1,4 +1,5 @@
 <?php
+
 namespace Dtc\GridBundle\Grid\Renderer;
 
 class JQueryGridRenderer extends TwigGridRenderer
@@ -10,7 +11,7 @@ class JQueryGridRenderer extends TwigGridRenderer
                     'total' => 'total',
                     'records' => 'records',
                     'page' => 'page',
-                    'repeatitems' => false
+                    'repeatitems' => false,
             ),
 
             'url' => null,
@@ -24,24 +25,24 @@ class JQueryGridRenderer extends TwigGridRenderer
 
             // Paging params
             'prmNames' => array(
-                    'page' => "page",
-                    'rows' => "limit",
-                    'sort' => "sort_column",
-                    'order' => "sort_order",
-                    'nd' => null
+                    'page' => 'page',
+                    'rows' => 'limit',
+                    'sort' => 'sort_column',
+                    'order' => 'sort_order',
+                    'nd' => null,
             ),
 
             'ajaxGridOptions' => array(
                     'cache' => false,
-                    'ifModified' => false
+                    'ifModified' => false,
             ),
 
             // Pager Config
-            'pager' => "grid-pager",
-            'recordtext' => "View {0} - {1} of {2}",
-            'emptyrecords' => "No records to view",
-            'loadtext' => "Loading...",
-            'pgtext' => "Page {0} of {1}"
+            'pager' => 'grid-pager',
+            'recordtext' => 'View {0} - {1} of {2}',
+            'emptyrecords' => 'No records to view',
+            'loadtext' => 'Loading...',
+            'pgtext' => 'Page {0} of {1}',
     );
 
     protected function afterBind()
@@ -50,14 +51,13 @@ class JQueryGridRenderer extends TwigGridRenderer
         $this->options['pager'] = "{$id}-pager";
 
         $params = array(
-                'id' => $this->gridSource->getId()
+                'id' => $this->gridSource->getId(),
         );
 
         $url = $this->router->generate('dtc_grid_grid_data', $params);
         $this->options['url'] = $url;
 
-        foreach ( $this->gridSource->getColumns() as $column )
-        {
+        foreach ($this->gridSource->getColumns() as $column) {
             $info = array();
             $info['label'] = $column->getLabel();
             $info['name'] = $column->getField();
@@ -80,14 +80,12 @@ class JQueryGridRenderer extends TwigGridRenderer
                 'total' => $gridSource->getPager()
                     ->getTotalPages(),
                 'records' => $gridSource->getCount(),
-                'id' => $gridSource->getId() // unique id
+                'id' => $gridSource->getId(), // unique id
         );
 
-        foreach ( $records as $record )
-        {
+        foreach ($records as $record) {
             $info = array();
-            foreach ( $columns as $column )
-            {
+            foreach ($columns as $column) {
                 $info[$column->getField()] = $column->format($record);
             }
 
@@ -103,10 +101,11 @@ class JQueryGridRenderer extends TwigGridRenderer
 
         $params = array(
                 'options' => $this->options,
-                'id' => $id
+                'id' => $id,
         );
 
         $template = 'DtcGridBundle:Grid:jquery_grid.html.twig';
+
         return $this->twigEngine->render($template, $params);
     }
 }

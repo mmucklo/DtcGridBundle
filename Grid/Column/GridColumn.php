@@ -1,10 +1,10 @@
 <?php
+
 namespace Dtc\GridBundle\Grid\Column;
 
 use Dtc\GridBundle\Grid\Source\AbstractGridSource;
 
-class GridColumn
-    extends AbstractGridColumn
+class GridColumn extends AbstractGridColumn
 {
     protected $formatter;
     protected $field;
@@ -24,41 +24,30 @@ class GridColumn
 
     public function format($object, AbstractGridSource $gridsource)
     {
-        if ($this->formatter)
-        {
+        if ($this->formatter) {
             return call_user_func($this->formatter, $object, $this);
-        }
-        else
-        {
+        } else {
             return $this->_format($object);
         }
     }
 
     protected function _format($object)
     {
-        if (is_array($object))
-        {
-            if (isset($object[$this->field]))
-            {
+        if (is_array($object)) {
+            if (isset($object[$this->field])) {
                 return $object[$this->field];
-            }
-            else
-            {
+            } else {
                 return null;
             }
-        }
-        else if (is_object($object))
-        {
+        } elseif (is_object($object)) {
             $funcPrefix = array(
                     'get',
                     'is',
-                    'has'
+                    'has',
             );
-            foreach ( $funcPrefix as $prefix )
-            {
-                $methodName = $prefix . $this->field;
-                if (method_exists($object, $methodName))
-                {
+            foreach ($funcPrefix as $prefix) {
+                $methodName = $prefix.$this->field;
+                if (method_exists($object, $methodName)) {
                     return $object->$methodName();
                 }
             }
@@ -89,6 +78,7 @@ class GridColumn
     {
         $retVal = (array) $this;
         unset($retVal['formatter']);
+
         return $retVal;
     }
 }

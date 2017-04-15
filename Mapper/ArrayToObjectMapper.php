@@ -1,4 +1,5 @@
 <?php
+
 namespace Dtc\GridBundle\Mapper;
 
 use Dtc\MarketBundle\Mapper\ArrayValueObject;
@@ -21,10 +22,8 @@ class ArrayToObjectMapper
         $data = $globalArray->getValueByArray($this->dataPath);
 
         $retVal = array();
-        if ($data)
-        {
-            foreach ( $data as $field => $objectData )
-            {
+        if ($data) {
+            foreach ($data as $field => $objectData) {
                 $object = new $this->classname();
                 $arrayValueObject = new ArrayValueObject($objectData);
 
@@ -38,35 +37,26 @@ class ArrayToObjectMapper
 
     protected function setFields($object, ArrayValueObject $globalArray, ArrayValueObject $dataArray)
     {
-        foreach ( $this->fields as $field => $fieldSetting )
-        {
+        foreach ($this->fields as $field => $fieldSetting) {
             $methodName = "set{$field}";
 
-            if (isset($fieldSetting['value']))
-            {
+            if (isset($fieldSetting['value'])) {
                 $value = $fieldSetting['value'];
-            }
-            else if (isset($fieldSetting['data_path']))
-            {
+            } elseif (isset($fieldSetting['data_path'])) {
                 $value = $dataArray->getValueByArray($fieldSetting['data_path']);
-            }
-            else if (isset($fieldSetting['path']))
-            {
+            } elseif (isset($fieldSetting['path'])) {
                 $value = $globalArray->getValueByArray($fieldSetting['path']);
             }
 
             $field = strtolower($field);
-            if (endsWith($field, 'time') || endsWith($field, 'date') || endsWith($field, 'at'))
-            {
+            if (endsWith($field, 'time') || endsWith($field, 'date') || endsWith($field, 'at')) {
                 $value = substr($value, 0, 14);
-                $value = \DateTime::createFromFormat("YmdHis", $value);
+                $value = \DateTime::createFromFormat('YmdHis', $value);
             }
 
-            if (method_exists($object, $methodName))
-            {
+            if (method_exists($object, $methodName)) {
                 $object->$methodName($value);
-            }
-            else {
+            } else {
                 throw new \Exception("Unable to map {$field}, {$this->classname} does not have setter function: {$methodName}");
             }
         }

@@ -1,30 +1,26 @@
 <?php
+
 namespace Dtc\GridBundle\Generator;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
-
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\Bundle\DoctrineBundle\Mapping\MetadataFactory;
 
-class GridSourceGenerator
-    extends Generator
+class GridSourceGenerator extends Generator
 {
     private $saveCache;
 
-    public function __construct($skeletonDir, ContainerInterface $container) {
+    public function __construct($skeletonDir, ContainerInterface $container)
+    {
         $this->skeletonDir = $skeletonDir;
         $this->container = $container;
     }
 
     protected function fromCamelCase($str)
     {
-        $func = function ($str)
-        {
-            return ' ' . $str[0];
+        $func = function ($str) {
+            return ' '.$str[0];
         };
 
         $value = preg_replace_callback('/([A-Z])/', $func, $str);
@@ -33,18 +29,19 @@ class GridSourceGenerator
         return $value;
     }
 
-    protected function generateColumns(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata) {
-        $parts       = explode('\\', $entity);
+    protected function generateColumns(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata)
+    {
+        $parts = explode('\\', $entity);
         $entityClass = array_pop($parts);
         $entityNamespace = implode('\\', $parts);
 
-        $gridColumnsNamespace = $bundle->getNamespace() . '\\Grid\\Columns';
-        $gridColumnsNamespace .= ($entityNamespace) ? '\\' . $entityNamespace : '';
+        $gridColumnsNamespace = $bundle->getNamespace().'\\Grid\\Columns';
+        $gridColumnsNamespace .= ($entityNamespace) ? '\\'.$entityNamespace : '';
 
         $gridColumnClass = $entityClass.'GridColumn';
-        $dirPath         = $bundle->getPath().'/Grid/Columns';
+        $dirPath = $bundle->getPath().'/Grid/Columns';
         $gridColumnPath = $dirPath.'/'.str_replace('\\', '/', $entity).'GridColumn.php';
-        $templatePath = $bundle->getPath() . '/Resources/views/' . str_replace('\\', '/', $entity) . '/_grid.html.twig';
+        $templatePath = $bundle->getPath().'/Resources/views/'.str_replace('\\', '/', $entity).'/_grid.html.twig';
 
         $fields = array();
         foreach ($this->getFieldsFromMetadata($metadata) as $field) {
@@ -52,10 +49,10 @@ class GridSourceGenerator
         }
 
         $params = array(
-                'fields'           => $fields,
-                'namespace'        => $gridColumnsNamespace,
-                'class'            => $gridColumnClass,
-                'template_name'    => "{$bundle->getName()}:{$entity}:_grid.html.twig"
+                'fields' => $fields,
+                'namespace' => $gridColumnsNamespace,
+                'class' => $gridColumnClass,
+                'template_name' => "{$bundle->getName()}:{$entity}:_grid.html.twig",
         );
 
         $this->saveCache[$templatePath] = $this->render($this->skeletonDir, 'grid_template.html.twig', $params);
@@ -64,30 +61,33 @@ class GridSourceGenerator
         return array($gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath);
     }
 
-    protected function generateSource(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata) {
-        $parts       = explode('\\', $entity);
+    protected function generateSource(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata)
+    {
+        $parts = explode('\\', $entity);
         $entityClass = array_pop($parts);
         $entityNamespace = implode('\\', $parts);
 
-        $gridSourceNamespace = $bundle->getNamespace() . '\\Grid\\Source';
-        $gridSourceNamespace .= ($entityNamespace) ? '\\' . $entityNamespace : '';
+        $gridSourceNamespace = $bundle->getNamespace().'\\Grid\\Source';
+        $gridSourceNamespace .= ($entityNamespace) ? '\\'.$entityNamespace : '';
 
         $gridSourceClass = $entityClass.'GridSource';
-        $dirPath         = $bundle->getPath().'/Grid/Source';
-        $gridSourcePath = $dirPath.'/'. str_replace('\\', '/', $entity) . 'GridSource.php';
+        $dirPath = $bundle->getPath().'/Grid/Source';
+        $gridSourcePath = $dirPath.'/'.str_replace('\\', '/', $entity).'GridSource.php';
 
         $params = array(
-                'namespace'        => $gridSourceNamespace,
-                'entity_class'     => $metadata->getReflectionClass()->getName(),
-                'class'            => $gridSourceClass
+                'namespace' => $gridSourceNamespace,
+                'entity_class' => $metadata->getReflectionClass()->getName(),
+                'class' => $gridSourceClass,
         );
 
         $this->saveCache[$gridSourcePath] = $this->render($this->skeletonDir, 'GridSource.php.twig', $params);
+
         return array($gridSourceClass, $gridSourceNamespace, $gridSourcePath);
     }
 
-    public function generate(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata) {
-        $parts       = explode('\\', $entity);
+    public function generate(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata)
+    {
+        $parts = explode('\\', $entity);
         $entityClass = array_pop($parts);
 
         list($gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath) =
@@ -99,7 +99,7 @@ class GridSourceGenerator
         $files = array(
                 'grid_source' => $gridSourcePath,
                 'grid_columns' => $gridColumnPath,
-                'grid_template' => $templatePath
+                'grid_template' => $templatePath,
         );
 
         // Check to see if the files exists
@@ -108,23 +108,23 @@ class GridSourceGenerator
         }
 
         $config = array();
-        $serviceName = "grid.source." . strtolower($entityClass);
+        $serviceName = 'grid.source.'.strtolower($entityClass);
         $documentManager = '@doctrine.orm.default_entity_manager';
         $config[$serviceName] = array(
-                'class' => $gridSourceNamespace . '\\' . $gridSourceClass,
+                'class' => $gridSourceNamespace.'\\'.$gridSourceClass,
                 'arguments' => array($documentManager),
                 'tags' => array(array('name' => 'dtc_grid.source')),
                 'calls' => array(
-                        array('setColumns', array (
-                                '@' . $serviceName . '.columns'
-                            )
-                        )
-                    )
+                        array('setColumns', array(
+                                '@'.$serviceName.'.columns',
+                            ),
+                        ),
+                    ),
             );
 
-        $config[$serviceName . '.columns'] = array(
-                'class' => $gridColumnsNamespace . '\\' . $gridColumnClass,
-                'arguments' => array('@twig', '@templating.globals')
+        $config[$serviceName.'.columns'] = array(
+                'class' => $gridColumnsNamespace.'\\'.$gridColumnClass,
+                'arguments' => array('@twig', '@templating.globals'),
             );
 
         $configFile = $bundle->getPath().'/Resources/config/grid.yml';
@@ -132,8 +132,7 @@ class GridSourceGenerator
         if (file_exists($configFile)) {
             $services = Yaml::parse($configFile);
             $services['services'] = array_merge($services['services'], $config);
-        }
-        else {
+        } else {
             $services['services'] = $config;
         }
 
@@ -141,11 +140,12 @@ class GridSourceGenerator
 
         $params = array(
             'gridsource_id' => $serviceName,
-            'files' => $files
+            'files' => $files,
         );
 
         $output = $this->render($this->skeletonDir, 'controller.php.twig', $params);
-        echo $output; exit();
+        echo $output;
+        exit();
     }
 
     private function getFieldsFromMetadata(ClassMetadataInfo $metadata)

@@ -1,22 +1,14 @@
 <?php
+
 namespace Dtc\GridBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Component\HttpFoundation\Response;
-
-use Dtc\GridBundle\Grid\Renderer\TwigGridRenderer;
-use Dtc\GridBundle\Grid\Renderer\JQueryGridRenderer;
 use Dtc\GridBundle\Grid\Grid;
-use Dtc\GridBundle\Grid\Column\GridColumn;
-use Dtc\GridBundle\Grid\Source\DocumentGridSource;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class GridController extends Controller
 {
-
     /**
      * @Route("/data/")
      */
@@ -39,12 +31,9 @@ class GridController extends Controller
         $content = null;
         // If changes to data is kept track using update_time, then we
         //   can skip querying for all data.
-        if ($lastModified = $gridSource->getLastModified())
-        {
+        if ($lastModified = $gridSource->getLastModified()) {
             $response->setLastModified($lastModified);
-        }
-        else
-        {
+        } else {
             // generate etag from data
             $data = $renderer->getData();
             $content = json_encode($data);
@@ -53,14 +42,10 @@ class GridController extends Controller
         }
 
         $response->setPublic();
-        if ($response->isNotModified($request))
-        {
+        if ($response->isNotModified($request)) {
             return $response;
-        }
-        else
-        {
-            if (!$content)
-            {
+        } else {
+            if (!$content) {
                 $data = $renderer->getData();
                 $content = json_encode($data);
             }

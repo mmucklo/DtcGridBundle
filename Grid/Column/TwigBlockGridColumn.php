@@ -1,24 +1,23 @@
 <?php
+
 namespace Dtc\GridBundle\Grid\Column;
 
 use Dtc\GridBundle\Grid\Source\AbstractGridSource;
-
 use Twig_Template;
 
-class TwigBlockGridColumn
-    extends AbstractGridColumn
+class TwigBlockGridColumn extends AbstractGridColumn
 {
     protected $template;
     protected $blockName;
     protected $env = array();
 
     /**
-     * Block name
+     * Block name.
      *
-     * @param string $field
-     * @param string $label
+     * @param string        $field
+     * @param string        $label
      * @param Twig_Template $template
-     * @param string $blockName
+     * @param string        $blockName
      */
     public function __construct($field, $label, Twig_Template $template, array $env, $blockName = null)
     {
@@ -28,8 +27,7 @@ class TwigBlockGridColumn
         $this->blockName = $blockName;
         $this->env = $env;
 
-        if (!$this->blockName)
-        {
+        if (!$this->blockName) {
             $this->blockName = $field;
         }
     }
@@ -50,14 +48,14 @@ class TwigBlockGridColumn
         return $this->blockName;
     }
 
-    public function format($object, AbstractGridSource $gridSource) {
-        if ($this->template->hasBlock($this->blockName))
-        {
+    public function format($object, AbstractGridSource $gridSource)
+    {
+        if ($this->template->hasBlock($this->blockName)) {
             $this->env['obj'] = $object;
             $this->env['source'] = $gridSource;
+
             return $this->template->renderBlock($this->blockName, $this->env);
-        }
-        else {
+        } else {
             return 'No Template';
         }
     }
