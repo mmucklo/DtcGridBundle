@@ -1,0 +1,11 @@
+<div>
+	<table id="{{ id }}"></table>
+	<div id="{{ id }}-pager"></div>
+</div>
+
+<script>
+(function($) {
+	var options = {{ options | json_encode | raw }};
+	$('#{{ id }}').jqGrid(options);
+})(jQuery);
+</script>

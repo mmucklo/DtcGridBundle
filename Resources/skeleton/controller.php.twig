@@ -11,39 +11,43 @@ Add the following code to your controller:
 
 	return array('grid' => $renderer);
 
-Add the following code to your Bundle Extension if you haven't:
+Add the following code to your Bundle Extension, if you haven't already:
 
 	$yamlLoader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 	$yamlLoader->load('grid.yml');
 
+Add the following code to your routing.yml, if you haven't already:
+
+    dtc_grid:
+        resource: '@DtcGridBundle/Resources/config/routing.yml'
+        prefix: /dtc_grid
+
 Use the following template (optional):
-{% raw %}
+{% verbatim %}
     <!DOCTYPE html>
     <html>
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-            {% stylesheets
-                'bundles/dtcgrid/lib/DataTables/media/jquery.dataTables*.css'
-                'bundles/dtcgrid/css/datatable.bootstrap.css'
-
-                combine=false
-                filter='cssrewrite, lessphp'
-                output="generated/css/grid_*.css"
-            %}
-                <link rel="stylesheet" href="{{ asset_url }}" />
-            {% endstylesheets %}
-
-            {% javascripts
-                'bundles/dtcgrid/lib/purl.js'
-                'bundles/dtcgrid/lib/DataTables/media/js/jquery.dataTables.min.js'
-                'bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js'
-                'bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'
-
-                combine=false
-                output="generated/js/grid_*.js"
-            %}
-                <script type="text/javascript" src="{{ asset_url }}"></script>
-            {% endjavascripts %}
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+			{% block stylesheets %}
+				{% for stylesheet in [  path('dtc_grid_bundle_media', { 'rest': 'css/jquery.dataTables.min.css' }),
+										path('dtc_grid_bundle_media', { 'rest': 'css/dataTables.bootstrap.min.css' }),
+									  ] %}
+					<link rel="stylesheet" href="{{ stylesheet }}" />
+				{% endfor %}
+			{% endblock %}
+			{% block javascripts %}
+				{% for javascript in [
+						path('dtc_grid_bundle_media', { 'rest': 'js/jquery.js' }),
+						path('dtc_grid_bundle_purl'),
+						path('dtc_grid_bundle_media', { 'rest': 'js/jquery.dataTables.js' }),
+						path('dtc_grid_bundle_media', { 'rest': 'js/dataTables.bootstrap.js' }),
+						'bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js',
+						'bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
+					<script type="text/javascript" src="{{ javascript }}"></script>
+				{% endfor %}
+			{% endblock %}
+			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         </head>
         <body>
             {{ grid.render | raw }}
@@ -54,4 +58,4 @@ Use the following template (optional):
             </script>
         </body>
     </html>
-{% endraw %}
+{% endverbatim %}

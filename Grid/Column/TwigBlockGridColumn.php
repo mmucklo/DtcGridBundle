@@ -50,7 +50,7 @@ class TwigBlockGridColumn extends AbstractGridColumn
 
     public function format($object, AbstractGridSource $gridSource)
     {
-        if ($this->template->hasBlock($this->blockName)) {
+        if ($this->template->hasBlock($this->blockName, [])) {
             $this->env['obj'] = $object;
             $this->env['source'] = $gridSource;
 

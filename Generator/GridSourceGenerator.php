@@ -124,14 +124,18 @@ class GridSourceGenerator extends Generator
 
         $config[$serviceName.'.columns'] = array(
                 'class' => $gridColumnsNamespace.'\\'.$gridColumnClass,
-                'arguments' => array('@twig', '@templating.globals'),
+                'arguments' => array('@twig'),
             );
 
         $configFile = $bundle->getPath().'/Resources/config/grid.yml';
         $services = array();
         if (file_exists($configFile)) {
-            $services = Yaml::parse($configFile);
-            $services['services'] = array_merge($services['services'], $config);
+            $services = Yaml::parse($contents = file_get_contents($configFile));
+            if (isset($services['services'])) {
+                $services['services'] = array_merge($services['services'], $config);
+            } else {
+                $services['services'] = $config;
+            }
         } else {
             $services['services'] = $config;
         }
@@ -150,7 +154,7 @@ class GridSourceGenerator extends Generator
 
     private function getFieldsFromMetadata(ClassMetadataInfo $metadata)
     {
-        $fields = (array) $metadata->fieldNames;
+        $fields = $metadata->fieldNames;
 
         // Remove the primary key field if it's not managed manually
         if (!$metadata->isIdentifierNatural()) {

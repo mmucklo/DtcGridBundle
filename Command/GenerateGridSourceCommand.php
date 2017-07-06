@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Doctrine\Bundle\DoctrineBundle\Mapping\MetadataFactory;
 use Sensio\Bundle\GeneratorBundle\Command\Validators;
 
 class GenerateGridSourceCommand extends ContainerAwareCommand
@@ -29,14 +28,14 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
         $entity = Validators::validateEntityName($input->getArgument('entity'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
-        $entityClass = $this->getContainer()->get('doctrine')->getEntityNamespace($bundle).'\\'.$entity;
+        $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
         $metadata = $this->getEntityMetadata($entityClass);
         $bundle = $this->getApplication()->getKernel()->getBundle($bundle);
 
         $skeletonDir = __DIR__.'/../Resources/skeleton';
         $columnGenerator = new GridSourceGenerator($skeletonDir, $this->getContainer());
 
-        $columnGenerator->generate($bundle, $entity, $metadata[0]);
+        $columnGenerator->generate($bundle, $entity, $metadata);
     }
 
     protected function parseShortcutNotation($shortcut)
@@ -52,8 +51,6 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
 
     protected function getEntityMetadata($entity)
     {
-        $factory = new MetadataFactory($this->getContainer()->get('doctrine'));
-
-        return $factory->getClassMetadata($entity)->getMetadata();
+        return $this->getContainer()->get('doctrine.orm.default_entity_manager')->getClassMetadata($entity);
     }
 }

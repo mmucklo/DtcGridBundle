@@ -14,3 +14,6 @@ bin/php-cs-fixer
 
 # Jetbrains
 .idea
+
+# Mac
+.DS_Store

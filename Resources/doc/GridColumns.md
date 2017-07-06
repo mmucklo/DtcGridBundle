@@ -22,5 +22,4 @@ Setting Columns for GridSource
 
 	<service id="bt.grid_source.user.cols" class="Dtc\BriefTestBundle\Grid\Column\UserColumns" public="false">
 	    <argument type="service" id="twig"></argument>
-	    <argument type="service" id="templating.globals" />
 	</service>

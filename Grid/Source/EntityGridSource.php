@@ -40,7 +40,6 @@ class EntityGridSource extends AbstractGridSource
         }
 
         if ($this->filter) {
-            $validFilters = array();
             $classMetaData = $this->getClassMetadata();
             $classFields = $classMetaData->fieldMappings;
 
@@ -56,8 +55,26 @@ class EntityGridSource extends AbstractGridSource
 
                 $qb->setParameter($key, $value);
             }
+            if ($query) {
+                $qb->add('where', implode(' and ', $query));
+            } else {
+                $starFilter = array_intersect_key($this->filter, ['*' => null]);
+                if ($starFilter) {
+                    $value = current($starFilter);
+                    $starQuery = [];
+                    foreach (array_keys($classFields) as $key) {
+                        $starQuery[] = "u.{$key} like :{$key}";
+                        $qb->setParameter($key, $value);
+                    }
 
-            $qb->add('where', implode('and', $query));
+                    $star = implode(' or ', $starQuery);
+                    if ($query) {
+                        $qb->andWhere($star);
+                    } else {
+                        $qb->add('where', $star);
+                    }
+                }
+            }
         }
 
         return $qb;

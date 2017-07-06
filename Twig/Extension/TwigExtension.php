@@ -12,7 +12,7 @@ class TwigExtension extends \Twig_Extension
 
         $funcs = array();
         foreach ($names as $twig => $local) {
-            $funcs[$twig] = new \Twig_Filter_Method($this, $local);
+            $funcs[$twig] = new \Twig_SimpleFunction($twig, [$this, $local]);
         }
 
         return $funcs;
@@ -26,7 +26,7 @@ class TwigExtension extends \Twig_Extension
 
         $funcs = array();
         foreach ($names as $twig => $local) {
-            $funcs[$twig] = new \Twig_Filter_Method($this, $local);
+            $funcs[$twig] = new \Twig_SimpleFilter($twig, [$this, $local]);
         }
 
         return $funcs;
