@@ -17,3 +17,7 @@ bin/php-cs-fixer
 
 # Mac
 .DS_Store
+
+#
+composer.lock
+bin

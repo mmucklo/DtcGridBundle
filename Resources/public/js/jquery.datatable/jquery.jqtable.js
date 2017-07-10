@@ -112,7 +112,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
                 }
             }
         });
-    }
+    };
 
     var methods = {};
 
@@ -155,7 +155,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             var jqTable = $table.dataTable();
             jqTable.fnReloadAjax();
         });
-    }
+    };
 
     /**
      * Filter takes jqTable's settings, then modifies
@@ -187,7 +187,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             settings.sAjaxSource = newUrl;
             jqTable.fnReloadAjax();
         });
-    }
+    };
 
     $.fn.jqtable = function(method) {
         // Method calling logic

@@ -5,7 +5,6 @@ namespace Dtc\GridBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Dtc\GridBundle\Grid\Grid;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class GridController extends Controller
@@ -58,60 +57,85 @@ class GridController extends Controller
     }
 
     /**
-     * @Route("/purl", name="dtc_grid_bundle_purl")
+     * @Route("/purl.js", name="dtc_grid_bundle_purl")
+     * @Route("/js/dataTables.{type}.js", name="dtc_grid_bundle_dataTables_extension", requirements={"type" = "\w+" })
+     * @Route("/js/jquery.dataTables.js", name="dtc_grid_bundle_dataTables")
+     * @Route("/css/jquery.dataTables.css", name="dtc_grid_bundle_dataTables_css")
+     * @Route("/css/jquery.dataTables_themeroller.css", name="dtc_grid_bundle_dataTables_themeroller_css")
+     * @Route("/js/jquery.js", name="dtc_grid_bundle_jquery")
+     * @Route("/css/dataTables.{type}.css", name="dtc_grid_bundle_dataTables_extension_css", requirements={"type" = "\w+" })
+     * @Route("/images/sort_{type}.png", name="dtc_grid_bundle_dataTables_images", requirements={"type" = "\w+" })
      */
-    public function purlAction()
+    public function mediaAction(Request $request, $type = null)
     {
-        $filePath = __DIR__.'/../Resources/external/purl/purl.js';
-        $filePath = realpath($filePath);
-        if (!file_exists($filePath)) {
-            throw $this->createNotFoundException();
-        }
+        $debug = $this->getParameter('kernel.debug');
+        $min = $debug ? '.min' : '';
 
-        return new Response(file_get_contents($filePath), 200, ['Content-Type' => 'application/javascript']);
+        $route = $request->get('_route');
+        switch ($route) {
+            case 'dtc_grid_bundle_purl':
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/purl/purl.js'));
+            case 'dtc_grid_bundle_dataTables':
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/js/jquery.dataTables' . $min . '.js'));
+            case 'dtc_grid_bundle_dataTables_css':
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/css/jquery.dataTables' . $min . '.css'));
+            case 'dtc_grid_bundle_dataTables_themeroller_css':
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/css/jquery.dataTables_themeroller.css'));
+            case 'dtc_grid_bundle_dataTables_extension':
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/js/dataTables.'.$type.$min.'.js'));
+            case 'dtc_grid_bundle_jquery':
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/js/jquery.js'));
+            case 'dtc_grid_bundle_dataTables_extension_css':
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/css/dataTables.'.$type.$min.'.css'));
+            case 'dtc_grid_bundle_dataTables_images':
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/images/sort_'.$type.'.png'));
+            default:
+                $this->get('logger')->error(__METHOD__ . " - Unknown route: " . $route);
+                throw $this->createNotFoundException();
+        }
     }
 
     /**
-     * @Route("/dt_media/{rest}", requirements={"rest" = ".+"}, name="dtc_grid_bundle_media")
+     * @param Request $request
+     * @param $filename
+     * @return Response
      */
-    public function dtMediaAction($rest)
+    protected function getResource(Request $request, $filename)
     {
-        $parts = explode('/', $rest);
-        $part0 = $parts[0];
-        switch ($part0) {
+        $response = new Response();
+        if ($filemtime = filemtime($filename)) {
+            $date = new \DateTime();
+            $date->setTimestamp($filemtime);
+            $response->setLastModified($date);
+            if ($response->isNotModified($request)) {
+                return $response;
+            }
+        }
+        $pathInfo = pathinfo($filename);
+        switch ($pathInfo['extension']) {
             case 'css':
                 $mimeType = 'text/css';
                 break;
             case 'js':
                 $mimeType = 'application/javascript';
                 break;
-            case 'images':
-                $pathInfo = pathinfo($rest);
-                if ($pathInfo['extension'] !== 'png') {
-                    throw $this->createNotFoundException();
-                }
+            case 'png':
                 $mimeType = 'image/png';
                 break;
             default:
+                $this->get('logger')->error(__METHOD__ . " Unsupported file extension: " . $pathInfo['extension']);
                 throw $this->createNotFoundException();
         }
-
-        $newParts = [];
-        foreach ($parts as $part) {
-            $part = preg_replace('/[^a-zA-Z\.\_\-]/', '', $part);
-            if (!$part || $part === '..' || $part === '.') {
-                throw $this->createNotFoundException();
-            }
-            $newParts[] = $part;
-        }
-
-        $path = implode('/', $newParts);
-        $path = __DIR__.'/../Resources/external/DataTables/media/'.$path;
-        $path = realpath($path);
-        if (!$path || !file_exists($path)) {
+        if (!file_exists($filename)) {
             throw $this->createNotFoundException();
         }
 
-        return new Response(file_get_contents($path), 200, ['Content-Type' => $mimeType]);
+        $content = file_get_contents($filename);
+        $response->setPublic();
+        $response->setContent($content);
+        $response->setStatusCode( 200);
+        $response->headers->set('Content-Type', $mimeType);
+        $response->setMaxAge(60);
+        return $response;
     }
 }

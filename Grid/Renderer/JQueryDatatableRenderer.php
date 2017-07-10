@@ -6,10 +6,10 @@ class JQueryDatatableRenderer extends TwigGridRenderer
 {
     protected $options = array(
             'bProcessing' => true,
+            'searchDelay' => 350,
             'table_attr' => array(
                     'class' => 'display table table-striped table-bordered small-font',
                 ),
-            'sDom' => "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span4'i><'span8'p>>",
             'sPaginationType' => 'bootstrap',
             'bServerSide' => true,
             'oLanguage' => array(
