@@ -69,7 +69,7 @@ class GridController extends Controller
     public function mediaAction(Request $request, $type = null)
     {
         $debug = $this->getParameter('kernel.debug');
-        $min = $debug ? '.min' : '';
+        $min = $debug ? '' : '.min';
 
         $route = $request->get('_route');
         switch ($route) {
