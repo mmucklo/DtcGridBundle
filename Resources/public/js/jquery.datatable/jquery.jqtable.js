@@ -145,14 +145,14 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             // Override Server Data, we want to use the format Grids support!
             options.fnServerData = _fnServerData;
 
-            $table.dataTable(options);
+            $table.DataTable(options);
         });
     };
 
     methods.reload = function(keepState) {
         return this.each(function() {
             var $table = $(this);
-            var jqTable = $table.dataTable();
+            var jqTable = $table.DataTable();
             jqTable.fnReloadAjax();
         });
     };
@@ -166,7 +166,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
     methods.filter = function(filters, resetPage) {
         return this.each(function() {
             var $table = $(this);
-            var jqTable = $table.dataTable();
+            var jqTable = $table.DataTable();
 
             var settings = jqTable.fnSettings();
             var url = settings.sAjaxSource;
