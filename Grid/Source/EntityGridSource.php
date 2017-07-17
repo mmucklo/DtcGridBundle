@@ -3,6 +3,7 @@
 namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 
 class EntityGridSource extends AbstractGridSource
@@ -40,6 +41,7 @@ class EntityGridSource extends AbstractGridSource
         }
 
         if ($this->filter) {
+            /** @var ClassMetadata $classMetaData */
             $classMetaData = $this->getClassMetadata();
             $classFields = $classMetaData->fieldMappings;
 
@@ -81,7 +83,7 @@ class EntityGridSource extends AbstractGridSource
     }
 
     /**
-     * @return ClassMetadata
+     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
      */
     public function getClassMetadata()
     {
@@ -96,6 +98,7 @@ class EntityGridSource extends AbstractGridSource
      */
     public function getReflectionColumns()
     {
+        /** @var ClassMetadata $metaClass */
         $metaClass = $this->getClassMetadata();
 
         $columns = array();

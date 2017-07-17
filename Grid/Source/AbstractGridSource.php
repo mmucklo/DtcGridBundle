@@ -85,7 +85,7 @@ abstract class AbstractGridSource implements GridSourceInterface
         $this->removeColumns(func_get_args());
     }
 
-    public function selectColums(array $fields)
+    public function selectColumns(array $fields)
     {
         $selectedCols = array();
         foreach ($fields as $field) {

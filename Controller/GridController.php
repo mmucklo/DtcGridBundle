@@ -24,7 +24,7 @@ class GridController extends Controller
 
         $fields = $request->get('fields', null);
         if ($fields && is_array($fields)) {
-            $gridSource->selectColums($fields);
+            $gridSource->selectColumns($fields);
         }
 
         $content = null;

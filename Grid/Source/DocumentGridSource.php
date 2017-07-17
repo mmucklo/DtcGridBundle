@@ -10,6 +10,7 @@ class DocumentGridSource extends AbstractGridSource
     protected $dm;
     protected $documentName;
     protected $repository;
+    protected $findCache;
 
     public function __construct(DocumentManager $dm, $documentName)
     {
@@ -22,10 +23,17 @@ class DocumentGridSource extends AbstractGridSource
     {
         $this->setColumns($this->getReflectionColumns());
     }
-
-    protected function getCursor()
+    
+    protected function find()
     {
-        return $this->repository->findBy($this->filter, $this->orderBy, $this->limit, $this->offset);
+        $arguments = array($this->filter, $this->orderBy, $this->limit, $this->offset);
+        $hashKey = serialize($arguments);
+
+        if (isset($this->findCache[$hashKey])) {
+            return $this->findCache[$hashKey];
+        }
+
+        return call_user_func_array([$this->repository, 'findBy'], $arguments);
     }
 
     /**
@@ -75,12 +83,11 @@ class DocumentGridSource extends AbstractGridSource
 
     public function getCount()
     {
-        return $this->getCursor()
-            ->count();
+        return ($results = $this->find()) ? count($results) : 0;
     }
 
     public function getRecords()
     {
-        return $this->getCursor();
+        return $this->find();
     }
 }
