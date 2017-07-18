@@ -6,7 +6,6 @@ use Dtc\GridBundle\Generator\GridSourceGenerator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Sensio\Bundle\GeneratorBundle\Command\Validators;
 
@@ -34,12 +33,10 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
 
         try {
             $metadata = $this->getEntityMetadata($entityClass);
-        }
-        catch (\Exception $exception) {
-            if (preg_match("/does not exist/", $exception->getMessage())) {
+        } catch (\Exception $exception) {
+            if (preg_match('/does not exist/', $exception->getMessage())) {
                 $metadata = $this->getDocumentMetadata($documentClass);
-            }
-            else {
+            } else {
                 throw $exception;
             }
         }
@@ -67,6 +64,7 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
     {
         return $this->getContainer()->get('doctrine.orm.default_entity_manager')->getClassMetadata($entity);
     }
+
     protected function getDocumentMetadata($document)
     {
         return $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager')->getClassMetadata($document);

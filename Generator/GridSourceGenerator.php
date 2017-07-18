@@ -67,14 +67,12 @@ class GridSourceGenerator extends Generator
     {
         if ($metadata instanceof ClassMetadataInfo) {
             $manager = '@doctrine.orm.default_entity_manager';
-            $class   = 'Dtc\GridBundle\Grid\Source\EntityGridSource';
-        }
-        else if ($metadata instanceof \Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo) {
+            $class = 'Dtc\GridBundle\Grid\Source\EntityGridSource';
+        } elseif ($metadata instanceof \Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo) {
             $manager = '@doctrine_mongodb.odm.default_document_manager';
-            $class   = 'Dtc\GridBundle\Grid\Source\DocumentGridSource';
-        }
-        else {
-            throw new \Exception(__METHOD__ . " - Unknown class for metadata: " . get_class($metadata));
+            $class = 'Dtc\GridBundle\Grid\Source\DocumentGridSource';
+        } else {
+            throw new \Exception(__METHOD__.' - Unknown class for metadata: '.get_class($metadata));
         }
         $entityDocumentClassPath = $metadata->getReflectionClass()->getName();
 
@@ -138,8 +136,6 @@ class GridSourceGenerator extends Generator
         exit();
     }
 
-
-
     private function getFieldsFromMetadata($metadata)
     {
         if ($metadata instanceof ClassMetadataInfo) {
@@ -157,8 +153,7 @@ class GridSourceGenerator extends Generator
             }
 
             return $fields;
-        }
-        else if ($metadata instanceof ClassMetadata) {
+        } elseif ($metadata instanceof ClassMetadata) {
             $fields = $metadata->getFieldNames();
             $retFields = [];
             $identifier = $metadata->getIdentifier();
@@ -172,6 +167,7 @@ class GridSourceGenerator extends Generator
                 }
                 $retFields[] = $field;
             }
+
             return $retFields;
         }
     }
