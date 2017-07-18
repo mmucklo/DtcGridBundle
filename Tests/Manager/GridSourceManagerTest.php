@@ -6,16 +6,18 @@ use Dtc\GridBundle\Manager\GridSourceManager;
 use Dtc\GridBundle\Tests\Grid\Source\TestGridSource;
 use PHPUnit\Framework\TestCase;
 
-class GridSourceManagerTest extends TestCase {
-
-    public function testConstruct() {
+class GridSourceManagerTest extends TestCase
+{
+    public function testConstruct()
+    {
         $gridSourceManager = new GridSourceManager();
         self::assertNotNull($gridSourceManager->all());
         self::assertInternalType('array', $gridSourceManager->all());
         self::assertEmpty($gridSourceManager->all());
     }
 
-    public function testAdd() {
+    public function testAdd()
+    {
         $gridSourceManager = new GridSourceManager();
         $gridSource = new TestGridSource();
         $gridSourceManager->add('test_grid_source', $gridSource);

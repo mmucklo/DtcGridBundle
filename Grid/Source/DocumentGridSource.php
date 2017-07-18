@@ -25,51 +25,48 @@ class DocumentGridSource extends AbstractGridSource
         $this->setColumns($this->getReflectionColumns());
     }
 
-    protected function find()
+    protected function getQueryBuilder()
     {
-        if ($this->filter) {
-            /** @var ClassMetadata $classMetaData */
-            $classMetaData = $this->getClassMetadata();
-            $classFields = $classMetaData->fieldMappings;
+        $qb = $this->dm->createQueryBuilder($this->documentName);
 
+        /** @var ClassMetadata $classMetaData */
+        $classMetaData = $this->getClassMetadata();
+        $classFields = $classMetaData->fieldMappings;
+
+        if ($this->filter) {
             $validFilters = array_intersect_key($this->filter, $classFields);
 
             $query = array();
             foreach ($validFilters as $key => $value) {
                 if (is_array($value)) {
-                    $query[$key] = ['$in' => $value];
+                    $qb->field($key)->in($value);
                 } else {
-                    $query[$key] = $value;
+                    $qb->field($key)->equals($value);
                 }
             }
             if (!$query) {
                 $starFilter = array_intersect_key($this->filter, ['*' => null]);
                 if ($starFilter) {
                     $value = current($starFilter);
-                    $starQuery = [];
-                    foreach (array_keys($classFields) as $key) {
-                        $starQuery[] = "u.{$key} like :{$key}";
-                        $qb->setParameter($key, $value);
-                    }
-
-                    $star = implode(' or ', $starQuery);
-                    if ($query) {
-                        $qb->andWhere($star);
-                    } else {
-                        $qb->add('where', $star);
+                    foreach ($classFields as $key => $info) {
+                        $expr = $qb->expr()->field($key);
+                        switch ($info['type']) {
+                            case 'integer':
+                                $expr = $expr->equals(intval($value));
+                                break;
+                            default:
+                                $expr = $expr->equals($value);
+                        }
+                        $qb->addOr($expr);
+                        // new \MongoRegex('/.*'.$value.'.*/') - > maybe use some day?
                     }
                 }
             }
         }
+        $qb->limit($this->limit);
+        $qb->skip($this->offset);
 
-        $arguments = array($this->filter, $this->orderBy, $this->limit, $this->offset);
-        $hashKey = serialize($arguments);
-
-        if (isset($this->findCache[$hashKey])) {
-            return $this->findCache[$hashKey];
-        }
-
-        return call_user_func_array([$this->repository, 'findBy'], $arguments);
+        return $qb;
     }
 
     /**
@@ -119,11 +116,13 @@ class DocumentGridSource extends AbstractGridSource
 
     public function getCount()
     {
-        return $this->dm->createQueryBuilder($this->documentName)->count()->getQuery()->execute();
+        $result = $this->getQueryBuilder()->limit(0)->skip(0)->count()->getQuery()->execute();
+
+        return $result;
     }
 
     public function getRecords()
     {
-        return $this->find();
+        return $this->getQueryBuilder()->getQuery()->execute()->toArray(false);
     }
 }

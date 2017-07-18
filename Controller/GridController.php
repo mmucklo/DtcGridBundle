@@ -76,9 +76,9 @@ class GridController extends Controller
             case 'dtc_grid_bundle_purl':
                 return $this->getResource($request, realpath(__DIR__.'/../Resources/external/purl/purl.js'));
             case 'dtc_grid_bundle_dataTables':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/js/jquery.dataTables' . $min . '.js'));
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/js/jquery.dataTables'.$min.'.js'));
             case 'dtc_grid_bundle_dataTables_css':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/css/jquery.dataTables' . $min . '.css'));
+                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/css/jquery.dataTables'.$min.'.css'));
             case 'dtc_grid_bundle_dataTables_themeroller_css':
                 return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/css/jquery.dataTables_themeroller.css'));
             case 'dtc_grid_bundle_dataTables_extension':
@@ -90,7 +90,7 @@ class GridController extends Controller
             case 'dtc_grid_bundle_dataTables_images':
                 return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/images/sort_'.$type.'.png'));
             default:
-                $this->get('logger')->error(__METHOD__ . " - Unknown route: " . $route);
+                $this->get('logger')->error(__METHOD__.' - Unknown route: '.$route);
                 throw $this->createNotFoundException();
         }
     }
@@ -98,6 +98,7 @@ class GridController extends Controller
     /**
      * @param Request $request
      * @param $filename
+     *
      * @return Response
      */
     protected function getResource(Request $request, $filename)
@@ -123,7 +124,7 @@ class GridController extends Controller
                 $mimeType = 'image/png';
                 break;
             default:
-                $this->get('logger')->error(__METHOD__ . " Unsupported file extension: " . $pathInfo['extension']);
+                $this->get('logger')->error(__METHOD__.' Unsupported file extension: '.$pathInfo['extension']);
                 throw $this->createNotFoundException();
         }
         if (!file_exists($filename)) {
@@ -133,9 +134,10 @@ class GridController extends Controller
         $content = file_get_contents($filename);
         $response->setPublic();
         $response->setContent($content);
-        $response->setStatusCode( 200);
+        $response->setStatusCode(200);
         $response->headers->set('Content-Type', $mimeType);
         $response->setMaxAge(60);
+
         return $response;
     }
 }

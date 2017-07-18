@@ -27,8 +27,5 @@ class GridSourceCompilerPass implements CompilerPassInterface
             $gridSourceDefinition->addMethodCall('setId', array($id));
             $sourceManager->addMethodCall('add', array($id, new Reference($id)));
         }
-
-
-
     }
 }

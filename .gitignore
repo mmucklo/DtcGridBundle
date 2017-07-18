@@ -21,3 +21,5 @@ bin/php-cs-fixer
 #
 composer.lock
 bin
+
+.php_cs.cache

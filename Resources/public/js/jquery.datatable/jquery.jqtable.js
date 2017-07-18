@@ -87,9 +87,15 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
                 params.order[fieldName] = sortedDirection;
             }
         }
+        // Abort any current xhr
+
+        console.log('oSettings', oSettings.jqXHR);
+        if (oSettings.jqXHR) {
+            oSettings.jqXHR.abort();
+        }
 
         // Set filters if there are any
-        $.ajax({
+        oSettings.jqXHR = $.ajax({
             url: baseUrl,
             data: $.param(params),
             dataType: "json",
