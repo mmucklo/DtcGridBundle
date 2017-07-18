@@ -23,7 +23,7 @@ class DocumentGridSource extends AbstractGridSource
     {
         $this->setColumns($this->getReflectionColumns());
     }
-    
+
     protected function find()
     {
         $arguments = array($this->filter, $this->orderBy, $this->limit, $this->offset);
@@ -83,7 +83,7 @@ class DocumentGridSource extends AbstractGridSource
 
     public function getCount()
     {
-        return ($results = $this->find()) ? count($results) : 0;
+        return $this->dm->createQueryBuilder($this->documentName)->count()->getQuery()->execute();
     }
 
     public function getRecords()
