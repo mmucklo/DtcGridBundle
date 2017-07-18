@@ -1,5 +1,6 @@
 DtcGridBundle
 ==============
+[![Build Status](https://travis-ci.org/mmucklo/DtcGridBundle.svg?branch=master)](https://travis-ci.org/mmucklo/DtcGridBundle)
 
 Render customizable tables using jqGrid, or jquery Data Tables.
 
