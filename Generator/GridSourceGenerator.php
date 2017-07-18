@@ -2,6 +2,7 @@
 
 namespace Dtc\GridBundle\Generator;
 
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -10,6 +11,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 class GridSourceGenerator extends Generator
 {
     private $saveCache;
+    private $skeletonDir;
 
     public function __construct($skeletonDir, ContainerInterface $container)
     {
@@ -29,7 +31,7 @@ class GridSourceGenerator extends Generator
         return $value;
     }
 
-    protected function generateColumns(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata)
+    protected function generateColumns(BundleInterface $bundle, $entity, $metadata)
     {
         $parts = explode('\\', $entity);
         $entityClass = array_pop($parts);
@@ -61,43 +63,28 @@ class GridSourceGenerator extends Generator
         return array($gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath);
     }
 
-    protected function generateSource(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata)
+    public function generate(BundleInterface $bundle, $entityDocument, $metadata)
     {
-        $parts = explode('\\', $entity);
-        $entityClass = array_pop($parts);
-        $entityNamespace = implode('\\', $parts);
+        if ($metadata instanceof ClassMetadataInfo) {
+            $manager = '@doctrine.orm.default_entity_manager';
+            $class   = 'Dtc\GridBundle\Grid\Source\EntityGridSource';
+        }
+        else if ($metadata instanceof \Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo) {
+            $manager = '@doctrine_mongodb.odm.default_document_manager';
+            $class   = 'Dtc\GridBundle\Grid\Source\DocumentGridSource';
+        }
+        else {
+            throw new \Exception(__METHOD__ . " - Unknown class for metadata: " . get_class($metadata));
+        }
+        $entityDocumentClassPath = $metadata->getReflectionClass()->getName();
 
-        $gridSourceNamespace = $bundle->getNamespace().'\\Grid\\Source';
-        $gridSourceNamespace .= ($entityNamespace) ? '\\'.$entityNamespace : '';
-
-        $gridSourceClass = $entityClass.'GridSource';
-        $dirPath = $bundle->getPath().'/Grid/Source';
-        $gridSourcePath = $dirPath.'/'.str_replace('\\', '/', $entity).'GridSource.php';
-
-        $params = array(
-                'namespace' => $gridSourceNamespace,
-                'entity_class' => $metadata->getReflectionClass()->getName(),
-                'class' => $gridSourceClass,
-        );
-
-        $this->saveCache[$gridSourcePath] = $this->render($this->skeletonDir, 'GridSource.php.twig', $params);
-
-        return array($gridSourceClass, $gridSourceNamespace, $gridSourcePath);
-    }
-
-    public function generate(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata)
-    {
-        $parts = explode('\\', $entity);
-        $entityClass = array_pop($parts);
+        $parts = explode('\\', $entityDocument);
+        $entityDocumentClass = array_pop($parts);
 
         list($gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath) =
-            $this->generateColumns($bundle, $entity, $metadata);
-
-        list($gridSourceClass, $gridSourceNamespace, $gridSourcePath) =
-            $this->generateSource($bundle, $entity, $metadata);
+            $this->generateColumns($bundle, $entityDocument, $metadata);
 
         $files = array(
-                'grid_source' => $gridSourcePath,
                 'grid_columns' => $gridColumnPath,
                 'grid_template' => $templatePath,
         );
@@ -108,11 +95,10 @@ class GridSourceGenerator extends Generator
         }
 
         $config = array();
-        $serviceName = 'grid.source.'.strtolower($entityClass);
-        $documentManager = '@doctrine.orm.default_entity_manager';
+        $serviceName = 'grid.source.'.strtolower($entityDocumentClass);
         $config[$serviceName] = array(
-                'class' => $gridSourceNamespace.'\\'.$gridSourceClass,
-                'arguments' => array($documentManager),
+                'class' => $class,
+                'arguments' => array($manager, $entityDocumentClassPath),
                 'tags' => array(array('name' => 'dtc_grid.source')),
                 'calls' => array(
                         array('setColumns', array(
@@ -152,21 +138,41 @@ class GridSourceGenerator extends Generator
         exit();
     }
 
-    private function getFieldsFromMetadata(ClassMetadataInfo $metadata)
+
+
+    private function getFieldsFromMetadata($metadata)
     {
-        $fields = $metadata->fieldNames;
+        if ($metadata instanceof ClassMetadataInfo) {
+            $fields = $metadata->getFieldNames();
 
-        // Remove the primary key field if it's not managed manually
-        if (!$metadata->isIdentifierNatural()) {
-            $fields = array_diff($fields, $metadata->identifier);
-        }
-
-        foreach ($metadata->associationMappings as $fieldName => $relation) {
-            if ($relation['type'] !== ClassMetadataInfo::ONE_TO_MANY) {
-                $fields[] = $fieldName;
+            // Remove the primary key field if it's not managed manually
+            if (!$metadata->isIdentifierNatural()) {
+                $fields = array_diff($fields, $metadata->getIdentifier());
             }
-        }
 
-        return $fields;
+            foreach ($metadata->associationMappings as $fieldName => $relation) {
+                if ($relation['type'] !== ClassMetadataInfo::ONE_TO_MANY) {
+                    $fields[] = $fieldName;
+                }
+            }
+
+            return $fields;
+        }
+        else if ($metadata instanceof ClassMetadata) {
+            $fields = $metadata->getFieldNames();
+            $retFields = [];
+            $identifier = $metadata->getIdentifier();
+            $identifier = isset($identifier[0]) ? $identifier[0] : null;
+            foreach ($fields as $field) {
+                if ($identifier === $field) {
+                    $mapping = $metadata->getFieldMapping($field);
+                    if (isset($mapping['strategy']) && $mapping['strategy'] == 'auto') {
+                        continue;
+                    }
+                }
+                $retFields[] = $field;
+            }
+            return $retFields;
+        }
     }
 }

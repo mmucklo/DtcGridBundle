@@ -6,6 +6,7 @@ use Dtc\GridBundle\Generator\GridSourceGenerator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Sensio\Bundle\GeneratorBundle\Command\Validators;
 
@@ -16,7 +17,7 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
         $this
         ->setName('dtc:grid:source:generate')
             ->setDefinition(array(
-                new InputArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)'),
+                new InputArgument('entity_or_document', InputArgument::REQUIRED, 'The entity or document class name to initialize (shortcut notation)'),
                 new InputArgument('class_name', InputArgument::OPTIONAL, 'Name of GridSource - camel case, no space.'),
             ))
         ->setDescription('Generate a class for GridSource, GridColumn and template file')
@@ -25,11 +26,24 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $entity = Validators::validateEntityName($input->getArgument('entity'));
+        $entity = Validators::validateEntityName($input->getArgument('entity_or_document'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
         $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
-        $metadata = $this->getEntityMetadata($entityClass);
+        $documentClass = $this->getContainer()->get('doctrine_mongodb')->getAliasNamespace($bundle).'\\'.$entity;
+
+        try {
+            $metadata = $this->getEntityMetadata($entityClass);
+        }
+        catch (\Exception $exception) {
+            if (preg_match("/does not exist/", $exception->getMessage())) {
+                $metadata = $this->getDocumentMetadata($documentClass);
+            }
+            else {
+                throw $exception;
+            }
+        }
+
         $bundle = $this->getApplication()->getKernel()->getBundle($bundle);
 
         $skeletonDir = __DIR__.'/../Resources/skeleton';
@@ -52,5 +66,9 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
     protected function getEntityMetadata($entity)
     {
         return $this->getContainer()->get('doctrine.orm.default_entity_manager')->getClassMetadata($entity);
+    }
+    protected function getDocumentMetadata($document)
+    {
+        return $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager')->getClassMetadata($document);
     }
 }

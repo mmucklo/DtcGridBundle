@@ -114,7 +114,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return the $limit
+     * @return $limit
      */
     public function getLimit()
     {
@@ -122,7 +122,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @param field_type $limit
+     * @param int $limit
      */
     public function setLimit($limit)
     {
@@ -130,7 +130,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return the $offset
+     * @return $offset
      */
     public function getOffset()
     {
@@ -138,7 +138,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @param field_type $offset
+     * @param int $offset
      */
     public function setOffset($offset)
     {
@@ -146,7 +146,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return the $filter
+     * @return $filter
      */
     public function getFilter()
     {
@@ -154,7 +154,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @param field_type $filter
+     * @param $filter
      */
     public function setFilter($filter)
     {
@@ -162,7 +162,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return the $orderBy
+     * @return $orderBy
      */
     public function getOrderBy()
     {
@@ -170,7 +170,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @param field_type $orderBy
+     * @param $orderBy
      */
     public function setOrderBy($orderBy)
     {
@@ -193,7 +193,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return the $parameters
+     * @return $parameters
      */
     public function getParameters()
     {
@@ -201,7 +201,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @param field_type $parameters
+     * @param $parameters
      */
     public function setParameters($parameters)
     {

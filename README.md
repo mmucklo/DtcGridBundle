@@ -3,25 +3,38 @@ DtcGridBundle
 
 Render customizable tables using jqGrid, or jquery Data Tables.
 
-Documentation
--------------
-
-The bulk of the documentation is stored in the `Resources/doc/index.md`
+Supports both Doctrine ORM and Doctrine MongoDB ODM
 
 Installation
 ------------
+    
+Add this to your AppKernel.php file:
 
+```
+        public function registerBundles()
+        {
+            $bundles = [
+                ...
+                new \Dtc\GridBundle\DtcGridBundle(),
+                ...
+            ]
+```
 
 Usage
 -----
+
+If you have your entities or documents already defined, start with this command:
+
+	./app/console dtc:grid:source:generate <entity_or_document>
 
 You can use symfony's console to view registered grid sources:
 
 	./app/console dtc:grid:source:list
 
-You can also use a build in console command to help generate grid related files:
+Documentation
+-------------
 
-	./app/console dtc:grid:source:generate
+There is additional documentation stored in `Resources/doc/`
 
 License
 -------
