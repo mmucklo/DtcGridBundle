@@ -2,6 +2,7 @@
 
 namespace Dtc\GridBundle\Grid\Source;
 
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -26,6 +27,41 @@ class DocumentGridSource extends AbstractGridSource
 
     protected function find()
     {
+        if ($this->filter) {
+            /** @var ClassMetadata $classMetaData */
+            $classMetaData = $this->getClassMetadata();
+            $classFields = $classMetaData->fieldMappings;
+
+            $validFilters = array_intersect_key($this->filter, $classFields);
+
+            $query = array();
+            foreach ($validFilters as $key => $value) {
+                if (is_array($value)) {
+                    $query[$key] = ['$in' => $value];
+                } else {
+                    $query[$key] = $value;
+                }
+            }
+            if (!$query) {
+                $starFilter = array_intersect_key($this->filter, ['*' => null]);
+                if ($starFilter) {
+                    $value = current($starFilter);
+                    $starQuery = [];
+                    foreach (array_keys($classFields) as $key) {
+                        $starQuery[] = "u.{$key} like :{$key}";
+                        $qb->setParameter($key, $value);
+                    }
+
+                    $star = implode(' or ', $starQuery);
+                    if ($query) {
+                        $qb->andWhere($star);
+                    } else {
+                        $qb->add('where', $star);
+                    }
+                }
+            }
+        }
+
         $arguments = array($this->filter, $this->orderBy, $this->limit, $this->offset);
         $hashKey = serialize($arguments);
 
