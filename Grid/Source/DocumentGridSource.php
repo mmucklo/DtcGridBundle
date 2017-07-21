@@ -3,11 +3,12 @@
 namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
-use Dtc\GridBundle\Grid\Column\GridColumn;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class DocumentGridSource extends AbstractGridSource
 {
+    use MetadataTrait;
+
     protected $dm;
     protected $documentName;
     protected $repository;
@@ -18,11 +19,6 @@ class DocumentGridSource extends AbstractGridSource
         $this->dm = $dm;
         $this->repository = $dm->getRepository($documentName);
         $this->documentName = $documentName;
-    }
-
-    public function autoDiscoverColumns()
-    {
-        $this->setColumns($this->getReflectionColumns());
     }
 
     protected function getQueryBuilder()
@@ -70,7 +66,7 @@ class DocumentGridSource extends AbstractGridSource
     }
 
     /**
-     * @return ClassMetadata
+     * @return mixed
      */
     public function getClassMetadata()
     {
@@ -78,40 +74,6 @@ class DocumentGridSource extends AbstractGridSource
         $classInfo = $metaFactory->getMetadataFor($this->documentName);
 
         return $classInfo;
-    }
-
-    /**
-     * Generate Columns based on document's Metadata.
-     */
-    public function getReflectionColumns()
-    {
-        $metaClass = $this->getClassMetadata();
-
-        $columns = array();
-        foreach ($metaClass->fieldMappings as $fieldInfo) {
-            $field = $fieldInfo['fieldName'];
-            if (isset($fieldInfo['options']) && isset($fieldInfo['options']['label'])) {
-                $label = $fieldInfo['options']['label'];
-            } else {
-                $label = $this->fromCamelCase($field);
-            }
-
-            $columns[$field] = new GridColumn($field, $label);
-        }
-
-        return $columns;
-    }
-
-    protected function fromCamelCase($str)
-    {
-        $func = function ($str) {
-            return ' '.$str[0];
-        };
-
-        $value = preg_replace_callback('/([A-Z])/', $func, $str);
-        $value = ucfirst($value);
-
-        return $value;
     }
 
     public function getCount()

@@ -1,15 +1,15 @@
 {
     "name": "mmucklo/grid-bundle",
-    "description": "Datagrid for symfony2 or symfony3",
+    "description": "Datagrid for symfony2 or symfony3 or symfony4",
     "keywords": ["grid", "jQGrid", "table"],
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
         {
-            "name": "David Tee"
+            "name": "Matthew J Mucklo"
         },
         {
-            "name": "Matthew J Mucklo"
+            "name": "David Tee"
         }
     ],
     "require": {
@@ -28,7 +28,9 @@
         "bin-dir": "bin"
     },
     "autoload": {
-        "psr-0": { "Dtc\\GridBundle": "" }
-    },
-    "target-dir": "Dtc/GridBundle"
+        "psr-4": { "Dtc\\GridBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    }
 }

@@ -2,7 +2,7 @@ Grid Columns
 ============
 
 You can customize the grid customs for any type of renderer. You can also set
-formatter to customize custom data for each columns fields. You can acheive this
+formatter to customize custom data for each columns fields. You can achieve this
 by using twig or php.
 
 Setting up Column Class

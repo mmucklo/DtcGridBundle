@@ -33,11 +33,10 @@ class GridColumn extends AbstractGridColumn
 
     protected function _format($object)
     {
+        $value = null;
         if (is_array($object)) {
             if (isset($object[$this->field])) {
-                return $object[$this->field];
-            } else {
-                return null;
+                $value = $object[$this->field];
             }
         } elseif (is_object($object)) {
             $funcPrefix = array(
@@ -48,18 +47,28 @@ class GridColumn extends AbstractGridColumn
             foreach ($funcPrefix as $prefix) {
                 $methodName = $prefix.$this->field;
                 if (method_exists($object, $methodName)) {
-                    return $object->$methodName();
+                    $value = $object->$methodName();
+                    break;
                 }
             }
+        }
+        if (is_object($value)) {
+            if ($value instanceof \DateTime) {
+                return $value->format(\DateTime::ISO8601);
+            }
 
-            return null;
+            return 'object: '.get_class($value);
+        } elseif (is_scalar($value)) {
+            return $value;
+        } elseif (is_array($value)) {
+            return 'array: '.print_r($value, true);
         }
 
-        return null;
+        return $value;
     }
 
     /**
-     * @return the $formatter
+     * @return $formatter
      */
     public function getFormatter()
     {
@@ -67,7 +76,7 @@ class GridColumn extends AbstractGridColumn
     }
 
     /**
-     * @param field_type $formatter
+     * @param $formatter
      */
     public function setFormatter($formatter)
     {

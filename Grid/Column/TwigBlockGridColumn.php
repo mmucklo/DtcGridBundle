@@ -33,7 +33,7 @@ class TwigBlockGridColumn extends AbstractGridColumn
     }
 
     /**
-     * @return the $template
+     * @return $template
      */
     public function getTemplate()
     {
@@ -41,7 +41,7 @@ class TwigBlockGridColumn extends AbstractGridColumn
     }
 
     /**
-     * @return the $blockName
+     * @return $blockName
      */
     public function getBlockName()
     {

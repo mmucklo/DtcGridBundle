@@ -22,6 +22,7 @@ class JQueryGridRenderer extends TwigGridRenderer
             'altRows' => true,
             'viewrecords' => true,
             'multiselect' => true,
+            'styleUI' => 'Bootstrap',
 
             // Paging params
             'prmNames' => array(
@@ -86,7 +87,7 @@ class JQueryGridRenderer extends TwigGridRenderer
         foreach ($records as $record) {
             $info = array();
             foreach ($columns as $column) {
-                $info[$column->getField()] = $column->format($record);
+                $info[$column->getField()] = $column->format($record, $this->gridSource);
             }
 
             $retVal['rows'][] = $info;

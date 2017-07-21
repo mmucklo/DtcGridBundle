@@ -3,6 +3,7 @@
 namespace Dtc\GridBundle\Generator;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Dtc\GridBundle\Util\CamelCaseTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -10,6 +11,8 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 class GridSourceGenerator extends Generator
 {
+    use CamelCaseTrait;
+
     private $saveCache;
     private $skeletonDir;
 
@@ -17,18 +20,6 @@ class GridSourceGenerator extends Generator
     {
         $this->skeletonDir = $skeletonDir;
         $this->container = $container;
-    }
-
-    protected function fromCamelCase($str)
-    {
-        $func = function ($str) {
-            return ' '.$str[0];
-        };
-
-        $value = preg_replace_callback('/([A-Z])/', $func, $str);
-        $value = ucfirst($value);
-
-        return $value;
     }
 
     protected function generateColumns(BundleInterface $bundle, $entity, $metadata)
@@ -63,7 +54,7 @@ class GridSourceGenerator extends Generator
         return array($gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath);
     }
 
-    public function generate(BundleInterface $bundle, $entityDocument, $metadata)
+    public function generate(BundleInterface $bundle, $entityDocument, $metadata, $columns = false)
     {
         if ($metadata instanceof ClassMetadataInfo) {
             $manager = '@doctrine.orm.default_entity_manager';
@@ -78,18 +69,23 @@ class GridSourceGenerator extends Generator
 
         $parts = explode('\\', $entityDocument);
         $entityDocumentClass = array_pop($parts);
+        $files = [];
 
-        list($gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath) =
-            $this->generateColumns($bundle, $entityDocument, $metadata);
+        if ($columns) {
+            list($gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath) =
+                $this->generateColumns($bundle, $entityDocument, $metadata);
 
-        $files = array(
+            $files = array(
                 'grid_columns' => $gridColumnPath,
                 'grid_template' => $templatePath,
-        );
+            );
+        }
 
         // Check to see if the files exists
-        foreach ($this->saveCache as $file => $output) {
-            $this->saveFile($file, $output);
+        if ($this->saveCache) {
+            foreach ($this->saveCache as $file => $output) {
+                $this->saveFile($file, $output);
+            }
         }
 
         $config = array();
@@ -99,17 +95,22 @@ class GridSourceGenerator extends Generator
                 'arguments' => array($manager, $entityDocumentClassPath),
                 'tags' => array(array('name' => 'dtc_grid.source')),
                 'calls' => array(
-                        array('setColumns', array(
-                                '@'.$serviceName.'.columns',
-                            ),
-                        ),
-                    ),
+                    array('autoDiscoverColumns'),
+        ), );
+
+        if ($columns && isset($gridColumnsNamespace) && isset($gridColumnClass)) {
+            $config[$serviceName]['calls'] = array(
+                array('setColumns', array(
+                    '@'.$serviceName.'.columns',
+                ),
+                ),
             );
 
-        $config[$serviceName.'.columns'] = array(
+            $config[$serviceName.'.columns'] = array(
                 'class' => $gridColumnsNamespace.'\\'.$gridColumnClass,
                 'arguments' => array('@twig'),
             );
+        }
 
         $configFile = $bundle->getPath().'/Resources/config/grid.yml';
         $services = array();

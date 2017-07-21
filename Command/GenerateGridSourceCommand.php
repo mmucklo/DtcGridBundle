@@ -4,8 +4,10 @@ namespace Dtc\GridBundle\Command;
 
 use Dtc\GridBundle\Generator\GridSourceGenerator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Sensio\Bundle\GeneratorBundle\Command\Validators;
 
@@ -18,6 +20,7 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('entity_or_document', InputArgument::REQUIRED, 'The entity or document class name to initialize (shortcut notation)'),
                 new InputArgument('class_name', InputArgument::OPTIONAL, 'Name of GridSource - camel case, no space.'),
+                new InputOption('columns', null, InputOption::VALUE_NONE, 'Generate column files.'),
             ))
         ->setDescription('Generate a class for GridSource, GridColumn and template file')
         ;
@@ -41,12 +44,16 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
             }
         }
 
-        $bundle = $this->getApplication()->getKernel()->getBundle($bundle);
-
+        $application = $this->getApplication();
+        if ($application instanceof Application) {
+            $bundle = $application->getKernel()->getBundle($bundle);
+        } else {
+            throw new \Exception("Can't lookup bundle for $bundle");
+        }
         $skeletonDir = __DIR__.'/../Resources/skeleton';
         $columnGenerator = new GridSourceGenerator($skeletonDir, $this->getContainer());
 
-        $columnGenerator->generate($bundle, $entity, $metadata);
+        $columnGenerator->generate($bundle, $entity, $metadata, $input->getOption('columns'));
     }
 
     protected function parseShortcutNotation($shortcut)

@@ -5,13 +5,20 @@ You can render your grid using jQuery Data table in just two easy steps
 
 ### 1. Create a GridSource service
 
+XML:
     <service id="grid.source.character" class="Dtc\GridBundle\Grid\Source\DocumentGridSource" public="true">
         <argument type="service" id="shadow.document_manager"></argument>
         <argument>Odl\ShadowBundle\Documents\Character</argument>
         <argument>grid.source.character</argument>
-
         <call method="autoDiscoverColumns"></call>
     </service>
+
+YAML:
+    grid.source.user:
+        class: Dtc\GridBundle\Grid\Source\EntityGridSource
+        arguments: ['@doctrine.orm.default_entity_manager', AppBundle\Entity\User]
+        tags: [{ name: dtc_grid.source }]
+        calls: [[autoDiscoverColumns]]
 
 ### 2. Use the JQueryDatatable Renderer to render table.
 
@@ -41,27 +48,26 @@ In your template file:
     <html>
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-            <title>JQuery Data Table Grid</title>
-            {% stylesheets
-                'bundles/dtcgrid/lib/DataTables/media/jquery.dataTables*.css'
-                'bundles/dtcgrid/css/datatable.bootstrap.css'
-                combine=false
-                filter='cssrewrite, lessphp'
-                output="generated/css/grid_*.css"
-            %}
-                <link rel="stylesheet" href="{{ asset_url }}" />
-            {% endstylesheets %}
-
-            {% javascripts
-                'bundles/dtcgrid/lib/purl.js'
-                'bundles/dtcgrid/lib/DataTables/media/js/jquery.dataTables.min.js'
-                'bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js'
-                'bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'
-                combine=false
-                output="generated/js/grid_*.js"
-            %}
-                <script type="text/javascript" src="{{ asset_url }}"></script>
-            {% endjavascripts %}
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+			{% block stylesheets %}
+				{% for stylesheet in [
+				path('dtc_grid_bundle_dataTables_extension_css', { 'type': 'bootstrap' }),
+										] %}
+					<link rel="stylesheet" href="{{ stylesheet }}" />
+				{% endfor %}
+			{% endblock %}
+			{% block javascripts %}
+				{% for javascript in [
+				path('dtc_grid_bundle_jquery'),
+				path('dtc_grid_bundle_purl'),
+				path('dtc_grid_bundle_dataTables'),
+				path('dtc_grid_bundle_dataTables_extension', { 'type': 'bootstrap' }),
+				'bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js',
+				'bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
+					<script type="text/javascript" src="{{ javascript }}"></script>
+				{% endfor %}
+			{% endblock %}
+			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         </head>
         <body>
             {{ grid.render | raw }}
