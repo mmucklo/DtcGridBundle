@@ -14,6 +14,8 @@ Render customizable tables using jqGrid, or jquery Data Tables.
 
 Supports both Doctrine ORM and Doctrine MongoDB ODM
 
+![Screenshot](/Resources/doc/img/screenshot.png?raw=true "Screenshot")
+
 Installation
 ------------
     
