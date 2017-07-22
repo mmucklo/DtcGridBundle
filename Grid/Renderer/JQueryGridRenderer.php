@@ -66,6 +66,7 @@ class JQueryGridRenderer extends TwigGridRenderer
             $info['label'] = $column->getLabel();
             $info['name'] = $column->getField();
             $info['index'] = $column->getField();
+            $info['sortable'] = $column->getOption('sortable') ? true : false;
             $info = array_merge($info, $column->getOptions());
 
             $this->options['colModel'][] = $info;
