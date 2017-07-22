@@ -34,6 +34,12 @@ In your controller:
         $gridSource = $this->get('grid.source.character');
         $renderer->bind($gridSource);
 
+        /* To enable sorting, uncomment below
+        $columns = $gridSource->getColumns();
+        foreach ($columns as $column) {
+            $column->setOption('sortable', true);
+        }*/
+
         $view = '::grid.html.twig';
 
         return $this->renderView($view, array(

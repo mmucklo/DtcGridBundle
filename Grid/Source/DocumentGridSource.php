@@ -59,6 +59,12 @@ class DocumentGridSource extends AbstractGridSource
                 }
             }
         }
+        if ($this->orderBy) {
+            foreach ($this->orderBy as $key => $direction) {
+                $qb->sort($key, $direction);
+            }
+        }
+
         $qb->limit($this->limit);
         $qb->skip($this->offset);
 
