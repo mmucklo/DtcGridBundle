@@ -9,6 +9,7 @@ use Dtc\GridBundle\Util\CamelCaseTrait;
 trait MetadataTrait
 {
     use CamelCaseTrait;
+
     /**
      * @return ClassMetadataInfo|ClassMetadataInfo
      */
@@ -48,6 +49,4 @@ trait MetadataTrait
 
         return $columns;
     }
-
-
 }

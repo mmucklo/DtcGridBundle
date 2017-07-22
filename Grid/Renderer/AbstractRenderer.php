@@ -6,7 +6,9 @@ use Dtc\GridBundle\Grid\Source\GridSourceInterface;
 
 abstract class AbstractRenderer
 {
+    /** @var GridSourceInterface */
     protected $gridSource;
+
     protected $options;
 
     public function setOptions(array $values)

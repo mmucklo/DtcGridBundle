@@ -2,7 +2,7 @@
 
 namespace Dtc\GridBundle\Grid\Column;
 
-use Dtc\GridBundle\Grid\Source\AbstractGridSource;
+use Dtc\GridBundle\Grid\Source\GridSourceInterface;
 
 class GridColumn extends AbstractGridColumn
 {
@@ -22,7 +22,7 @@ class GridColumn extends AbstractGridColumn
         $this->formatter = $formatter;
     }
 
-    public function format($object, AbstractGridSource $gridsource)
+    public function format($object, GridSourceInterface $gridsource)
     {
         if ($this->formatter) {
             return call_user_func($this->formatter, $object, $this);

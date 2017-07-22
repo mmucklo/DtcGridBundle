@@ -8,18 +8,75 @@ by using twig or php.
 Setting up Column Class
 -----------------------
 
+    <?php
+    namespace AppBundle\Grid\Columns;
+    
+    use Dtc\GridBundle\Grid\Column\TwigBlockGridColumn;
+    
+    use Twig_Environment;
+    use ArrayObject;
+    
+    class UserGridColumn
+        extends ArrayObject
+    {
+        public function __construct(Twig_Environment $twig)
+        {
+            $columns = array();
+    
+            $template = $twig->loadTemplate('AppBundle:User:_grid.html.twig');
+            $env = $twig->getGlobals();
+    
+            $col = new TwigBlockGridColumn('firstName', 'First Name', $template, $env);
+            $col->setOption('width', 75);
+            $columns[] = $col;
+    
+            $col = new TwigBlockGridColumn('lastName', 'Last Name', $template, $env);
+            $col->setOption('width', 75);
+            $columns[] = $col;
+    
+            $col = new TwigBlockGridColumn('username', 'Username', $template, $env);
+            $col->setOption('width', 75);
+            $columns[] = $col;
+    
+            $col = new TwigBlockGridColumn('createdAt', 'Created At', $template, $env);
+            $col->setOption('width', 75);
+            $columns[] = $col;
+    
+            $col = new TwigBlockGridColumn('updatedAt', 'Updated At', $template, $env);
+            $col->setOption('width', 75);
+            $columns[] = $col;
+    
+            parent::__construct($columns);
+        }
+    }
+
 
 Setting Columns for GridSource
 ------------------------------
-	<service id="bt.grid_source.user" class="Dtc\BriefTestBundle\Grid\Source\BaseManagerGridSource" public="true" scope="request">
-	    <argument type="service" id="bt.manager.user"></argument>
-	    <argument>bt.grid_source.user</argument>
 
-	    <call method="setColumns">
-	        <argument type="service" id="bt.grid_source.user.cols"></argument>
-	    </call>
-	</service>
+* XML
 
-	<service id="bt.grid_source.user.cols" class="Dtc\BriefTestBundle\Grid\Column\UserColumns" public="false">
-	    <argument type="service" id="twig"></argument>
-	</service>
+        <service id="bt.grid_source.user" class="Dtc\BriefTestBundle\Grid\Source\BaseManagerGridSource" public="true" scope="request">
+            <argument type="service" id="bt.manager.user"></argument>
+            <argument>bt.grid_source.user</argument>
+    
+            <call method="setColumns">
+                <argument type="service" id="bt.grid_source.user.cols"></argument>
+            </call>
+        </service>
+    
+        <service id="bt.grid_source.user.cols" class="Dtc\BriefTestBundle\Grid\Column\UserColumns" public="false">
+            <argument type="service" id="twig"></argument>
+        </service>
+
+* YAML
+
+        services:
+            grid.source.user:
+                class: Dtc\GridBundle\Grid\Source\EntityGridSource
+                arguments: ['@doctrine.orm.default_entity_manager', AppBundle\Entity\User]
+                tags: [{ name: dtc_grid.source }]
+                calls: [[setColumns, ['@grid.source.user.columns']]]
+            grid.source.user.columns:
+                class: AppBundle\Grid\Columns\UserGridColumn
+                arguments: ['@twig']

@@ -2,7 +2,7 @@
 
 namespace Dtc\GridBundle\Grid\Column;
 
-use Dtc\GridBundle\Grid\Source\AbstractGridSource;
+use Dtc\GridBundle\Grid\Source\GridSourceInterface;
 
 /**
  * Standard options.
@@ -13,7 +13,7 @@ abstract class AbstractGridColumn
     protected $label;
     protected $options = array();
 
-    abstract public function format($object, AbstractGridSource $gridsource);
+    abstract public function format($object, GridSourceInterface $gridsource);
 
     public function setOption($key, $value)
     {
@@ -40,7 +40,7 @@ abstract class AbstractGridColumn
     }
 
     /**
-     * @return the $field
+     * @return string
      */
     public function getField()
     {
@@ -48,7 +48,7 @@ abstract class AbstractGridColumn
     }
 
     /**
-     * @return the $label
+     * @return string
      */
     public function getLabel()
     {
@@ -56,7 +56,7 @@ abstract class AbstractGridColumn
     }
 
     /**
-     * @param field_type $field
+     * @param string $field
      */
     public function setField($field)
     {
@@ -64,7 +64,7 @@ abstract class AbstractGridColumn
     }
 
     /**
-     * @param field_type $label
+     * @param string $label
      */
     public function setLabel($label)
     {

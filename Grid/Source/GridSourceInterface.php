@@ -2,6 +2,8 @@
 
 namespace Dtc\GridBundle\Grid\Source;
 
+use Dtc\GridBundle\Grid\Pager\GridSourcePager;
+
 interface GridSourceInterface
 {
     public function setId($id);
@@ -17,4 +19,22 @@ interface GridSourceInterface
     public function getOffset();
 
     public function getLastModified();
+
+    /**
+     * @return array()
+     */
+    public function getColumns();
+
+    public function getDivId();
+
+    /**
+     * @return GridSourcePager
+     */
+    public function getPager();
+
+    public function getFilter();
+
+    public function getParameters();
+
+    public function getOrderBy();
 }

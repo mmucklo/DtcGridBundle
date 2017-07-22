@@ -2,7 +2,8 @@
 
 namespace Dtc\GridBundle\Util;
 
-trait CamelCaseTrait {
+trait CamelCaseTrait
+{
     /**
      * @param string $str
      *

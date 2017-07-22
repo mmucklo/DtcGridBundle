@@ -2,6 +2,7 @@
 
 namespace Dtc\GridBundle\Grid\Source;
 
+use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 use Dtc\GridBundle\Grid\Pager\GridSourcePager;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -75,6 +76,7 @@ abstract class AbstractGridSource implements GridSourceInterface
 
     public function setColumns($value)
     {
+        /** @var AbstractGridColumn $col */
         foreach ($value as $col) {
             $this->columns[$col->getField()] = $col;
         }

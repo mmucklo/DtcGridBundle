@@ -5,22 +5,26 @@ You can render your grid using jQuery Data table in just two easy steps
 
 ### 1. Create a GridSource service
 
-XML:
-    <service id="grid.source.character" class="Dtc\GridBundle\Grid\Source\DocumentGridSource" public="true">
-        <argument type="service" id="shadow.document_manager"></argument>
-        <argument>Odl\ShadowBundle\Documents\Character</argument>
-        <argument>grid.source.character</argument>
-        <call method="autoDiscoverColumns"></call>
-    </service>
+    XML:
+        <service id="grid.source.character" class="Dtc\GridBundle\Grid\Source\DocumentGridSource" public="true">
+            <argument type="service" id="doctrine_mongodb.odm.default_document_manager"></argument>
+            <argument>Odl\ShadowBundle\Documents\Character</argument>
+            <argument>grid.source.character</argument>
+            <call method="autoDiscoverColumns"></call>
+        </service>
+    
+    YAML:
+        grid.source.user:
+            class: Dtc\GridBundle\Grid\Source\DocumentGridSource
+            arguments: ['@doctrine_mongodb.odm.default_document_manager', AppBundle\Document\User]
+            tags: [{ name: dtc_grid.source }]
+            calls: [[autoDiscoverColumns]]
 
-YAML:
-    grid.source.user:
-        class: Dtc\GridBundle\Grid\Source\EntityGridSource
-        arguments: ['@doctrine.orm.default_entity_manager', AppBundle\Entity\User]
-        tags: [{ name: dtc_grid.source }]
-        calls: [[autoDiscoverColumns]]
+ * For ORMs, use
+    * class: Dtc\GridBundle\Grid\Source\EntityGridSource
+    * arguments: @doctrine.orm.default_entity_manager (instead of @doctrine_mongodb.odm.default_document_manager)
 
-### 2. Use the JQueryDatatable Renderer to render table.
+### 2. Use the JQueryDataTable Renderer to render the table.
 
 In your controller:
 

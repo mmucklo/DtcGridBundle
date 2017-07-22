@@ -2,6 +2,8 @@
 
 namespace Dtc\GridBundle\Grid\Renderer;
 
+use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
+
 class JQueryGridRenderer extends TwigGridRenderer
 {
     protected $options = array(
@@ -58,6 +60,7 @@ class JQueryGridRenderer extends TwigGridRenderer
         $url = $this->router->generate('dtc_grid_grid_data', $params);
         $this->options['url'] = $url;
 
+        /** @var AbstractGridColumn $column */
         foreach ($this->gridSource->getColumns() as $column) {
             $info = array();
             $info['label'] = $column->getLabel();
@@ -86,6 +89,7 @@ class JQueryGridRenderer extends TwigGridRenderer
 
         foreach ($records as $record) {
             $info = array();
+            /** @var AbstractGridColumn $column */
             foreach ($columns as $column) {
                 $info[$column->getField()] = $column->format($record, $this->gridSource);
             }

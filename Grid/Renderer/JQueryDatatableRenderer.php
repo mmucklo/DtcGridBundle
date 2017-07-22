@@ -2,6 +2,8 @@
 
 namespace Dtc\GridBundle\Grid\Renderer;
 
+use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
+
 class JQueryDatatableRenderer extends TwigGridRenderer
 {
     protected $options = array(
@@ -53,6 +55,7 @@ class JQueryDatatableRenderer extends TwigGridRenderer
         $this->options['sAjaxSource'] = $url;
 
         $columnsDef = array();
+        /** @var AbstractGridColumn $column */
         foreach ($this->gridSource->getColumns() as $index => $column) {
             $info = array();
             $info['bSortable'] = $column->getOption('sortable') ? true : false;
@@ -90,6 +93,7 @@ class JQueryDatatableRenderer extends TwigGridRenderer
         $data = array();
         foreach ($records as $record) {
             $info = array();
+            /** @var AbstractGridColumn $column */
             foreach ($columns as $column) {
                 $info[] = $column->format($record, $gridSource);
             }

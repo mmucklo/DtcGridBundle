@@ -15,7 +15,7 @@
 		<tr>
 			{% for column in columns %}
 			<td>
-				{{ column.format(record) | raw }}
+				{{ column.format(record, source) | raw }}
 			</td>
 			{% endfor %}
 		</tr>

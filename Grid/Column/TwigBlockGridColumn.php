@@ -2,7 +2,7 @@
 
 namespace Dtc\GridBundle\Grid\Column;
 
-use Dtc\GridBundle\Grid\Source\AbstractGridSource;
+use Dtc\GridBundle\Grid\Source\GridSourceInterface;
 use Twig_Template;
 
 class TwigBlockGridColumn extends AbstractGridColumn
@@ -48,7 +48,7 @@ class TwigBlockGridColumn extends AbstractGridColumn
         return $this->blockName;
     }
 
-    public function format($object, AbstractGridSource $gridSource)
+    public function format($object, GridSourceInterface $gridSource)
     {
         if ($this->template->hasBlock($this->blockName, [])) {
             $this->env['obj'] = $object;

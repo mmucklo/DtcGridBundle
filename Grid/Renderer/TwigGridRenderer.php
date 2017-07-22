@@ -27,6 +27,7 @@ class TwigGridRenderer extends AbstractRenderer
                 'records' => $this->gridSource->getRecords(),
                 'columns' => $this->gridSource->getColumns(),
                 'options' => $this->options,
+                'source' => $this->gridSource,
         );
 
         $template = 'DtcGridBundle:Grid:grid.html.twig';
