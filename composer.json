@@ -6,10 +6,11 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Matthew J Mucklo"
+            "name": "David Tee"
         },
         {
-            "name": "David Tee"
+            "name": "Matthew J Mucklo",
+            "email": "mmucklo@gmail.com"
         }
     ],
     "require": {

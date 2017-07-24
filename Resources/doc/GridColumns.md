@@ -8,48 +8,84 @@ by using twig or php.
 Setting up Column Class
 -----------------------
 
-    <?php
-    namespace AppBundle\Grid\Columns;
-    
-    use Dtc\GridBundle\Grid\Column\TwigBlockGridColumn;
-    
-    use Twig_Environment;
-    use ArrayObject;
-    
-    class UserGridColumn
-        extends ArrayObject
-    {
-        public function __construct(Twig_Environment $twig)
-        {
-            $columns = array();
-    
-            $template = $twig->loadTemplate('AppBundle:User:_grid.html.twig');
-            $env = $twig->getGlobals();
-    
-            $col = new TwigBlockGridColumn('firstName', 'First Name', $template, $env);
-            $col->setOption('width', 75);
-            $columns[] = $col;
-    
-            $col = new TwigBlockGridColumn('lastName', 'Last Name', $template, $env);
-            $col->setOption('width', 75);
-            $columns[] = $col;
-    
-            $col = new TwigBlockGridColumn('username', 'Username', $template, $env);
-            $col->setOption('width', 75);
-            $columns[] = $col;
-    
-            $col = new TwigBlockGridColumn('createdAt', 'Created At', $template, $env);
-            $col->setOption('width', 75);
-            $columns[] = $col;
-    
-            $col = new TwigBlockGridColumn('updatedAt', 'Updated At', $template, $env);
-            $col->setOption('width', 75);
-            $columns[] = $col;
-    
-            parent::__construct($columns);
-        }
-    }
+  * Example: AppBundle/Grid/Columns/UserGridColumn.php
 
+        <?php
+        namespace AppBundle\Grid\Columns;
+        
+        use Dtc\GridBundle\Grid\Column\TwigBlockGridColumn;
+        
+        use Twig_Environment;
+        use ArrayObject;
+        
+        class UserGridColumn
+            extends ArrayObject
+        {
+            public function __construct(Twig_Environment $twig)
+            {
+                $columns = array();
+        
+                $template = $twig->loadTemplate('AppBundle:User:_grid.html.twig');
+                $env = $twig->getGlobals();
+        
+                $col = new TwigBlockGridColumn('firstName', 'First Name', $template, $env);
+                $col->setOption('width', 75);
+                $columns[] = $col;
+        
+                $col = new TwigBlockGridColumn('lastName', 'Last Name', $template, $env);
+                $col->setOption('width', 75);
+                $columns[] = $col;
+        
+                $col = new TwigBlockGridColumn('username', 'Username', $template, $env);
+                $col->setOption('width', 75);
+                $columns[] = $col;
+        
+                $col = new TwigBlockGridColumn('createdAt', 'Created At', $template, $env);
+                $col->setOption('width', 75);
+                $columns[] = $col;
+        
+                $col = new TwigBlockGridColumn('updatedAt', 'Updated At', $template, $env);
+                $col->setOption('width', 75);
+                $columns[] = $col;
+        
+                parent::__construct($columns);
+            }
+        }
+
+Twig file for GridColumn
+------------------------
+
+   * Example: AppBundle/Resources/views/User/_grid.html.twig
+
+            {% block firstName %}
+            {% spaceless %}
+            {{- obj. firstName | format_cell -}}
+            {% endspaceless %}
+            {% endblock %}
+            
+            {% block lastName %}
+            {% spaceless %}
+            {{- obj. lastName | format_cell -}}
+            {% endspaceless %}
+            {% endblock %}
+            
+            {% block username %}
+            {% spaceless %}
+            {{- obj. username | format_cell -}}
+            {% endspaceless %}
+            {% endblock %}
+            
+            {% block createdAt %}
+            {% spaceless %}
+            {{- obj. createdAt | format_cell -}}
+            {% endspaceless %}
+            {% endblock %}
+            
+            {% block updatedAt %}
+            {% spaceless %}
+            {{- obj. updatedAt | format_cell -}}
+            {% endspaceless %}
+            {% endblock %}
 
 Setting Columns for GridSource
 ------------------------------
@@ -80,3 +116,4 @@ Setting Columns for GridSource
             grid.source.user.columns:
                 class: AppBundle\Grid\Columns\UserGridColumn
                 arguments: ['@twig']
+
