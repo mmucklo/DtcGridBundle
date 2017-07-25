@@ -1,6 +1,8 @@
 # emacs
 *~
 \#*
+\#*\#
+auto-save-list
 
 # vim
 *.swp
