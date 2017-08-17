@@ -23,6 +23,7 @@
         "doctrine/orm": "^2.4",
         "doctrine/annotations": "<1.5",
         "doctrine/cache": "<1.7",
+        "doctrine/common": "<2.8",
         "doctrine/collections": "<1.5",
         "doctrine/mongodb-odm": "^1.1",
         "phpunit/phpunit": "^5.7.0",
