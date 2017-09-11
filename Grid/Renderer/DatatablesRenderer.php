@@ -4,7 +4,7 @@ namespace Dtc\GridBundle\Grid\Renderer;
 
 use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 
-class JQueryDatatableRenderer extends TwigGridRenderer
+class DatatablesRenderer extends TableGridRenderer
 {
     protected $options = array(
             'bProcessing' => true,
@@ -44,7 +44,7 @@ class JQueryDatatableRenderer extends TwigGridRenderer
         // We need to pass filter information here.
         $params = array(
                'id' => $this->gridSource->getId(),
-               'renderer' => 'grid.renderer.jq_table_grid',
+               'renderer' => 'dtc_grid.renderer.datatables',
                'filter' => $this->gridSource->getFilter(),
                'parameters' => $this->gridSource->getParameters(),
                'order' => $this->gridSource->getOrderBy(),
@@ -120,7 +120,7 @@ class JQueryDatatableRenderer extends TwigGridRenderer
                 'id' => $id,
         );
 
-        $template = 'DtcGridBundle:Grid:jquery_datatable.html.twig';
+        $template = 'DtcGridBundle:Grid:datatables.html.twig';
 
         return $this->twigEngine->render($template, $params);
     }

@@ -7,23 +7,23 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 class DocumentGridSource extends AbstractGridSource
 {
-    use MetadataTrait;
+    use ColumnExtractionTrait;
 
-    protected $dm;
-    protected $documentName;
+    protected $documentManager;
     protected $repository;
     protected $findCache;
+    protected $documentName;
 
-    public function __construct(DocumentManager $dm, $documentName)
+    public function __construct(DocumentManager $documentManager, $documentName)
     {
-        $this->dm = $dm;
-        $this->repository = $dm->getRepository($documentName);
+        $this->documentManager = $documentManager;
+        $this->repository = $documentManager->getRepository($documentName);
         $this->documentName = $documentName;
     }
 
     protected function getQueryBuilder()
     {
-        $qb = $this->dm->createQueryBuilder($this->documentName);
+        $qb = $this->documentManager->createQueryBuilder($this->documentName);
 
         /** @var ClassMetadata $classMetaData */
         $classMetaData = $this->getClassMetadata();
@@ -54,7 +54,7 @@ class DocumentGridSource extends AbstractGridSource
                                 $expr = $expr->equals($value);
                         }
                         $qb->addOr($expr);
-                        // new \MongoRegex('/.*'.$value.'.*/') - > maybe use some day?
+                        // @TODO - maybe allow pattern searches some day: new \MongoRegex('/.*'.$value.'.*/')
                     }
                 }
             }
@@ -76,7 +76,7 @@ class DocumentGridSource extends AbstractGridSource
      */
     public function getClassMetadata()
     {
-        $metaFactory = $this->dm->getMetadataFactory();
+        $metaFactory = $this->documentManager->getMetadataFactory();
         $classInfo = $metaFactory->getMetadataFor($this->documentName);
 
         return $classInfo;

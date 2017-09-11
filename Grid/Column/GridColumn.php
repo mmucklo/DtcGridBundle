@@ -10,7 +10,7 @@ class GridColumn extends AbstractGridColumn
     protected $field;
     protected $label;
 
-    public function __construct($field, $label = null, $formatter = null)
+    public function __construct($field, $label = null, $formatter = null, array $options = null)
     {
         $this->field = $field;
 
@@ -20,6 +20,9 @@ class GridColumn extends AbstractGridColumn
 
         $this->label = $label;
         $this->formatter = $formatter;
+        if ($options) {
+            $this->setOptions($options);
+        }
     }
 
     public function format($object, GridSourceInterface $gridsource)

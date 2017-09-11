@@ -5,7 +5,7 @@ namespace Dtc\GridBundle\Grid\Renderer;
 use Symfony\Component\Routing\Router;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
-class TwigGridRenderer extends AbstractRenderer
+class TableGridRenderer extends AbstractRenderer
 {
     protected $twigEngine;
     protected $router;
@@ -30,7 +30,7 @@ class TwigGridRenderer extends AbstractRenderer
                 'source' => $this->gridSource,
         );
 
-        $template = 'DtcGridBundle:Grid:grid.html.twig';
+        $template = 'DtcGridBundle:Grid:table.html.twig';
 
         return $this->twigEngine->render($template, $params);
     }

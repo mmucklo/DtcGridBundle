@@ -9,6 +9,7 @@ auto-save-list
 
 # composer
 vendor
+composer.lock
 
 # bin
 bin/phpunit
@@ -24,7 +25,5 @@ bin/php-cs-fixer
 .DS_Store
 
 #
-composer.lock
 bin
-
 .php_cs.cache

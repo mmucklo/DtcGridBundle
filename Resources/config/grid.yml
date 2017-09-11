@@ -1,0 +1,35 @@
+services:
+    dtc_grid.renderer.table:
+        class: Dtc\GridBundle\Grid\Renderer\TableGridRenderer
+        arguments:
+            - "@templating"
+            - "@router"
+        calls:
+            - [ 'setBootstrapCss', [ '%dtc_grid.jq_grid.bootstrap_css%']]
+            - [ 'setBootstrapJs', [ '%dtc_grid.jq_grid.bootstrap_js%']]
+    dtc_grid.renderer.jq_grid:
+        class: Dtc\GridBundle\Grid\Renderer\JQGridRenderer
+        arguments:
+            - "@templating"
+            - "@router"
+        calls:
+            - [ 'setJavascripts', [ '%dtc_grid.jq_grid.javascripts%']]
+            - [ 'setStylesheets', [ '%dtc_grid.jq_grid.stylesheets%']]
+            - [ 'setBootstrapCss', [ '%dtc_grid.jq_grid.bootstrap_css%']]
+            - [ 'setBootstrapJs', [ '%dtc_grid.jq_grid.bootstrap_js%']]
+    dtc_grid.renderer.datatables:
+        class: Dtc\GridBundle\Grid\Renderer\DatatablesRenderer
+        arguments:
+            - "@templating"
+            - "@router"
+        calls:
+            - [ 'setBootstrapCss', [ '%dtc_grid.jq_grid.bootstrap_css%']]
+            - [ 'setBootstrapJs', [ '%dtc_grid.jq_grid.bootstrap_js%']]
+    dtc_grid.manager.source:
+        class: Dtc\GridBundle\Manager\GridSourceManager
+        arguments:
+            - "@service_container"
+    dtc_grid.twig.extension:
+        class: Dtc\GridBundle\Twig\Extension\TwigExtension
+        tags:
+            - { name: twig.extension }

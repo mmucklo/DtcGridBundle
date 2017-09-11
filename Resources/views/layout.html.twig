@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block head %}
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ bootstrap_css }}">
+        {% endblock %}
+        {% block dtc_grid_stylesheets %}
+        {% endblock %}
+        {% block dtc_grid_javascripts %}
+        {% endblock %}
+        {% block javascripts %}
+            <script src="{{ bootstrap_js }}"></script>
+        {% endblock javascripts %}
+    {% endblock %}
+</head>
+<body>
+{% block grid %}
+{{ grid.render | raw }}
+{% endblock %}
+<script>
+    {% block body_javascript %}
+    {% endblock %}
+</script>
+`</body>
+</html>

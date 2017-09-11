@@ -11,6 +11,9 @@ class GridSourceCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $sourceManager = $container->getDefinition('dtc_grid.manager.source');
+        if ($container->hasDefinition('annotations.reader')) {
+            $sourceManager->addMethodCall('setReader', [new Reference('annotations.reader')]);
+        }
 
         // Add each worker to workerManager, make sure each worker has instance to work
         foreach ($container->findTaggedServiceIds('dtc_grid.source') as $id => $attributes) {
@@ -25,7 +28,7 @@ class GridSourceCompilerPass implements CompilerPassInterface
             }
 
             $gridSourceDefinition->addMethodCall('setId', array($id));
-            $sourceManager->addMethodCall('add', array($id, new Reference($id)));
+            $sourceManager->addMethodCall('add', [$id, $id]);
         }
     }
 }

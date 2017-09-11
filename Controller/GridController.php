@@ -14,9 +14,9 @@ class GridController extends Controller
      */
     public function dataAction(Request $request)
     {
-        $rendererService = $request->get('renderer', 'grid.renderer.jq_grid');
+        $rendererService = $request->get('renderer', 'dtc_grid.renderer.datatables');
         $renderer = $this->get($rendererService);
-        $gridSource = $this->get($request->get('id'));
+        $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
 
         $response = new Response();
         $gridSource->bind($request); // Sets limit, offset, sort, filter, etc

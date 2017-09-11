@@ -7,20 +7,20 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 class EntityGridSource extends AbstractGridSource
 {
-    use MetadataTrait;
+    use ColumnExtractionTrait;
 
-    protected $em;
+    protected $entityManager;
     protected $entityName;
 
-    public function __construct(EntityManager $em, $entityName)
+    public function __construct(EntityManager $entityManager, $entityName)
     {
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->entityName = $entityName;
     }
 
     protected function getQueryBuilder()
     {
-        $qb = $this->em->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $orderBy = array();
         foreach ($this->orderBy as $key => $value) {
             $orderBy[] = "u.{$key} {$value}";
@@ -83,7 +83,7 @@ class EntityGridSource extends AbstractGridSource
      */
     public function getClassMetadata()
     {
-        $metaFactory = $this->em->getMetadataFactory();
+        $metaFactory = $this->entityManager->getMetadataFactory();
         $classInfo = $metaFactory->getMetadataFor($this->entityName);
 
         return $classInfo;

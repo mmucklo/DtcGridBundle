@@ -7,13 +7,13 @@ The following files are generated:
 
 Add the following code to your controller:
 
-	$renderer = $this->get('grid.renderer.jq_table_grid');
+	$renderer = $this->get('dtc_grid.renderer.datatables');
 
 	// for a plain html grid, use the following
-	// $renderer = $this->get('grid.renderer.html');
+	// $renderer = $this->get('dtc_grid.renderer.table');
 
 	// for jq_grid, use the following
-	// $renderer = $this->get('grid.renderer.jq_grid');
+	// $renderer = $this->get('dtc_grid.renderer.jq_grid');
 
 	$gridSource = $this->get('{{ gridsource_id }}');
 

@@ -11,6 +11,24 @@ abstract class AbstractRenderer
 
     protected $options;
 
+    protected $bootstrapCss;
+    protected $bootstrapJs;
+
+    /**
+     * @param array|null $params Will be populated if passed in
+     */
+    public function getParams(array &$params = null)
+    {
+        if ($params === null) {
+            $params = [];
+        }
+        $params['grid'] = $this;
+        $params['bootstrap_css'] = $this->bootstrapCss;
+        $params['bootstrap_js'] = $this->bootstrapJs;
+
+        return $params;
+    }
+
     public function setOptions(array $values)
     {
         $this->options = $values;
@@ -36,6 +54,38 @@ abstract class AbstractRenderer
 
     protected function afterBind()
     {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBootstrapCss()
+    {
+        return $this->bootstrapCss;
+    }
+
+    /**
+     * @param mixed $bootstrapCss
+     */
+    public function setBootstrapCss($bootstrapCss)
+    {
+        $this->bootstrapCss = $bootstrapCss;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBootstrapJs()
+    {
+        return $this->bootstrapJs;
+    }
+
+    /**
+     * @param mixed $bootstrapJs
+     */
+    public function setBootstrapJs($bootstrapJs)
+    {
+        $this->bootstrapJs = $bootstrapJs;
     }
 
     abstract public function render();

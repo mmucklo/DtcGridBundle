@@ -34,7 +34,7 @@ In your controller:
      */
     public function indexAction()
     {
-        $renderer = $this->get('grid.renderer.jq_table_grid');
+        $renderer = $this->get('dtc_grid.renderer.datatables');
         $gridSource = $this->get('grid.source.character');
         $renderer->bind($gridSource);
 

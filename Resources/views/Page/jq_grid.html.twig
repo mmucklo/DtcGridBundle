@@ -1,0 +1,18 @@
+{% extends '@DtcGrid/layout.html.twig' %}
+{% block dtc_grid_stylesheets %}
+    {% for stylesheet in jq_grid_stylesheets %}
+        <link rel="stylesheet" href="{{ stylesheet }}" />
+    {% endfor %}
+{% endblock %}
+
+{% block dtc_grid_javascripts %}
+    {% for javascript in [
+    path('dtc_grid_bundle_jquery'),
+    path('dtc_grid_bundle_purl'),
+    ] %}
+        <script type="text/javascript" src="{{ javascript }}"></script>
+    {% endfor %}
+    {% for javascript in jq_grid_javascripts %}
+        <script type="text/javascript" src="{{ javascript }}"></script>
+    {% endfor %}
+{% endblock %}

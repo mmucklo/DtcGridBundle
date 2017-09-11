@@ -28,7 +28,7 @@
      * @Route("/users_html", name="dtc_grid_users_html")
      */
     public function usersHtmlAction(Request $request) {
-        $renderer = $this->get('grid.renderer.html');
+        $renderer = $this->get('dtc_grid.renderer.table');
         $gridSource = $this->get('grid.source.user');
         $columns = $gridSource->getColumns();
         $renderer->bind($gridSource);

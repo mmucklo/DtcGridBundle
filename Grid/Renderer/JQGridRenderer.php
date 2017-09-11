@@ -4,8 +4,10 @@ namespace Dtc\GridBundle\Grid\Renderer;
 
 use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 
-class JQueryGridRenderer extends TwigGridRenderer
+class JQGridRenderer extends TableGridRenderer
 {
+    protected $stylesheets;
+    protected $javascripts;
     protected $options = array(
             'datatype' => 'json',
             'jsonReader' => array(
@@ -55,6 +57,7 @@ class JQueryGridRenderer extends TwigGridRenderer
 
         $params = array(
                 'id' => $this->gridSource->getId(),
+                'renderer' => 'dtc_grid.renderer.jq_grid',
         );
 
         $url = $this->router->generate('dtc_grid_grid_data', $params);
@@ -101,6 +104,31 @@ class JQueryGridRenderer extends TwigGridRenderer
         return $retVal;
     }
 
+    public function setStylesheets(array $stylesheets)
+    {
+        $this->stylesheets = $stylesheets;
+    }
+
+    public function setJavascripts(array $javascripts)
+    {
+        $this->javascripts = $javascripts;
+    }
+
+    /**
+     * @param array|null $params
+     */
+    public function getParams(array &$params = null)
+    {
+        if ($params === null) {
+            $params = [];
+        }
+        parent::getParams($params);
+        $params['jq_grid_stylesheets'] = isset($this->stylesheets) ? $this->stylesheets : [];
+        $params['jq_grid_javascripts'] = isset($this->javascripts) ? $this->javascripts : [];
+
+        return $params;
+    }
+
     public function render()
     {
         $id = $this->gridSource->getDivId();
@@ -110,7 +138,7 @@ class JQueryGridRenderer extends TwigGridRenderer
                 'id' => $id,
         );
 
-        $template = 'DtcGridBundle:Grid:jquery_grid.html.twig';
+        $template = 'DtcGridBundle:Grid:jq_grid.html.twig';
 
         return $this->twigEngine->render($template, $params);
     }
