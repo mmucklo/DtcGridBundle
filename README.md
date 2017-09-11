@@ -4,13 +4,14 @@ DtcGridBundle
 
 Generate a searchable Grid from a Doctrine ORM Entity or Doctrine MongoDB Document
 
-  * Utilize jQuery [DataTables](https://datatables.net) or [jqGrid](http://www.trirand.com/blog/)(*)
+  * Utilize jQuery [DataTables](https://datatables.net), [jqGrid](http://www.trirand.com/blog/)(*), or a Styled HTML Table(*)
   * Easily styled using Bootstrap
   * Customize columns and more...
+  * (new as of 2.0): Easy to install, easy get started
 
 (*) search supported on DataTables only
 
-Render customizable tables using jqGrid, or jquery Data Tables.
+Render customizable tables using jqGrid, or jQuery DataTables, or in a Styled HTML Table.
 
 Supports both Doctrine ORM and Doctrine MongoDB ODM
 
