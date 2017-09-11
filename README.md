@@ -34,7 +34,7 @@ Add this to your AppKernel.php file:
 Usage
 -----
 
-###Quick Datatables example
+### Quick Datatables example
 
 ```php
 /**
@@ -48,7 +48,7 @@ public function usersAction(Request $request) {
 }
 ```
 
-###Changing the renderer
+### Changing the renderer
 
 ```php
 /**
@@ -62,7 +62,7 @@ public function usersAction(Request $request) {
 }
 ```
 
-###Customize Columns
+### Customize Columns
 
 There's a @GridColumn annotation that lives in Dtc\GridBundle\Annotation that you place on each column you want to be visible.  Then you can specify a custom label, and or sortability if you want.  If there's no @GridColumn annotations at all, it will default to show all the columns.
 
@@ -102,7 +102,7 @@ class User {
     protected $lastName;
 ```
 
-###JQ Grid
+### JQ Grid
 
 To use JQ Grid, you need to specify the absolute URL, or relative/absolute path to the JQGrid files.
 
@@ -131,7 +131,7 @@ To use JQ Grid, you need to specify the absolute URL, or relative/absolute path 
     }
 ```
 
-###Custom Entity or Document Managers
+### Custom Entity or Document Managers
 
 The EntityManager or DocumentManger can be customized if it's a non-default one.  Presently it has to be specified in the config.yml with one line per entity / document.
 ```yaml
@@ -142,7 +142,7 @@ The EntityManager or DocumentManger can be customized if it's a non-default one.
             AppBundle\Document\Event: doctrine_mongodb.odm.some_other_document_manager
 ```
 
-###Customize Bootstrap
+### Customize Bootstrap
 
 ```yaml
     # config.yml
@@ -152,7 +152,7 @@ The EntityManager or DocumentManger can be customized if it's a non-default one.
             js: path_or_url_to_bootstrap.js
 ```
 
-###Customize/Embed Grio
+### Customize/Embed Grio
 
 To customize the grid's CSS/Javascript, or embed it into an existing page, follow the example below:
 
@@ -180,7 +180,7 @@ public function usersCustomAction(Request $request) {
 }
 ```
 
-####Datatables Twig Example:
+#### Datatables Twig Example:
 ```twig
 <html>
 <head>
@@ -219,7 +219,7 @@ public function usersCustomAction(Request $request) {
 </html>
 ```
 
-####JQGrid Twig Example:
+#### JQGrid Twig Example:
 ```twig
 <html>
 <head>
@@ -257,7 +257,7 @@ public function usersCustomAction(Request $request) {
 </html>
 ```
 
-####Table Twig Example:
+#### Table Twig Example:
 ```twig
 <html>
 <head>
@@ -281,8 +281,8 @@ Documentation
 -------------
 There is additional documentation stored in `Resources/doc/`
 
-####Legacy:
-You used to have to use a "Generator" to create the grid.source service, however this is no longer necessary, however documentation on how to use it is still available in the Resources/doc/
+#### Legacy:
+You used to have to use a "Generator" to create the grid.source service, however this is no longer necessary, however documentation on how to use it is still available in the Resources/doc/ area.
 
 License
 -------
