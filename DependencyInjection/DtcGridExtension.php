@@ -22,6 +22,7 @@ class DtcGridExtension extends Extension
         $this->setCustomManagers($config, $container);
         $this->setJqGrid($config, $container);
         $this->setBootstrap($config, $container);
+        $container->setParameter('dtc_grid.page_div_style', isset($config['page_div_style']) ? $config['page_div_style'] : null);
     }
 
     public function setCustomManagers(array $config, ContainerBuilder $container)

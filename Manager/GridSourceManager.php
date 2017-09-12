@@ -2,7 +2,6 @@
 
 namespace Dtc\GridBundle\Manager;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +16,6 @@ class GridSourceManager
     protected $sourcesByClass;
     protected $sourcesByName;
 
-    protected $cacheDir;
     protected $reader;
     protected $debug;
 
@@ -128,12 +126,8 @@ class GridSourceManager
                 } else {
                     $gridSource = new DocumentGridSource($manager, $name);
                 }
-                if ($this->reader) {
-                    $gridSource->setAnnotationReader($this->reader);
-                }
-                if ($this->cacheDir) {
-                    $gridSource->setCacheDir($this->cacheDir);
-                }
+                $gridSource->setAnnotationReader($this->container->get('annotation_reader'));
+                $gridSource->setCacheDir($this->container->getParameter('kernel.cache_dir'));
 
                 $gridSource->setDebug($this->debug);
                 $gridSource->autoDiscoverColumns();
@@ -212,10 +206,5 @@ class GridSourceManager
     public function setDocumentManager(DocumentManager $documentManager)
     {
         $this->documentManager = $documentManager;
-    }
-
-    public function setReader(Reader $reader)
-    {
-        $this->reader = $reader;
     }
 }

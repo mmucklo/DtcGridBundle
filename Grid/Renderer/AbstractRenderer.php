@@ -13,6 +13,7 @@ abstract class AbstractRenderer
 
     protected $bootstrapCss;
     protected $bootstrapJs;
+    protected $pageDivStyle;
 
     /**
      * @param array|null $params Will be populated if passed in
@@ -22,9 +23,11 @@ abstract class AbstractRenderer
         if ($params === null) {
             $params = [];
         }
-        $params['grid'] = $this;
-        $params['bootstrap_css'] = $this->bootstrapCss;
-        $params['bootstrap_js'] = $this->bootstrapJs;
+
+        $params['dtc_grid'] = $this;
+        $params['dtc_grid_bootstrap_css'] = $this->bootstrapCss;
+        $params['dtc_grid_bootstrap_js'] = $this->bootstrapJs;
+        $params['dtc_grid_page_div_style'] = $this->pageDivStyle;
 
         return $params;
     }
@@ -86,6 +89,22 @@ abstract class AbstractRenderer
     public function setBootstrapJs($bootstrapJs)
     {
         $this->bootstrapJs = $bootstrapJs;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPageDivStyle()
+    {
+        return $this->pageDivStyle;
+    }
+
+    /**
+     * @param mixed $pageDivStyle
+     */
+    public function setPageDivStyle($pageDivStyle)
+    {
+        $this->pageDivStyle = $pageDivStyle;
     }
 
     abstract public function render();

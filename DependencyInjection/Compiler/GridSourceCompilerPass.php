@@ -4,16 +4,12 @@ namespace Dtc\GridBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
 
 class GridSourceCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
         $sourceManager = $container->getDefinition('dtc_grid.manager.source');
-        if ($container->hasDefinition('annotations.reader')) {
-            $sourceManager->addMethodCall('setReader', [new Reference('annotations.reader')]);
-        }
 
         // Add each worker to workerManager, make sure each worker has instance to work
         foreach ($container->findTaggedServiceIds('dtc_grid.source') as $id => $attributes) {

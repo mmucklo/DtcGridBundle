@@ -35,7 +35,7 @@ Add the following code to your controller:
         $gridSource = $this->get('grid.source.user');
         $renderer->bind($gridSource);
 
-        return array('grid' => $renderer);
+        return array('dtc_grid' => $renderer);
     }
 
 # A sample template
@@ -69,6 +69,6 @@ Resources/views/your_controller/usersJq.html.twig
     
     </head>
     <body>
-    {{ grid.render | raw }}
+    {{ dtc_grid.render | raw }}
     </body>
     </html>

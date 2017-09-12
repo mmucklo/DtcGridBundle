@@ -174,7 +174,7 @@ public function usersCustomAction(Request $request) {
     
     // Alternatively you can do
     // $dataGridParams = $renderer->getParams();
-    // $myParams['my_grid'] = $dataGridParams['grid'];
+    // $myParams['my_grid'] = $dataGridParams['dtc_grid'];
 
     // render your page
     return $this->render('@App/Something/somepage.html.twig', $params);
@@ -187,7 +187,7 @@ public function usersCustomAction(Request $request) {
 <head>
     <!-- Setup all CSS and Javascript manually -->
     <!-- Any of these below could be modified / customized -->
-    <link rel="stylesheet" href="{{ bootstrap_css }}">
+    <link rel="stylesheet" href="{{ dtc_grid_bootstrap_css }}">
     {% block dtc_grid_stylesheets %}
         {% for stylesheet in [
         path('dtc_grid_bundle_dataTables_extension_css', { 'type': 'bootstrap' }),
@@ -207,13 +207,13 @@ public function usersCustomAction(Request $request) {
             <script type="text/javascript" src="{{ javascript }}"></script>
         {% endfor %}
     {% endblock %}
-    <script src="{{ bootstrap_js }}"></script>
+    <script src="{{ dtc_grid_bootstrap_js }}"></script>
 </head>
 <body>
 
 <!-- .... -->
-{# This is the most important part - 'grid.render' should be 'grid.render' or 'my_grid.render', or whatever you called it if you change the parameter's name #}
-{{ grid.render | raw }}
+{# This is the most important part - 'dtc_grid.render' should be 'dtc_grid.render' or 'my_grid.render', or whatever you called it if you change the parameter's name #}
+{{ dtc_grid.render | raw }}
 
 <!-- ... -->
 </body>
@@ -226,7 +226,7 @@ public function usersCustomAction(Request $request) {
 <head>
     <!-- Setup all CSS and Javascript manually -->
     <!-- Any of these below could be modified / customized -->
-    <link rel="stylesheet" href="{{ bootstrap_css }}">
+    <link rel="stylesheet" href="{{ dtc_grid_bootstrap_css }}">
     {% block dtc_grid_stylesheets %}
         {% for stylesheet in [
           'path_or_url_to/prettify.css',
@@ -245,13 +245,13 @@ public function usersCustomAction(Request $request) {
             <script type="text/javascript" src="{{ javascript }}"></script>
         {% endfor %}
     {% endblock %}
-    <script src="{{ bootstrap_js }}"></script>
+    <script src="{{ dtc_grid_bootstrap_js }}"></script>
 </head>
 <body>
 
 <!-- .... -->
-{# This is the most important part - 'grid.render' should be 'grid.render' or 'my_grid.render', or whatever you called it if you change the parameter's name #}
-{{ grid.render | raw }}
+{# This is the most important part - 'dtc_grid.render' should be 'dtc_grid.render' or 'my_grid.render', or whatever you called it if you change the parameter's name #}
+{{ dtc_grid.render | raw }}
 
 <!-- ... -->
 </body>
@@ -264,14 +264,14 @@ public function usersCustomAction(Request $request) {
 <head>
     <!-- Setup all CSS and Javascript manually -->
     <!-- Any of these below could be modified / customized -->
-    <link rel="stylesheet" href="{{ bootstrap_css }}">
-    <script src="{{ bootstrap_js }}"></script>
+    <link rel="stylesheet" href="{{ dtc_grid_bootstrap_css }}">
+    <script src="{{ dtc_grid_bootstrap_js }}"></script>
 </head>
 <body>
 
 <!-- .... -->
-{# This is the most important part - 'grid.render' should be 'grid.render' or 'my_grid.render', or whatever you called it if you change the parameter's name #}
-{{ grid.render | raw }}
+{# This is the most important part - 'dtc_grid.render' should be 'dtc_grid.render' or 'my_grid.render', or whatever you called it if you change the parameter's name #}
+{{ dtc_grid.render | raw }}
 
 <!-- ... -->
 </body>

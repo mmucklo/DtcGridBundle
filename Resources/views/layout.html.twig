@@ -4,21 +4,23 @@
     {% block head %}
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         {% block stylesheets %}
-            <link rel="stylesheet" href="{{ bootstrap_css }}">
+            <link rel="stylesheet" href="{{ dtc_grid_bootstrap_css }}">
         {% endblock %}
         {% block dtc_grid_stylesheets %}
         {% endblock %}
         {% block dtc_grid_javascripts %}
         {% endblock %}
         {% block javascripts %}
-            <script src="{{ bootstrap_js }}"></script>
+            <script src="{{ dtc_grid_bootstrap_js }}"></script>
         {% endblock javascripts %}
     {% endblock %}
 </head>
 <body>
-{% block grid %}
-{{ grid.render | raw }}
-{% endblock %}
+<div style="{{ dtc_grid_page_div_style }}">
+    {% block grid %}
+    {{ dtc_grid.render | raw }}
+    {% endblock %}
+</div>
 <script>
     {% block body_javascript %}
     {% endblock %}

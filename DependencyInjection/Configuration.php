@@ -40,6 +40,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('js')->defaultValue('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')->end()
                     ->end()
                 ->end()
+                ->scalarNode('page_div_style')->defaultValue('margin: 10px')->end()
             ->end();
 
         return $treeBuilder;
