@@ -153,7 +153,120 @@ The EntityManager or DocumentManger can be customized if it's a non-default one.
             js: path_or_url_to_bootstrap.js
 ```
 
-### Customize/Embed Grio
+### Multiple Grids on the same page
+
+The RendererFactory needs to be used if you want to render multiple grids on the same page.
+
+There are presently three typs of renderers it supports:
+
+   * datatables
+   * jq_grid
+   * table
+
+```php
+    /**
+     * List jobs in system by default.
+     *
+     * @Route("/jobs/")
+     */
+    public function jobsAction()
+    {
+        $rendererFactory = $this->get('dtc_grid.renderer.factory');
+        $renderer = $rendererFactory->create('datatables');
+        $gridSource = $this->get('dtc_grid.manager.source')->get('Dtc\\QueueBundle\\Documents\\Job');
+        $renderer->bind($gridSource);
+        $params = $renderer->getParams();
+
+        $renderer2 = $rendererFactory->create('datatables');
+        $gridSource2 = $this->get('dtc_grid.manager.source')->get('Dtc\\QueueBundle\\Documents\\JobArchive');
+        $renderer2->bind($gridSource2);
+        $params2 = $renderer2->getParams();
+
+        $params['archive_grid'] = $params2['dtc_grid'];
+        return $this->render('@DtcQueue/Queue/jobs.html.twig', $params);
+    }
+```
+
+
+#### Twig file rendering the multiple grids on the same page
+
+jobs.html.twig:
+```twig
+{% extends "DtcGridBundle:Page:datatables.html.twig" %}
+
+{% block grid %}
+    <h3>Live Jobs</h3>
+    {{ dtc_grid.render | raw }}
+    <h3>Archived Jobs</h3>
+    {{ archive_grid.render | raw }}
+{% endblock %}
+```
+
+#### You can even render multiple types of grids on the same page
+
+```php
+    /**
+     * List jobs in system by default.
+     *
+     * @Route("/jobs/")
+     */
+    public function jobsAction()
+    {
+        $rendererFactory = $this->get('dtc_grid.renderer.factory');
+        $renderer = $rendererFactory->create('jq_grid');  // NOTE THE DIFFERENT GRID TYPE
+        $gridSource = $this->get('dtc_grid.manager.source')->get('Dtc\\QueueBundle\\Documents\\Job');
+        $renderer->bind($gridSource);
+        $params = $renderer->getParams();
+
+        $renderer2 = $rendererFactory->create('datatables');
+        $gridSource2 = $this->get('dtc_grid.manager.source')->get('Dtc\\QueueBundle\\Documents\\JobArchive');
+        $renderer2->bind($gridSource2);
+        $params2 = $renderer2->getParams();
+
+        $params['archive_grid'] = $params2['dtc_grid'];
+        return $this->render('@DtcQueue/Queue/jobs.html.twig', $params);
+    }
+```
+
+jobs.html.twig (a little complicated as styles and javascript has to be included for both grid types, although this isn't necessary if you use the "table" type renderer as it's CSS and Javascript overlaps with the "datatables" renderer):
+```twig
+{% extends '@DtcGrid/layout.html.twig' %}
+
+{% block dtc_grid_stylesheets %}
+    {% for stylesheet in [
+    path('dtc_grid_bundle_dataTables_extension_css', { 'type': 'bootstrap' }),
+    ] %}
+        <link rel="stylesheet" href="{{ stylesheet }}" />
+    {% endfor %}
+    {% for stylesheet in jq_grid_stylesheets %}
+        <link rel="stylesheet" href="{{ stylesheet }}" />
+    {% endfor %}
+{% endblock %}
+
+{% block dtc_grid_javascripts %}
+    {% for javascript in [
+    path('dtc_grid_bundle_jquery'),
+    path('dtc_grid_bundle_purl'),
+    path('dtc_grid_bundle_dataTables'),
+    path('dtc_grid_bundle_dataTables_extension', { 'type': 'bootstrap' }),
+    '/bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js',
+    '/bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
+        <script type="text/javascript" src="{{ javascript }}"></script>
+    {% endfor %}
+    {% for javascript in jq_grid_javascripts %}
+        <script type="text/javascript" src="{{ javascript }}"></script>
+    {% endfor %}
+{% endblock %}
+
+{% block grid %}
+    <h3>Live Jobs</h3>
+    {{ dtc_grid.render | raw }}
+    <h3>Archived Jobs</h3>
+    {{ archive_grid.render | raw }}
+{% endblock %}
+```
+
+### Customize/Embed Grid
 
 To customize the grid's CSS/Javascript, or embed it into an existing page, follow the example below:
 

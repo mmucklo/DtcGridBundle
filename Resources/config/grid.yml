@@ -19,8 +19,18 @@ services:
             - [ 'setBootstrapCss', [ '%dtc_grid.jq_grid.bootstrap_css%']]
             - [ 'setBootstrapJs', [ '%dtc_grid.jq_grid.bootstrap_js%']]
             - [ 'setPageDivStyle', [ '%dtc_grid.page_div_style%']]
+    dtc_grid.renderer.factory:
+        class: Dtc\GridBundle\Grid\Renderer\RendererFactory
+        arguments:
+            - "@templating"
+            - "@router"
+            - '%dtc_grid.jq_grid.bootstrap_css%'
+            - '%dtc_grid.jq_grid.bootstrap_js%'
+            - '%dtc_grid.page_div_style%'
+            - '%dtc_grid.jq_grid.stylesheets%'
+            - '%dtc_grid.jq_grid.javascripts%'
     dtc_grid.renderer.datatables:
-        class: Dtc\GridBundle\Grid\Renderer\DatatablesRenderer
+        class: Dtc\GridBundle\Grid\Renderer\DataTablesRenderer
         arguments:
             - "@templating"
             - "@router"

@@ -4,7 +4,7 @@ namespace Dtc\GridBundle\Grid\Renderer;
 
 use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 
-class DatatablesRenderer extends TableGridRenderer
+class DataTablesRenderer extends TableGridRenderer
 {
     protected $options = array(
             'bProcessing' => true,
