@@ -56,12 +56,12 @@ trait ColumnExtractionTrait
     {
         $annotationColumns = $this->getAnnotationColumns();
         if ($annotationColumns) {
-            $this->setColumns($annotationColumns);
+            $this->addColumns($annotationColumns);
 
             return;
         }
 
-        $this->setColumns($this->getReflectionColumns());
+        $this->addColumns($this->getReflectionColumns());
     }
 
     /**

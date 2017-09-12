@@ -74,10 +74,10 @@ abstract class AbstractGridSource implements GridSourceInterface
         return $this->columns;
     }
 
-    public function setColumns($value)
+    public function addColumns(array $columns)
     {
         /** @var AbstractGridColumn $col */
-        foreach ($value as $col) {
+        foreach ($columns as $col) {
             $this->columns[$col->getField()] = $col;
         }
     }
