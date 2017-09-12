@@ -5,7 +5,8 @@ namespace Dtc\GridBundle\Grid\Renderer;
 use Symfony\Component\Routing\Router;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
-class RendererFactory {
+class RendererFactory
+{
     protected $twigEngine;
     protected $router;
     protected $bootstrapCss;
@@ -32,19 +33,22 @@ class RendererFactory {
     }
 
     /**
-     * Creates a new renderer of type $type, throws an exception if it's not known how to create a renderer of type $type
+     * Creates a new renderer of type $type, throws an exception if it's not known how to create a renderer of type $type.
+     *
      * @param $type
+     *
      * @return AbstractRenderer
      */
-    public function create($type) {
-        switch($type) {
-            case "datatables":
+    public function create($type)
+    {
+        switch ($type) {
+            case 'datatables':
                 $renderer = new DataTablesRenderer($this->twigEngine, $this->router);
                 break;
-            case "jq_grid":
+            case 'jq_grid':
                 $renderer = new JQGridRenderer($this->twigEngine, $this->router);
                 break;
-            case "table":
+            case 'table':
                 $renderer = new TableGridRenderer($this->twigEngine, $this->router);
                 break;
             default:
@@ -73,5 +77,4 @@ class RendererFactory {
 
         return $renderer;
     }
-
 }
