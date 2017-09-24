@@ -243,4 +243,22 @@ trait ColumnExtractionTrait
 
         return $columns;
     }
+
+    /**
+     * @return string|null
+     */
+    protected function getIdColumn() {
+        static $identifier = false;
+        if ($identifier !== false) {
+            return $identifier;
+        }
+
+        $metadata = $this->getClassMetadata();
+        $identifier = $metadata->getIdentifier();
+        $identifier = isset($identifier[0]) ? $identifier[0] : null;
+        return $identifier;
+    }
+    public function hasIdColumn() {
+        return $this->getIdColumn() ? true : false;
+    }
 }

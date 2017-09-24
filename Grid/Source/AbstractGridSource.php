@@ -209,4 +209,19 @@ abstract class AbstractGridSource implements GridSourceInterface
     {
         $this->parameters = $parameters;
     }
+
+    /**
+     * @return bool Returns true if this GridSource has an ID or false otherise
+     */
+    public function hasIdColumn() {
+        return false;
+    }
+
+    /**
+     * @param $id
+     * @return null|mixed Returns the row identified by Id if found.
+     */
+    public function find($id) {
+        return null;
+    }
 }

@@ -21,6 +21,9 @@ class DocumentGridSource extends AbstractGridSource
         $this->documentName = $documentName;
     }
 
+    /**
+     * @return \Doctrine\ODM\MongoDB\Query\Builder
+     */
     protected function getQueryBuilder()
     {
         $qb = $this->documentManager->createQueryBuilder($this->documentName);
@@ -92,5 +95,15 @@ class DocumentGridSource extends AbstractGridSource
     public function getRecords()
     {
         return $this->getQueryBuilder()->getQuery()->execute()->toArray(false);
+    }
+
+    public function find($id) {
+        if (!$this->hasIdColumn()) {
+            throw new \Exception("No id column found for " . $this->documentName);
+        }
+        $qb = $this->documentManager->createQueryBuilder($this->documentName);
+        $idColumn = $this->getIdColumn();
+        $qb->field($idColumn)->equals($id);
+        return $qb->getQuery()->execute()->toArray(false);
     }
 }

@@ -39,4 +39,8 @@ interface GridSourceInterface
     public function getOrderBy();
 
     public function addColumns(array $columns);
+
+    public function hasIdColumn();
+
+    public function find($id);
 }

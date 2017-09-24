@@ -3,6 +3,7 @@
 namespace Dtc\GridBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -54,6 +55,19 @@ class GridController extends Controller
         }
 
         return $response;
+    }
+
+    /**
+     * @Route("/show", name="dtc_grid_bundle_show")
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function showAction(Request $request) {
+        $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
+        $id = $request->get('identifier');
+        $results = $gridSource->find($id);
+
+        return new JsonResponse($results);
     }
 
     /**

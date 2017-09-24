@@ -105,4 +105,17 @@ class EntityGridSource extends AbstractGridSource
         return $this->getQueryBuilder()->getQuery()
             ->getResult();
     }
+
+    public function find($id) {
+        if (!$this->hasIdColumn()) {
+            throw new \Exception("No id column found for " . $this->documentName);
+        }
+        $qb = $this->entityManager->createQueryBuilder();
+        $idColumn = $this->getIdColumn();
+        $qb->from($this->entityName, 'a');
+        $qb->select('a.'.implode(',a.', $this->getClassMetadata()->getFieldNames()));
+        $qb->where('a.' .$idColumn . ' = :id')->setParameter(':id', $id);
+        return $qb->getQuery()->execute();
+    }
+
 }
