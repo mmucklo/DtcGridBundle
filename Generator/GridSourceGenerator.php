@@ -2,6 +2,7 @@
 
 namespace Dtc\GridBundle\Generator;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Dtc\GridBundle\Util\CamelCaseTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -9,6 +10,11 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+/**
+ * @deprecated
+ * Class GridSourceGenerator
+ * @package Dtc\GridBundle\Generator
+ */
 class GridSourceGenerator extends Generator
 {
     use CamelCaseTrait;

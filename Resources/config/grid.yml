@@ -1,47 +1,25 @@
 services:
-    dtc_grid.renderer.table:
-        class: Dtc\GridBundle\Grid\Renderer\TableGridRenderer
-        arguments:
-            - "@templating"
-            - "@router"
-        calls:
-            - [ 'setBootstrapCss', [ '%dtc_grid.jq_grid.bootstrap_css%']]
-            - [ 'setBootstrapJs', [ '%dtc_grid.jq_grid.bootstrap_js%']]
-            - [ 'setPageDivStyle', [ '%dtc_grid.page_div_style%']]
-    dtc_grid.renderer.jq_grid:
-        class: Dtc\GridBundle\Grid\Renderer\JQGridRenderer
-        arguments:
-            - "@templating"
-            - "@router"
-        calls:
-            - [ 'setJavascripts', [ '%dtc_grid.jq_grid.javascripts%']]
-            - [ 'setStylesheets', [ '%dtc_grid.jq_grid.stylesheets%']]
-            - [ 'setBootstrapCss', [ '%dtc_grid.jq_grid.bootstrap_css%']]
-            - [ 'setBootstrapJs', [ '%dtc_grid.jq_grid.bootstrap_js%']]
-            - [ 'setPageDivStyle', [ '%dtc_grid.page_div_style%']]
     dtc_grid.renderer.factory:
         class: Dtc\GridBundle\Grid\Renderer\RendererFactory
         arguments:
             - "@templating"
             - "@router"
-            - '%dtc_grid.jq_grid.bootstrap_css%'
-            - '%dtc_grid.jq_grid.bootstrap_js%'
-            - '%dtc_grid.page_div_style%'
-            - '%dtc_grid.jq_grid.stylesheets%'
-            - '%dtc_grid.jq_grid.javascripts%'
-    dtc_grid.renderer.datatables:
-        class: Dtc\GridBundle\Grid\Renderer\DataTablesRenderer
-        arguments:
-            - "@templating"
-            - "@router"
-        calls:
-            - [ 'setBootstrapCss', [ '%dtc_grid.jq_grid.bootstrap_css%']]
-            - [ 'setBootstrapJs', [ '%dtc_grid.jq_grid.bootstrap_js%']]
-            - [ 'setPageDivStyle', [ '%dtc_grid.page_div_style%']]
+            -
+                theme.css: '%dtc_grid.theme.css%'
+                theme.js: '%dtc_grid.theme.js%'
+                page_div_style: '%dtc_grid.page_div_style%'
+                jquery: '%dtc_grid.jquery%'
+                purl: '%dtc_grid.purl%'
+                jq_grid.css: '%dtc_grid.jq_grid.css%'
+                jq_grid.js: '%dtc_grid.jq_grid.js%'
+                datatables.css: '%dtc_grid.datatables.css%'
+                datatables.js: '%dtc_grid.datatables.js%'
     dtc_grid.manager.source:
         class: Dtc\GridBundle\Manager\GridSourceManager
         arguments:
-            - "@service_container"
+            - "@annotation_reader"
+            - "%kernel.cache_dir%"
+            - "%kernel.debug%"
     dtc_grid.twig.extension:
         class: Dtc\GridBundle\Twig\Extension\TwigExtension
         tags:

@@ -57,8 +57,8 @@ Resources/views/your_controller/usersJq.html.twig
         {% endblock %}
         {% block javascripts %}
             {% for javascript in [
-            path('dtc_grid_bundle_jquery'),
-            path('dtc_grid_bundle_purl'),
+            path('dtc_grid_jquery'),
+            path('dtc_grid_purl'),
             'path/to/i18n/grid.locale-en.js',
             'path/to/jquery.jqGrid.js'
             ] %}

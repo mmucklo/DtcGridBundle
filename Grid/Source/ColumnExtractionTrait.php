@@ -4,6 +4,7 @@ namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
+use Dtc\GridBundle\Annotation\Grid;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 use Dtc\GridBundle\Util\CamelCaseTrait;
 
@@ -56,12 +57,12 @@ trait ColumnExtractionTrait
     {
         $annotationColumns = $this->getAnnotationColumns();
         if ($annotationColumns) {
-            $this->addColumns($annotationColumns);
+            $this->setColumns($annotationColumns);
 
             return;
         }
 
-        $this->addColumns($this->getReflectionColumns());
+        $this->setColumns($this->getReflectionColumns());
     }
 
     /**
@@ -199,6 +200,11 @@ trait ColumnExtractionTrait
         $metadata = $this->getClassMetadata();
         $reflectionClass = $metadata->getReflectionClass();
         $properties = $reflectionClass->getProperties();
+
+        /** @var Grid $gridAnnotation */
+        if ($gridAnnotation = $this->reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid')) {
+            $actions = $gridAnnotation->actions;
+        }
 
         $gridColumns = [];
         foreach ($properties as $property) {

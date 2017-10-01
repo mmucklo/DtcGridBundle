@@ -4,8 +4,11 @@ namespace Dtc\GridBundle\Grid\Renderer;
 
 use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 
-class DataTablesRenderer extends TableGridRenderer
+class DataTablesRenderer extends AbstractJqueryRenderer
 {
+    protected $dataTablesCss = [];
+    protected $dataTablesJs = [];
+
     protected $options = array(
             'bProcessing' => true,
             'searchDelay' => 350,
@@ -34,6 +37,40 @@ class DataTablesRenderer extends TableGridRenderer
         $this->mode = $mode;
     }
 
+    /**
+     * Set the type (bootstrap, bootstrap4, foundation, etc.)
+     * @param $type
+     */
+    public function setDataTablesCss($css) {
+        $this->dataTablesCss = $css;
+    }
+
+    public function getDataTablesCss() {
+        return $this->dataTablesCss;
+    }
+
+    public function setDataTablesJs($js) {
+        $this->dataTablesJs = $js;
+    }
+
+    public function getDataTablesJs() {
+        return $this->dataTablesJs;
+    }
+
+    /**
+     * @param array|null $params
+     */
+    public function getParams(array &$params = null)
+    {
+        if ($params === null) {
+            $params = [];
+        }
+        parent::getParams($params);
+        $params['dtc_grid_datatables_css'] = $this->dataTablesCss;
+        $params['dtc_grid_datatables_js'] = $this->dataTablesJs;
+        return $params;
+    }
+
     protected function afterBind()
     {
         $id = $this->gridSource->getDivId();
@@ -44,14 +81,14 @@ class DataTablesRenderer extends TableGridRenderer
         // We need to pass filter information here.
         $params = array(
                'id' => $this->gridSource->getId(),
-               'renderer' => 'dtc_grid.renderer.datatables',
+               'renderer' => 'datatables',
                'filter' => $this->gridSource->getFilter(),
                'parameters' => $this->gridSource->getParameters(),
                'order' => $this->gridSource->getOrderBy(),
                'fields' => $fields,
         );
 
-        $url = $this->router->generate('dtc_grid_grid_data', $params);
+        $url = $this->router->generate('dtc_grid_data', $params);
         $this->options['sAjaxSource'] = $url;
 
         $columnsDef = array();
