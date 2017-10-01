@@ -1,12 +1,12 @@
 <?php
 
-namespace Dtc\Grid\Annotation;
+namespace Dtc\GridBundle\Annotation;
 
 /**
  * @Annotation
  * @Target("ANNOTATION")
  */
-class Action {
+class Action implements Annotation {
     /**
      * @var string
      */

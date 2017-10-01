@@ -1,6 +1,6 @@
 <?php
 
-namespace Dtc\Grid\Annotation;
+namespace Dtc\GridBundle\Annotation;
 
 /**
  * @Annotation

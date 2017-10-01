@@ -10,7 +10,6 @@
      * $container->get('dtc_grid.renderer.jq_grid') -> $container->get('dtc_grid.renderer.factory')->create('jq_grid');
      * $container->get('dtc_grid.renderer.table') -> $container->get('dtc_grid.renderer.factory')->create('table');
    * Mark old generator code as deprecated
-   * New class based annotation for adding Actions
    * Changing bootstrap_css and boostrap_js to theme_css array and theme_js array
      * In config.yml you can specify the location of the theme_css (formerly bootstrap_css)
 
@@ -39,8 +38,69 @@ After:
    * Added the ability to override the url of jQuery used
    * Removed embedded purl, Datatables, and jQuery
       * Added ability to change URLs for purl, jQuery, and DataTables via config, defaulting to CDN versions
+   * Renamed annotations
+Old:
+```php
+<?php
 
-  
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Dtc\GridBundle\Annotation\GridColumn;
+
+/**
+ * Class User
+ * @ORM\Entity
+ * @package AppBundle\Entity
+ */
+class User {
+
+    /**
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    /**
+     * @GridColumn
+     * @ORM\Column(type="string")
+     */
+    protected $firstName;
+
+```
+
+New:
+```php
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Dtc\GridBundle\Annotation as Grid;
+
+/**
+ * Class User
+ * @ORM\Entity
+ * @package AppBundle\Entity
+ */
+class User {
+
+    /**
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    /**
+     * @Grid\Column
+     * @ORM\Column(type="string")
+     */
+    protected $firstName;
+
+```
+   * Added @Grid\Grid annotation for actions
   
 2.3.0
    * Refactor: rename setColumns to addColumns and add it to GridSourceInterface

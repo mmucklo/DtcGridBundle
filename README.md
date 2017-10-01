@@ -121,7 +121,7 @@ There's a @GridColumn annotation that lives in Dtc\GridBundle\Annotation that yo
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Dtc\GridBundle\Annotation\GridColumn;
+use Dtc\GridBundle\Annotation as Grid;
 
 /**
  * Class User
@@ -138,13 +138,13 @@ class User {
     protected $id;
 
     /**
-     * @GridColumn
+     * @Grid\Column
      * @ORM\Column(type="string")
      */
     protected $firstName;
 
     /**
-     * @GridColumn(label="Last",sortable=true)
+     * @Grid\Column(label="Last",sortable=true)
      * @ORM\Column(type="string")
      */
     protected $lastName;

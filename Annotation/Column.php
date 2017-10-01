@@ -8,7 +8,7 @@ namespace Dtc\GridBundle\Annotation;
  * @Annotation
  * @Target("PROPERTY")
  */
-class GridColumn
+class Column implements Annotation
 {
     /**
      * @var string

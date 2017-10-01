@@ -4,6 +4,7 @@ namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
+use Dtc\GridBundle\Annotation\Action;
 use Dtc\GridBundle\Annotation\Grid;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 use Dtc\GridBundle\Util\CamelCaseTrait;
@@ -208,13 +209,19 @@ trait ColumnExtractionTrait
 
         $gridColumns = [];
         foreach ($properties as $property) {
-            /** @var \Dtc\GridBundle\Annotation\GridColumn $annotation */
-            $annotation = $this->reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\GridColumn');
+            /** @var \Dtc\GridBundle\Annotation\Column $annotation */
+            $annotation = $this->reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
             if ($annotation) {
                 $name = $property->getName();
                 $label = $annotation->getLabel() ?: $this->fromCamelCase($name);
                 $gridColumns[$name] = ['label' => $label, 'sortable' => $annotation->getSortable()];
             }
+        }
+        /** @var Action $action */
+        if (isset($actions)) {
+/*            foreach ($actions as $action) {
+            }*/
+            $gridColumns['action'] = ['label' => 'Action'];
         }
 
         return $gridColumns;

@@ -8,10 +8,10 @@ namespace Dtc\GridBundle\Annotation;
  * @Annotation
  * @Target("CLASS")
  */
-class Grid
+class Grid implements Annotation
 {
     /**
-     * @var array<\Dtc\Grid\GridAction>
+     * @var array<Dtc\GridBundle\Annotation\Action>
      */
     public $actions;
 }
