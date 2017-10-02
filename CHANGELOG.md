@@ -83,6 +83,7 @@ use Dtc\GridBundle\Annotation as Grid;
 /**
  * Class User
  * @ORM\Entity
+ * @Grid\Grid()
  * @package AppBundle\Entity
  */
 class User {
@@ -101,8 +102,13 @@ class User {
     protected $firstName;
 
 ```
-   * Added @Grid\Grid annotation for actions
-  
+   * Added @Grid\Grid annotation
+   * Added action Annotations
+      * Added a ShowAction
+      * 
+   * Deleted a bunch of images / css for doing pagination, and old formatting code (now uses bootstrap)
+   * Created a new CSS file for spinner on Show
+   
 2.3.0
    * Refactor: rename setColumns to addColumns and add it to GridSourceInterface
 
