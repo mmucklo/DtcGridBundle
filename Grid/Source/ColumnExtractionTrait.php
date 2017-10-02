@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
 use Dtc\GridBundle\Annotation\Action;
 use Dtc\GridBundle\Annotation\Grid;
+use Dtc\GridBundle\Annotation\ShowAction;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 use Dtc\GridBundle\Util\CamelCaseTrait;
 
@@ -158,6 +159,9 @@ trait ColumnExtractionTrait
         $filename = $reflectionClass->getFileName();
         if ($filename && is_file($filename)) {
             $mtime = filemtime($filename);
+            if (($currentfileMtime = filemtime(__FILE__)) > $mtime) {
+                $mtime = $currentfileMtime;
+            }
             $mtimeAnnotation = filemtime($this->annotationCacheFilename);
             if ($mtime && $mtimeAnnotation && $mtime <= $mtimeAnnotation) {
                 return $this->annotationColumns = include $this->annotationCacheFilename;
@@ -176,12 +180,19 @@ trait ColumnExtractionTrait
         if ($annotationColumns) {
             $output = "<?php\nreturn array(\n";
             foreach ($annotationColumns as $field => $info) {
-                $label = $info['label'];
-                $output .= "'$field' => new \Dtc\GridBundle\Grid\Column\GridColumn('$field', '$label'";
-                if ($info['sortable']) {
-                    $output .= ", null, ['sortable' => true]";
+
+                $class = $info['class'];
+                $output .= "'$field' => new $class(";
+                $first = true;
+                foreach ($info['arguments'] as $argument) {
+                    if ($first) {
+                        $first = false;
+                    } else {
+                        $output .= ',';
+                    }
+                    $output .= var_export($argument, true);
                 }
-                $output .= "),\n";
+                $output .= "),";
             }
             $output .= ");\n";
         } else {
@@ -214,14 +225,30 @@ trait ColumnExtractionTrait
             if ($annotation) {
                 $name = $property->getName();
                 $label = $annotation->getLabel() ?: $this->fromCamelCase($name);
-                $gridColumns[$name] = ['label' => $label, 'sortable' => $annotation->getSortable()];
+                $gridColumns[$name] = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$name, $label]];
+                if ($annotation->getSortable()) {
+                    $gridColumns[$name]['arguments'][] = null;
+                    $gridColumns[$name]['arguments'][] = ['sortable' => true];
+                }
             }
         }
+
         /** @var Action $action */
         if (isset($actions)) {
-/*            foreach ($actions as $action) {
-            }*/
-            $gridColumns['action'] = ['label' => 'Action'];
+            $field = '\$-action';
+            $actionArgs = [$field];
+            $actionDefs = [];
+            foreach ($actions as $action) {
+                $actionDef = ['label' => $action->label, 'route' => $action->route];
+                if ($action instanceof ShowAction) {
+                    $actionDef['action'] = 'show';
+                }
+                $actionDefs[] = $actionDef;
+            }
+            $actionArgs[] = $actionDefs;
+
+            $gridColumns[$field] = ['class' => '\Dtc\GridBundle\Grid\Column\ActionGridColumn',
+                'arguments' => $actionArgs];
         }
 
         return $gridColumns;

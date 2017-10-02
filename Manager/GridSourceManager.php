@@ -84,30 +84,32 @@ class GridSourceManager
      */
     protected function getGridSource($manager, $entityOrDocument)
     {
-        try {
-            $repository = $manager->getRepository($entityOrDocument);
-            if ($repository) {
-                $className = $repository->getClassName();
-                $name = $manager->getClassMetadata($className)->getName();
-                if ($manager instanceof EntityManagerInterface) {
-                    $gridSource = new EntityGridSource($manager, $name);
-                } else {
-                    $gridSource = new DocumentGridSource($manager, $name);
-                }
-                $gridSource->setAnnotationReader($this->reader);
-                $gridSource->setCacheDir($this->cacheDir);
-
-                $gridSource->setDebug($this->debug);
-                $gridSource->autoDiscoverColumns();
-                $this->sourcesByName[$name] = $gridSource;
-                $this->sourcesByClass[$className] = $gridSource;
-                $gridSource->setId($className);
-
-                return $gridSource;
+        $repository = $manager->getRepository($entityOrDocument);
+        if ($repository) {
+            $className = $repository->getClassName();
+            $classMetadata = $manager->getClassMetadata($className);
+            $name = $classMetadata->getName();
+            $reflectionClass = $classMetadata->getReflectionClass();
+            $annotation = $this->reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid');
+            if (!$annotation) {
+                throw new \Exception("GridSource requested for '$entityOrDocument' but no Grid annotation found");
             }
-        } catch (\Exception $exception) {
-        }
+            if ($manager instanceof EntityManagerInterface) {
+                $gridSource = new EntityGridSource($manager, $name);
+            } else {
+                $gridSource = new DocumentGridSource($manager, $name);
+            }
+            $gridSource->setAnnotationReader($this->reader);
+            $gridSource->setCacheDir($this->cacheDir);
 
+            $gridSource->setDebug($this->debug);
+            $gridSource->autoDiscoverColumns();
+            $this->sourcesByName[$name] = $gridSource;
+            $this->sourcesByClass[$className] = $gridSource;
+            $gridSource->setId($className);
+
+            return $gridSource;
+        }
         return null;
     }
 

@@ -1,8 +1,9 @@
 3.0.0
+   * Requirement - add Dtc\GridBundle\Annotation\Grid for all auto-detected Entities or Documents
    * Remove custom_managers section from config.yml
      * Now auto-detected
         * Custom document/entity managers should now be auto-detected based on what's registered in the doctrine registry
-     * Remove "custom_managers:" section from your config.yml (if present)     
+     * Remove "custom_managers:" section from your config.yml (if present)
    * New grid route for auto-rendering of grid pages based on parameters
      * Example:
    * Removed renderer services as they can be accessed via the RendrerFactory

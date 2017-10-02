@@ -3,6 +3,7 @@
 namespace Dtc\GridBundle\Controller;
 
 use Dtc\GridBundle\Grid\Renderer\AbstractRenderer;
+use Dtc\GridBundle\Util\CamelCaseTrait;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class GridController extends Controller
 {
+    use CamelCaseTrait;
+
     /**
      * @Route("/grid", name="dtc_grid")
      * @param Request $request
@@ -106,8 +109,21 @@ class GridController extends Controller
     public function showAction(Request $request) {
         $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
         $id = $request->get('identifier');
-        $results = $gridSource->find($id);
+        $result = $gridSource->find($id);
 
-        return new JsonResponse($results);
+        $responseResult = [];
+        foreach ($result as $key => $value) {
+            $responseResult[$this->fromCamelCase($key)] = $value;
+        }
+
+        return new JsonResponse($responseResult);
+    }
+
+    public function deleteAction(Request $request) {
+        $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
+        $id = $request->get('identifier');
+        $result = $gridSource->find($id);
+
+
     }
 }

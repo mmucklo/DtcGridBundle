@@ -108,14 +108,50 @@ class EntityGridSource extends AbstractGridSource
 
     public function find($id) {
         if (!$this->hasIdColumn()) {
-            throw new \Exception("No id column found for " . $this->documentName);
+            throw new \Exception("No id column found for " . $this->entityName);
         }
         $qb = $this->entityManager->createQueryBuilder();
         $idColumn = $this->getIdColumn();
         $qb->from($this->entityName, 'a');
         $qb->select('a.'.implode(',a.', $this->getClassMetadata()->getFieldNames()));
         $qb->where('a.' .$idColumn . ' = :id')->setParameter(':id', $id);
-        return $qb->getQuery()->execute();
+        $result = $qb->getQuery()->execute();
+        if (isset($result[0])) {
+            return $result[0];
+        }
     }
 
+    public function remove($id, $soft = false, $softColumn = 'deletedAt', $softColumnType = 'datetime') {
+        if (!$this->hasIdColumn()) {
+            throw new \Exception("No id column found for " . $this->entityName);
+        }
+        if (!$soft) {
+            $qb = $this->entityManager->createQueryBuilder();
+            $idColumn = $this->getIdColumn();
+            $qb->delete($this->entityName, 'a');
+            $qb->where('a.' .$idColumn . ' = :id')->setParameter(':id', $id);
+            $result = $qb->getQuery()->execute();
+            return $result;
+        }
+        else {
+            switch($softColumnType) {
+                case 'datetime':
+                    $value = 'NOW()';
+                    break;
+                case 'boolean':
+                case 'integer':
+                    $value = '1';
+                    break;
+                default:
+                    throw new \Exception("Unknown column type $softColumnType for soft-removing a column");
+            }
+            $qb = $this->entityManager->createQueryBuilder();
+            $idColumn = $this->getIdColumn();
+            $qb->update($this->entityName, 'a');
+            $qb->set('a.' . $softColumn, $value);
+            $qb->where('a.' .$idColumn . ' = :id')->setParameter(':id', $id);
+            $result = $qb->getQuery()->execute();
+            return $result;
+        }
+    }
 }

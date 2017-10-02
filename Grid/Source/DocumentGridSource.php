@@ -104,6 +104,46 @@ class DocumentGridSource extends AbstractGridSource
         $qb = $this->documentManager->createQueryBuilder($this->documentName);
         $idColumn = $this->getIdColumn();
         $qb->field($idColumn)->equals($id);
-        return $qb->getQuery()->execute()->toArray(false);
+        $result = $qb->getQuery()->execute()->toArray(false);
+        if (isset($result[0])) {
+            return $result[0];
+        }
     }
+
+    public function remove($id, $soft = false, $softColumn = 'deletedAt', $softColumnType = 'datetime') {
+        if (!$this->hasIdColumn()) {
+            throw new \Exception("No id column found for " . $this->documentName);
+        }
+        if (!$soft) {
+            $qb = $this->documentManager->createQueryBuilder();
+            $idColumn = $this->getIdColumn();
+            $qb->remove($this->documentName);
+            $qb->field($idColumn)->equals($id);
+            $result = $qb->getQuery()->execute();
+            return $result;
+        }
+        else {
+            switch ($softColumnType) {
+                case 'datetime':
+                    $value = new \DateTime();
+                    break;
+                case 'boolean':
+                    $value = true;
+                    break;
+                case 'integer':
+                    $value = '1';
+                    break;
+                default:
+                    throw new \Exception("Unknown column type $softColumnType for soft-removing a column");
+            }
+            $qb = $this->documentManager->createQueryBuilder();
+            $idColumn = $this->getIdColumn();
+            $qb->update($this->documentName);
+            $qb->set($softColumn, $value);
+            $qb->field($idColumn)->equals($id);
+            $result = $qb->getQuery()->execute();
+            return $result;
+        }
+    }
+
 }

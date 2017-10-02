@@ -44,12 +44,33 @@ Usage
 
 ### Get Started
 
-After installation, all entities and documents should be available off the dtc_grid route:
+After installation, all entities and documents that have a Grid annotation should be available off the dtc_grid route:
+
+```php
+
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Dtc\GridBundle\Annotation as Grid;
+
+/**
+ * Class User
+ * @Grid\Grid
+ * @ORM\Entity
+ * @package AppBundle\Entity
+ */
+class User {
+    //...
+}
+```
 
   * Route: dtc_grid
   * Parameters:
       * class=[document_or_entity]
-         * This can be in either namespaced class or symfony-style format separated by ':'
+         * This can be in either a fully-namespaced class name or symfony-style entity/document format separated by ':'
+            * e.g. either: 'AppBundle:User' or 'AppBundle\Entity\User'
       * type=[datatables|table|jq_grid]
 
 #### Examples:
@@ -125,6 +146,7 @@ use Dtc\GridBundle\Annotation as Grid;
 
 /**
  * Class User
+ * @Grid\Grid
  * @ORM\Entity
  * @package AppBundle\Entity
  */

@@ -132,6 +132,12 @@ class DataTablesRenderer extends AbstractJqueryRenderer
             $info = array();
             /** @var AbstractGridColumn $column */
             foreach ($columns as $column) {
+                if (method_exists($column, 'setRouter')) {
+                    $column->setRouter($this->router);
+                }
+                if (method_exists($column, 'setGridSourceId')) {
+                    $column->setGridSourceId($gridSource->getId());
+                }
                 $info[] = $column->format($record, $gridSource);
             }
 
