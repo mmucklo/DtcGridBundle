@@ -47,7 +47,6 @@ Usage
 After installation, all entities and documents that have a Grid annotation should be available off the dtc_grid route:
 
 ```php
-
 <?php
 
 namespace AppBundle\Entity;
@@ -103,6 +102,31 @@ security:
 
 ```
 
+### Adding actions
+
+There are presently several actions that you can add to your grid that will appear under a final column called "Actions"
+
+These must be added as annotations to the Grid annotation.
+
+```php
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Dtc\GridBundle\Annotation as Grid;
+
+/**
+ * Class User
+ * @Grid\Grid(actions={@Grid\ShowAction(), @Grid\DeleteAction()})
+ * @ORM\Entity
+ * @package AppBundle\Entity
+ */
+class User {
+    //...
+}
+```
+
 ### A more custom Route
 
 ```php
@@ -133,7 +157,7 @@ public function usersAction(Request $request) {
 
 ### Customize Columns
 
-There's a @GridColumn annotation that lives in Dtc\GridBundle\Annotation that you place on each column you want to be visible.  Then you can specify a custom label, and or sortability if you want.  If there's no @GridColumn annotations at all, it will default to show all the columns.
+There's a @Column annotation that lives in Dtc\GridBundle\Annotation that you place on each column you want to be visible.  Then you can specify a custom label, and or sortability if you want.  If there's no @GridColumn annotations at all, it will default to show all the columns.
 
 ```php
 
