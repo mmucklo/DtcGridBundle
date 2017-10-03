@@ -2,6 +2,7 @@
 
 namespace Dtc\GridBundle\Tests\Manager;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Dtc\GridBundle\Manager\GridSourceManager;
 use Dtc\GridBundle\Tests\Grid\Source\TestGridSource;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +14,7 @@ class GridSourceManagerTest extends TestCase
     {
         $container = new Container();
         $container->setParameter('dtc_grid.custom_managers', []);
-        $gridSourceManager = new GridSourceManager($container);
+        $gridSourceManager = new GridSourceManager(new AnnotationReader(), '/tmp', true);
         self::assertNotNull($gridSourceManager->all());
         self::assertInternalType('array', $gridSourceManager->all());
         self::assertEmpty($gridSourceManager->all());
@@ -23,7 +24,7 @@ class GridSourceManagerTest extends TestCase
     {
         $container = new Container();
         $container->setParameter('dtc_grid.custom_managers', []);
-        $gridSourceManager = new GridSourceManager($container);
+        $gridSourceManager = new GridSourceManager(new AnnotationReader(), '/tmp', true);
         $gridSource = new TestGridSource();
         $gridSourceManager->add('test_grid_source', $gridSource);
         self::assertSame($gridSource, $gridSourceManager->get('test_grid_source'));
@@ -38,7 +39,7 @@ class GridSourceManagerTest extends TestCase
     {
         $container = new Container();
         $container->setParameter('dtc_grid.custom_managers', []);
-        $gridSourceManager = new GridSourceManager($container);
+        $gridSourceManager = new GridSourceManager(new AnnotationReader(), '/tmp', true);
         $gridSource = new TestGridSource();
         try {
             $gridSourceManager->get('test_grirce');

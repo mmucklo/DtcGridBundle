@@ -74,7 +74,7 @@ abstract class AbstractGridSource implements GridSourceInterface
         return $this->columns;
     }
 
-    public function addColumns(array $columns)
+    public function setColumns($columns)
     {
         /** @var AbstractGridColumn $col */
         foreach ($columns as $col) {
@@ -208,5 +208,23 @@ abstract class AbstractGridSource implements GridSourceInterface
     public function setParameters($parameters)
     {
         $this->parameters = $parameters;
+    }
+
+    /**
+     * @return bool Returns true if this GridSource has an ID or false otherise
+     */
+    public function hasIdColumn()
+    {
+        return false;
+    }
+
+    /**
+     * @param $id
+     *
+     * @return null|mixed returns the row identified by Id if found
+     */
+    public function find($id)
+    {
+        return null;
     }
 }

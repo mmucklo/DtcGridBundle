@@ -4,10 +4,10 @@ namespace Dtc\GridBundle\Grid\Renderer;
 
 use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 
-class JQGridRenderer extends TableGridRenderer
+class JQGridRenderer extends AbstractJqueryRenderer
 {
-    protected $stylesheets;
-    protected $javascripts;
+    protected $jqGridCss = [];
+    protected $jqGridJs = [];
     protected $options = array(
             'datatype' => 'json',
             'jsonReader' => array(
@@ -57,10 +57,10 @@ class JQGridRenderer extends TableGridRenderer
 
         $params = array(
                 'id' => $this->gridSource->getId(),
-                'renderer' => 'dtc_grid.renderer.jq_grid',
+                'renderer' => 'jq_grid',
         );
 
-        $url = $this->router->generate('dtc_grid_grid_data', $params);
+        $url = $this->router->generate('dtc_grid_data', $params);
         $this->options['url'] = $url;
 
         /** @var AbstractGridColumn $column */
@@ -95,6 +95,12 @@ class JQGridRenderer extends TableGridRenderer
             $info = array();
             /** @var AbstractGridColumn $column */
             foreach ($columns as $column) {
+                if (method_exists($column, 'setRouter')) {
+                    $column->setRouter($this->router);
+                }
+                if (method_exists($column, 'setGridSourceId')) {
+                    $column->setGridSourceId($gridSource->getId());
+                }
                 $info[$column->getField()] = $column->format($record, $this->gridSource);
             }
 
@@ -104,14 +110,14 @@ class JQGridRenderer extends TableGridRenderer
         return $retVal;
     }
 
-    public function setStylesheets(array $stylesheets)
+    public function setJqGridCss(array $css)
     {
-        $this->stylesheets = $stylesheets;
+        $this->jqGridCss = $css;
     }
 
-    public function setJavascripts(array $javascripts)
+    public function setJqGridJs(array $js)
     {
-        $this->javascripts = $javascripts;
+        $this->jqGridJs = $js;
     }
 
     /**
@@ -123,8 +129,8 @@ class JQGridRenderer extends TableGridRenderer
             $params = [];
         }
         parent::getParams($params);
-        $params['jq_grid_stylesheets'] = isset($this->stylesheets) ? $this->stylesheets : [];
-        $params['jq_grid_javascripts'] = isset($this->javascripts) ? $this->javascripts : [];
+        $params['dtc_grid_jq_grid_css'] = $this->jqGridCss;
+        $params['dtc_grid_jq_grid_js'] = $this->jqGridJs;
 
         return $params;
     }

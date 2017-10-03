@@ -1,21 +1,18 @@
-{% extends '@DtcGrid/layout.html.twig' %}
+{% extends '@DtcGrid/layout_base_jquery.html.twig' %}
 
 {% block dtc_grid_stylesheets %}
-    {% for stylesheet in [
-    path('dtc_grid_bundle_dataTables_extension_css', { 'type': 'bootstrap' }),
-    ] %}
+    {% for stylesheet in dtc_grid_datatables_css %}
         <link rel="stylesheet" href="{{ stylesheet }}" />
     {% endfor %}
+    <link rel="stylesheet" href="/bundles/dtcgrid/css/dtc_grid_spinner.css" />
 {% endblock %}
 
 {% block dtc_grid_javascripts %}
-    {% for javascript in [
-    path('dtc_grid_bundle_jquery'),
-    path('dtc_grid_bundle_purl'),
-    path('dtc_grid_bundle_dataTables'),
-    path('dtc_grid_bundle_dataTables_extension', { 'type': 'bootstrap' }),
-    '/bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js',
-    '/bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
-        <script type="text/javascript" src="{{ javascript }}"></script>
+    {{ parent() }}
+    {% for javascript in dtc_grid_datatables_js %}
+        <script src="{{ javascript }}"></script>
     {% endfor %}
+    <script src="/bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js"></script>
+    <script src="/bundles/dtcgrid/js/jquery.datatable/DT_action.js"></script>
+    <script src="/bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js"></script>
 {% endblock %}

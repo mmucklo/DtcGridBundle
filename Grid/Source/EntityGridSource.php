@@ -4,6 +4,7 @@ namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Dtc\GridBundle\Grid\Column\GridColumn;
 
 class EntityGridSource extends AbstractGridSource
 {
@@ -20,6 +21,14 @@ class EntityGridSource extends AbstractGridSource
 
     protected function getQueryBuilder()
     {
+        $columns = $this->getColumns();
+        $fieldList = [];
+        foreach ($columns as $column) {
+            if ($column instanceof GridColumn && $column->isSearchable()) {
+                $fieldList[$column->getField()] = true;
+            }
+        }
+
         $qb = $this->entityManager->createQueryBuilder();
         $orderBy = array();
         foreach ($this->orderBy as $key => $value) {
@@ -45,12 +54,13 @@ class EntityGridSource extends AbstractGridSource
 
             $query = array();
             foreach ($validFilters as $key => $value) {
-                if (is_array($value)) {
-                    $query[] = "u.{$key} IN :{$key}";
-                } else {
-                    $query[] = "u.{$key} = :{$key}";
+                if (isset($fieldList[$key])) {
+                    if (is_array($value)) {
+                        $query[] = "u.{$key} IN :{$key}";
+                    } else {
+                        $query[] = "u.{$key} = :{$key}";
+                    }
                 }
-
                 $qb->setParameter($key, $value);
             }
             if ($query) {
@@ -61,15 +71,20 @@ class EntityGridSource extends AbstractGridSource
                     $value = current($starFilter);
                     $starQuery = [];
                     foreach (array_keys($classFields) as $key) {
-                        $starQuery[] = "u.{$key} like :{$key}";
-                        $qb->setParameter($key, $value);
+                        if (isset($fieldList[$key])) {
+                            $starQuery[] = "u.{$key} like :{$key}";
+                            $qb->setParameter($key, $value);
+                        }
                     }
 
-                    $star = implode(' or ', $starQuery);
-                    if ($query) {
-                        $qb->andWhere($star);
-                    } else {
-                        $qb->add('where', $star);
+                    if ($starQuery) {
+                        $star = implode(' or ', $starQuery);
+
+                        if ($query) {
+                            $qb->andWhere($star);
+                        } else {
+                            $qb->add('where', $star);
+                        }
                     }
                 }
             }
@@ -104,5 +119,40 @@ class EntityGridSource extends AbstractGridSource
     {
         return $this->getQueryBuilder()->getQuery()
             ->getResult();
+    }
+
+    public function find($id)
+    {
+        if (!$this->hasIdColumn()) {
+            throw new \Exception('No id column found for '.$this->entityName);
+        }
+        $qb = $this->entityManager->createQueryBuilder();
+        $idColumn = $this->getIdColumn();
+        $qb->from($this->entityName, 'a');
+        $qb->select('a.'.implode(',a.', $this->getClassMetadata()->getFieldNames()));
+        $qb->where('a.'.$idColumn.' = :id')->setParameter(':id', $id);
+        $result = $qb->getQuery()->execute();
+        if (isset($result[0])) {
+            return $result[0];
+        }
+    }
+
+    public function remove($id)
+    {
+        if (!$this->hasIdColumn()) {
+            throw new \Exception('No id column found for '.$this->entityName);
+        }
+
+        $repository = $this->entityManager->getRepository($this->entityName);
+        $entity = $repository->find($id);
+
+        if ($entity) {
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
+
+            return true;
+        }
+
+        return false;
     }
 }

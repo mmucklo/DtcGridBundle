@@ -9,27 +9,31 @@ class RendererFactory
 {
     protected $twigEngine;
     protected $router;
-    protected $bootstrapCss;
-    protected $bootstrapJs;
+    protected $themeCss;
+    protected $themeJs;
     protected $pageDivStyle;
-    protected $javascripts;
-    protected $stylesheets;
+    protected $jqGridJs;
+    protected $jqGridCss;
+    protected $dataTablesCss;
+    protected $dataTablesJs;
+    protected $jQuery;
+    protected $purl;
 
     public function __construct(TwigEngine $twigEngine,
                                 Router $router,
-                                $bootstrapCss,
-                                $bootstrapJs,
-                                $pageDivStyle,
-                                $stylesheets,
-                                $javascripts)
+                                array $config)
     {
         $this->twigEngine = $twigEngine;
         $this->router = $router;
-        $this->bootstrapCss = $bootstrapCss;
-        $this->bootstrapJs = $bootstrapJs;
-        $this->pageDivStyle = $pageDivStyle;
-        $this->stylesheets = $stylesheets;
-        $this->javascripts = $javascripts;
+        $this->themeCss = $config['theme.css'];
+        $this->themeJs = $config['theme.js'];
+        $this->pageDivStyle = $config['page_div_style'];
+        $this->jQuery = $config['jquery'];
+        $this->purl = $config['purl'];
+        $this->dataTablesCss = $config['datatables.css'];
+        $this->dataTablesJs = $config['datatables.js'];
+        $this->jqGridCss = $config['jq_grid.css'];
+        $this->jqGridJs = $config['jq_grid.js'];
     }
 
     /**
@@ -55,24 +59,40 @@ class RendererFactory
                 throw new \Exception("No renderer for type '$type''");
         }
 
-        if (method_exists($renderer, 'setBootstrapCss')) {
-            $renderer->setBootstrapCss($this->bootstrapCss);
+        if (method_exists($renderer, 'setThemeCss')) {
+            $renderer->setThemeCss($this->themeCss);
         }
 
-        if (method_exists($renderer, 'setBootstrapJs')) {
-            $renderer->setBootstrapJs($this->bootstrapJs);
+        if (method_exists($renderer, 'setThemeJs')) {
+            $renderer->setThemeJs($this->themeJs);
+        }
+
+        if (method_exists($renderer, 'setJQuery')) {
+            $renderer->setJQuery($this->jQuery);
+        }
+
+        if (method_exists($renderer, 'setPurl')) {
+            $renderer->setPurl($this->purl);
         }
 
         if (method_exists($renderer, 'setPageDivStyle')) {
             $renderer->setPageDivStyle($this->pageDivStyle);
         }
 
-        if (method_exists($renderer, 'setStylesheets')) {
-            $renderer->setStylesheets($this->stylesheets);
+        if (method_exists($renderer, 'setJqGridCss')) {
+            $renderer->setJqGridCss($this->jqGridCss);
         }
 
-        if (method_exists($renderer, 'setJavascripts')) {
-            $renderer->setJavascripts($this->javascripts);
+        if (method_exists($renderer, 'setJqGridJs')) {
+            $renderer->setJqGridJs($this->jqGridJs);
+        }
+
+        if (method_exists($renderer, 'setDataTablesCss')) {
+            $renderer->setDataTablesCss($this->dataTablesCss);
+        }
+
+        if (method_exists($renderer, 'setDataTablesJs')) {
+            $renderer->setDataTablesJs($this->dataTablesJs);
         }
 
         return $renderer;

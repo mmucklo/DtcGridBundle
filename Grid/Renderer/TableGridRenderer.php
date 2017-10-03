@@ -34,4 +34,17 @@ class TableGridRenderer extends AbstractRenderer
 
         return $this->twigEngine->render($template, $params);
     }
+
+    /**
+     * @param array|null $params
+     */
+    public function getParams(array &$params = null)
+    {
+        if ($params === null) {
+            $params = [];
+        }
+        parent::getParams($params);
+
+        return $params;
+    }
 }

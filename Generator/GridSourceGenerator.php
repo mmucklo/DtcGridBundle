@@ -9,6 +9,10 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+/**
+ * @deprecated
+ * Class GridSourceGenerator
+ */
 class GridSourceGenerator extends Generator
 {
     use CamelCaseTrait;

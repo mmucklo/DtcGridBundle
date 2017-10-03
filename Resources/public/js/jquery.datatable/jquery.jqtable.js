@@ -151,7 +151,8 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             // Override Server Data, we want to use the format Grids support!
             options.fnServerData = _fnServerData;
 
-            $table.DataTable(options);
+            var dataTable = $table.DataTable(options);
+            $table.data('datatable', dataTable);
         });
     };
 

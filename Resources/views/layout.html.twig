@@ -4,14 +4,18 @@
     {% block head %}
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         {% block stylesheets %}
-            <link rel="stylesheet" href="{{ dtc_grid_bootstrap_css }}">
+            {% for stylesheet in dtc_grid_theme_css %}
+                <link rel="stylesheet" href="{{ stylesheet }}">
+            {% endfor %}
         {% endblock %}
         {% block dtc_grid_stylesheets %}
         {% endblock %}
         {% block dtc_grid_javascripts %}
         {% endblock %}
         {% block javascripts %}
-            <script src="{{ dtc_grid_bootstrap_js }}"></script>
+            {% for javascript in dtc_grid_theme_js %}
+                <script src="{{ javascript }}"></script>
+            {% endfor %}
         {% endblock javascripts %}
     {% endblock %}
 </head>
