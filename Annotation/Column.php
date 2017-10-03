@@ -21,34 +21,7 @@ class Column implements Annotation
     public $sortable = false;
 
     /**
-     * @return mixed
+     * @var bool
      */
-    public function getSortable()
-    {
-        return $this->sortable;
-    }
-
-    /**
-     * @param mixed $sortable
-     */
-    public function setSortable($sortable)
-    {
-        $this->sortable = $sortable;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLabel()
-    {
-        return $this->label;
-    }
-
-    /**
-     * @param mixed $label
-     */
-    public function setLabel($label)
-    {
-        $this->label = $label;
-    }
+    public $searchable = false;
 }

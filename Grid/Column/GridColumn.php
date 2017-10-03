@@ -9,8 +9,9 @@ class GridColumn extends AbstractGridColumn
     protected $formatter;
     protected $field;
     protected $label;
+    protected $searchable;
 
-    public function __construct($field, $label = null, $formatter = null, array $options = null)
+    public function __construct($field, $label = null, $formatter = null, array $options = null, $searchable = true)
     {
         $this->field = $field;
 
@@ -23,6 +24,12 @@ class GridColumn extends AbstractGridColumn
         if ($options) {
             $this->setOptions($options);
         }
+
+        $this->searchable = $searchable;
+    }
+
+    public function isSearchable() {
+        return $this->searchable;
     }
 
     public function format($object, GridSourceInterface $gridsource)

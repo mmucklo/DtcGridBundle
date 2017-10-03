@@ -225,12 +225,16 @@ trait ColumnExtractionTrait
             $annotation = $this->reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
             if ($annotation) {
                 $name = $property->getName();
-                $label = $annotation->getLabel() ?: $this->fromCamelCase($name);
+                $label = $annotation->label ?: $this->fromCamelCase($name);
                 $gridColumns[$name] = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$name, $label]];
-                if ($annotation->getSortable()) {
-                    $gridColumns[$name]['arguments'][] = null;
+                $gridColumns[$name]['arguments'][] = null;
+                if ($annotation->sortable) {
                     $gridColumns[$name]['arguments'][] = ['sortable' => true];
                 }
+                else {
+                    $gridColumns[$name]['arguments'][] = [];
+                }
+                $gridColumns[$name]['arguments'][] = $annotation->searchable;
             }
         }
 
