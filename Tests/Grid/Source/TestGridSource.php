@@ -13,4 +13,8 @@ class TestGridSource extends AbstractGridSource
     public function getCount()
     {
     }
+
+    public function remove($id) {
+
+    }
 }

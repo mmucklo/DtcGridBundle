@@ -16,6 +16,17 @@ function dtc_grid_tablize(value) {
     return table;
 }
 
+function dtc_grid_delete(context) {
+    var $table = $(context).parents('table');
+    var id = $table.attr('id');
+    var route = $(context).attr('data-route');
+    $table.find('button').attr('disabled','disabled');
+    $.ajax({
+        url: route
+    }).then(function () {
+        $table.data('datatable').ajax.reload();
+    })
+}
 
 function dtc_grid_show(context) {
     var $table = $(context).parents('table');
@@ -36,8 +47,4 @@ function dtc_grid_show(context) {
         $modalBody.removeClass('dtc-grid-spinner');
         $modalBody.html(dtc_grid_tablize(result));
     });
-}
-
-function dtc_grid_delete(context) {
-    // tbd
 }

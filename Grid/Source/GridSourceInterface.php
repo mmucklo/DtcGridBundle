@@ -44,5 +44,5 @@ interface GridSourceInterface
 
     public function find($id);
 
-    public function remove($id, $soft = false, $softColumn = 'deletedAt', $softColumnType = 'datetime');
+    public function remove($id);
 }

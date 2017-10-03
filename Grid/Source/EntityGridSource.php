@@ -121,37 +121,19 @@ class EntityGridSource extends AbstractGridSource
         }
     }
 
-    public function remove($id, $soft = false, $softColumn = 'deletedAt', $softColumnType = 'datetime') {
+    public function remove($id) {
         if (!$this->hasIdColumn()) {
             throw new \Exception("No id column found for " . $this->entityName);
         }
-        if (!$soft) {
-            $qb = $this->entityManager->createQueryBuilder();
-            $idColumn = $this->getIdColumn();
-            $qb->delete($this->entityName, 'a');
-            $qb->where('a.' .$idColumn . ' = :id')->setParameter(':id', $id);
-            $result = $qb->getQuery()->execute();
-            return $result;
+
+        $repository = $this->entityManager->getRepository($this->entityName);
+        $entity = $repository->find($id);
+
+        if ($entity) {
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
+            return true;
         }
-        else {
-            switch($softColumnType) {
-                case 'datetime':
-                    $value = 'NOW()';
-                    break;
-                case 'boolean':
-                case 'integer':
-                    $value = '1';
-                    break;
-                default:
-                    throw new \Exception("Unknown column type $softColumnType for soft-removing a column");
-            }
-            $qb = $this->entityManager->createQueryBuilder();
-            $idColumn = $this->getIdColumn();
-            $qb->update($this->entityName, 'a');
-            $qb->set('a.' . $softColumn, $value);
-            $qb->where('a.' .$idColumn . ' = :id')->setParameter(':id', $id);
-            $result = $qb->getQuery()->execute();
-            return $result;
-        }
+        return false;
     }
 }

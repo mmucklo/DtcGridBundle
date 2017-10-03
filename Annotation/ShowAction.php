@@ -15,5 +15,5 @@ class ShowAction extends Action {
     /**
      * @var string
      */
-    public $route = 'dtc_grid_grid_show';
+    public $route = 'dtc_grid_show';
 }

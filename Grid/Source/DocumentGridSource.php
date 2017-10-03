@@ -114,36 +114,14 @@ class DocumentGridSource extends AbstractGridSource
         if (!$this->hasIdColumn()) {
             throw new \Exception("No id column found for " . $this->documentName);
         }
-        if (!$soft) {
-            $qb = $this->documentManager->createQueryBuilder();
-            $idColumn = $this->getIdColumn();
-            $qb->remove($this->documentName);
-            $qb->field($idColumn)->equals($id);
-            $result = $qb->getQuery()->execute();
-            return $result;
+        $repository = $this->documentManager->getRepository($this->documentName);
+        $document = $repository->find($id);
+        if ($document) {
+            $this->documentManager->remove($document);
+            $this->documentManager->flush();
+            return true;
         }
-        else {
-            switch ($softColumnType) {
-                case 'datetime':
-                    $value = new \DateTime();
-                    break;
-                case 'boolean':
-                    $value = true;
-                    break;
-                case 'integer':
-                    $value = '1';
-                    break;
-                default:
-                    throw new \Exception("Unknown column type $softColumnType for soft-removing a column");
-            }
-            $qb = $this->documentManager->createQueryBuilder();
-            $idColumn = $this->getIdColumn();
-            $qb->update($this->documentName);
-            $qb->set($softColumn, $value);
-            $qb->field($idColumn)->equals($id);
-            $result = $qb->getQuery()->execute();
-            return $result;
-        }
+        return false;
     }
 
 }

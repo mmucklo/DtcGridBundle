@@ -104,7 +104,7 @@ class GridController extends Controller
     /**
      * @Route("/show", name="dtc_grid_show")
      * @param Request $request
-     * @return JsonResponse
+     * @return JsonResponse|Response
      */
     public function showAction(Request $request) {
         $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
@@ -112,18 +112,38 @@ class GridController extends Controller
         $result = $gridSource->find($id);
 
         $responseResult = [];
-        foreach ($result as $key => $value) {
-            $responseResult[$this->fromCamelCase($key)] = $value;
+        if (!$result) {
+            return new Response('Not Found', 404);
         }
-
+        if (is_array($result)) {
+            foreach ($result as $key => $value) {
+                $responseResult[$this->fromCamelCase($key)] = $value;
+            }
+        }
+        elseif (method_exists($gridSource, 'getClassMetadata')) {
+            $classMetadata = $gridSource->getClassMetadata();
+            $fieldNames = $classMetadata->getFieldNames();
+            foreach ($fieldNames as $fieldName) {
+                $method = 'get' . ucfirst($fieldName);
+                if (method_exists($result, $method)) {
+                    $responseResult[$this->fromCamelCase($fieldName)] = $result->$method();
+                }
+            }
+        }
         return new JsonResponse($responseResult);
     }
 
+    /**
+     * @Route("/delete", name="dtc_grid_delete")
+     * @param Request $request
+     * @return Response
+     */
     public function deleteAction(Request $request) {
         $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
         $id = $request->get('identifier');
-        $result = $gridSource->find($id);
-
-
+        $gridSource->remove($id);
+        $response = new Response();
+        $response->setStatusCode(204);
+        return $response;
     }
 }

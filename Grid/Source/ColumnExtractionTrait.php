@@ -5,6 +5,7 @@ namespace Dtc\GridBundle\Grid\Source;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
 use Dtc\GridBundle\Annotation\Action;
+use Dtc\GridBundle\Annotation\DeleteAction;
 use Dtc\GridBundle\Annotation\Grid;
 use Dtc\GridBundle\Annotation\ShowAction;
 use Dtc\GridBundle\Grid\Column\GridColumn;
@@ -242,6 +243,9 @@ trait ColumnExtractionTrait
                 $actionDef = ['label' => $action->label, 'route' => $action->route];
                 if ($action instanceof ShowAction) {
                     $actionDef['action'] = 'show';
+                }
+                if ($action instanceof DeleteAction) {
+                    $actionDef['action'] = 'delete';
                 }
                 $actionDefs[] = $actionDef;
             }
