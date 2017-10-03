@@ -109,6 +109,18 @@ class User {
    * Deleted a bunch of images / css for doing pagination, and old formatting code (now uses bootstrap)
    * Created a new CSS file for spinner on Show
    * Added a DeleteAction
+   * If you want to able searching you have to set searchable=true on the @Grid\Column annotation
+Example:
+```php
+    /**
+     * @Grid\Column(searchable=true)
+     * @ORM\Column(type="string")
+     */
+    protected $firstName;
+
+```
+   
+   
    
 2.3.0
    * Refactor: rename setColumns to addColumns and add it to GridSourceInterface

@@ -184,13 +184,13 @@ class User {
     protected $id;
 
     /**
-     * @Grid\Column
+     * @Grid\Column(searchable=true)
      * @ORM\Column(type="string")
      */
     protected $firstName;
 
     /**
-     * @Grid\Column(label="Last",sortable=true)
+     * @Grid\Column(label="Last", sortable=true, searchable=true)
      * @ORM\Column(type="string")
      */
     protected $lastName;
