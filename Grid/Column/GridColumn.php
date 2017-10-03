@@ -28,7 +28,8 @@ class GridColumn extends AbstractGridColumn
         $this->searchable = $searchable;
     }
 
-    public function isSearchable() {
+    public function isSearchable()
+    {
         return $this->searchable;
     }
 

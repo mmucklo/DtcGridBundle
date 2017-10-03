@@ -109,9 +109,10 @@ class DocumentGridSource extends AbstractGridSource
         return $this->getQueryBuilder()->getQuery()->execute()->toArray(false);
     }
 
-    public function find($id) {
+    public function find($id)
+    {
         if (!$this->hasIdColumn()) {
-            throw new \Exception("No id column found for " . $this->documentName);
+            throw new \Exception('No id column found for '.$this->documentName);
         }
         $qb = $this->documentManager->createQueryBuilder($this->documentName);
         $idColumn = $this->getIdColumn();
@@ -122,18 +123,20 @@ class DocumentGridSource extends AbstractGridSource
         }
     }
 
-    public function remove($id, $soft = false, $softColumn = 'deletedAt', $softColumnType = 'datetime') {
+    public function remove($id, $soft = false, $softColumn = 'deletedAt', $softColumnType = 'datetime')
+    {
         if (!$this->hasIdColumn()) {
-            throw new \Exception("No id column found for " . $this->documentName);
+            throw new \Exception('No id column found for '.$this->documentName);
         }
         $repository = $this->documentManager->getRepository($this->documentName);
         $document = $repository->find($id);
         if ($document) {
             $this->documentManager->remove($document);
             $this->documentManager->flush();
+
             return true;
         }
+
         return false;
     }
-
 }

@@ -6,7 +6,8 @@ namespace Dtc\GridBundle\Annotation;
  * @Annotation
  * @Target("ANNOTATION")
  */
-class DeleteAction extends Action {
+class DeleteAction extends Action
+{
     /**
      * @var string
      */

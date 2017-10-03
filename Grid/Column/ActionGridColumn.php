@@ -5,8 +5,8 @@ namespace Dtc\GridBundle\Grid\Column;
 use Dtc\GridBundle\Grid\Source\GridSourceInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class ActionGridColumn extends AbstractGridColumn {
-
+class ActionGridColumn extends AbstractGridColumn
+{
     protected $actions;
     protected $idField;
 
@@ -14,15 +14,17 @@ class ActionGridColumn extends AbstractGridColumn {
     protected $router;
     protected $gridSourceId;
 
-    public function __construct($field, array $actions, $idField = 'id') {
+    public function __construct($field, array $actions, $idField = 'id')
+    {
         $this->actions = $actions;
         $this->idField = $idField;
         $this->label = 'Actions';
         $this->field = $field;
     }
 
-    public function format($object, GridSourceInterface $gridsource) {
-        $method = 'get' . ucfirst($this->idField);
+    public function format($object, GridSourceInterface $gridsource)
+    {
+        $method = 'get'.ucfirst($this->idField);
         $id = $object->$method();
         $idHtml = htmlspecialchars($id);
         $content = '';
@@ -31,7 +33,7 @@ class ActionGridColumn extends AbstractGridColumn {
             if ($content) {
                 $content .= ' ';
             }
-            switch($options['action']) {
+            switch ($options['action']) {
                 case 'show':
                     $route = $this->router->generate('dtc_grid_show', ['identifier' => $id, 'id' => $this->gridSourceId]);
                     $route = htmlspecialchars($route);
@@ -46,14 +48,17 @@ class ActionGridColumn extends AbstractGridColumn {
                     break;
             }
         }
+
         return $content;
     }
 
-    public function setRouter(RouterInterface $router) {
+    public function setRouter(RouterInterface $router)
+    {
         $this->router = $router;
     }
 
-    public function setGridSourceId($gridSourceId) {
+    public function setGridSourceId($gridSourceId)
+    {
         $this->gridSourceId = $gridSourceId;
     }
 }

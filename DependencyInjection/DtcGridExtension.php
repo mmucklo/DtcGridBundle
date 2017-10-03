@@ -27,12 +27,14 @@ class DtcGridExtension extends Extension
         $container->setParameter('dtc_grid.page_div_style', isset($config['page_div_style']) ? $config['page_div_style'] : null);
     }
 
-    public function setPurl(array $config, ContainerBuilder $container) {
+    public function setPurl(array $config, ContainerBuilder $container)
+    {
         $purl = isset($config['purl']) ? $config['purl'] : [];
         $container->setParameter('dtc_grid.purl', $purl);
     }
 
-    public function setJquery(array $config, ContainerBuilder $container) {
+    public function setJquery(array $config, ContainerBuilder $container)
+    {
         $jquery = isset($config['jquery']) ? $config['jquery'] : [];
         $container->setParameter('dtc_grid.jquery', $jquery);
     }

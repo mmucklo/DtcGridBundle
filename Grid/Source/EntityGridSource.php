@@ -121,24 +121,26 @@ class EntityGridSource extends AbstractGridSource
             ->getResult();
     }
 
-    public function find($id) {
+    public function find($id)
+    {
         if (!$this->hasIdColumn()) {
-            throw new \Exception("No id column found for " . $this->entityName);
+            throw new \Exception('No id column found for '.$this->entityName);
         }
         $qb = $this->entityManager->createQueryBuilder();
         $idColumn = $this->getIdColumn();
         $qb->from($this->entityName, 'a');
         $qb->select('a.'.implode(',a.', $this->getClassMetadata()->getFieldNames()));
-        $qb->where('a.' .$idColumn . ' = :id')->setParameter(':id', $id);
+        $qb->where('a.'.$idColumn.' = :id')->setParameter(':id', $id);
         $result = $qb->getQuery()->execute();
         if (isset($result[0])) {
             return $result[0];
         }
     }
 
-    public function remove($id) {
+    public function remove($id)
+    {
         if (!$this->hasIdColumn()) {
-            throw new \Exception("No id column found for " . $this->entityName);
+            throw new \Exception('No id column found for '.$this->entityName);
         }
 
         $repository = $this->entityManager->getRepository($this->entityName);
@@ -147,8 +149,10 @@ class EntityGridSource extends AbstractGridSource
         if ($entity) {
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
+
             return true;
         }
+
         return false;
     }
 }

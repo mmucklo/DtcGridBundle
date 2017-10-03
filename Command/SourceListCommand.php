@@ -10,7 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @deprecated
  *
  * Class SourceListCommand
- * @package Dtc\GridBundle\Command
  */
 class SourceListCommand extends ContainerAwareCommand
 {

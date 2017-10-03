@@ -15,7 +15,6 @@ use Sensio\Bundle\GeneratorBundle\Command\Validators;
  * @deprecated
  *
  * Class GenerateGridSourceCommand
- * @package Dtc\GridBundle\Command
  */
 class GenerateGridSourceCommand extends ContainerAwareCommand
 {

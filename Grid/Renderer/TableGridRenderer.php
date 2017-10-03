@@ -44,6 +44,7 @@ class TableGridRenderer extends AbstractRenderer
             $params = [];
         }
         parent::getParams($params);
+
         return $params;
     }
 }

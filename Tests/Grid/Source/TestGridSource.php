@@ -14,7 +14,7 @@ class TestGridSource extends AbstractGridSource
     {
     }
 
-    public function remove($id) {
-
+    public function remove($id)
+    {
     }
 }

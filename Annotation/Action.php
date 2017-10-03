@@ -6,7 +6,8 @@ namespace Dtc\GridBundle\Annotation;
  * @Annotation
  * @Target("ANNOTATION")
  */
-class Action implements Annotation {
+class Action implements Annotation
+{
     /**
      * @var string
      */

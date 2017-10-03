@@ -2,7 +2,6 @@
 
 namespace Dtc\GridBundle\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Persistence\AbstractManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -32,7 +31,6 @@ class GridSourceManager
 
     protected $extraGridSources;
 
-
     /**
      * GridSourceManager constructor.
      *
@@ -47,11 +45,13 @@ class GridSourceManager
         $this->sources = array();
     }
 
-    public function setRegistry(AbstractManagerRegistry $registry) {
+    public function setRegistry(AbstractManagerRegistry $registry)
+    {
         $this->registry = $registry;
     }
 
-    public function setMongodbRegistry(AbstractManagerRegistry $registry) {
+    public function setMongodbRegistry(AbstractManagerRegistry $registry)
+    {
         $this->mongodbRegistry = $registry;
     }
 
@@ -110,6 +110,7 @@ class GridSourceManager
 
             return $gridSource;
         }
+
         return null;
     }
 
@@ -143,8 +144,7 @@ class GridSourceManager
                 $gridSource = $this->getGridSource($manager, $entityOrDocumentNameOrId)) {
                 return $gridSource;
             }
-        }
-        catch (\ReflectionException $exception) {
+        } catch (\ReflectionException $exception) {
         }
 
         if ($this->mongodbRegistry && ($manager = $this->mongodbRegistry->getManagerForClass($entityOrDocumentNameOrId)) &&

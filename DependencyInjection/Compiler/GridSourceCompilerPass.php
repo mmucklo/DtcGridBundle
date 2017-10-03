@@ -16,7 +16,6 @@ class GridSourceCompilerPass implements CompilerPassInterface
             $sourceManager->addMethodCall('setRegistry', [new Reference('doctrine')]);
         }
 
-
         if ($container->has('doctrine_mongodb')) {
             $sourceManager->addMethodCall('setMongodbRegistry', [new Reference('doctrine_mongodb')]);
         }

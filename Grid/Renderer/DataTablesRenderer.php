@@ -38,22 +38,27 @@ class DataTablesRenderer extends AbstractJqueryRenderer
     }
 
     /**
-     * Set the type (bootstrap, bootstrap4, foundation, etc.)
+     * Set the type (bootstrap, bootstrap4, foundation, etc.).
+     *
      * @param $type
      */
-    public function setDataTablesCss($css) {
+    public function setDataTablesCss($css)
+    {
         $this->dataTablesCss = $css;
     }
 
-    public function getDataTablesCss() {
+    public function getDataTablesCss()
+    {
         return $this->dataTablesCss;
     }
 
-    public function setDataTablesJs($js) {
+    public function setDataTablesJs($js)
+    {
         $this->dataTablesJs = $js;
     }
 
-    public function getDataTablesJs() {
+    public function getDataTablesJs()
+    {
         return $this->dataTablesJs;
     }
 
@@ -68,6 +73,7 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         parent::getParams($params);
         $params['dtc_grid_datatables_css'] = $this->dataTablesCss;
         $params['dtc_grid_datatables_js'] = $this->dataTablesJs;
+
         return $params;
     }
 

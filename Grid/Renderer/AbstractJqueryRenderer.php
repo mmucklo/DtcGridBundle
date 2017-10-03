@@ -2,24 +2,28 @@
 
 namespace Dtc\GridBundle\Grid\Renderer;
 
-
-abstract class AbstractJqueryRenderer extends TableGridRenderer {
+abstract class AbstractJqueryRenderer extends TableGridRenderer
+{
     protected $jQuery = [];
     protected $purl;
 
-    public function getPurl() {
+    public function getPurl()
+    {
         return $this->purl;
     }
 
-    public function setPurl($purl) {
+    public function setPurl($purl)
+    {
         $this->purl = $purl;
     }
 
-    public function getJQuery() {
+    public function getJQuery()
+    {
         return $this->jQuery;
     }
 
-    public function setJQuery(array $jQuery) {
+    public function setJQuery(array $jQuery)
+    {
         $this->jQuery = $jQuery;
     }
 
@@ -31,6 +35,7 @@ abstract class AbstractJqueryRenderer extends TableGridRenderer {
         parent::getParams($params);
         $params['dtc_grid_jquery'] = $this->jQuery;
         $params['dtc_grid_purl'] = $this->purl;
+
         return $params;
     }
 }

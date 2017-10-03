@@ -181,7 +181,6 @@ trait ColumnExtractionTrait
         if ($annotationColumns) {
             $output = "<?php\nreturn array(\n";
             foreach ($annotationColumns as $field => $info) {
-
                 $class = $info['class'];
                 $output .= "'$field' => new $class(";
                 $first = true;
@@ -193,7 +192,7 @@ trait ColumnExtractionTrait
                     }
                     $output .= var_export($argument, true);
                 }
-                $output .= "),";
+                $output .= '),';
             }
             $output .= ");\n";
         } else {
@@ -230,15 +229,14 @@ trait ColumnExtractionTrait
                 $gridColumns[$name]['arguments'][] = null;
                 if ($annotation->sortable) {
                     $gridColumns[$name]['arguments'][] = ['sortable' => true];
-                }
-                else {
+                } else {
                     $gridColumns[$name]['arguments'][] = [];
                 }
                 $gridColumns[$name]['arguments'][] = $annotation->searchable;
             }
         }
 
-        /** @var Action $action */
+        /* @var Action $action */
         if (isset($actions)) {
             $field = '\$-action';
             $actionArgs = [$field];
@@ -256,7 +254,7 @@ trait ColumnExtractionTrait
             $actionArgs[] = $actionDefs;
 
             $gridColumns[$field] = ['class' => '\Dtc\GridBundle\Grid\Column\ActionGridColumn',
-                'arguments' => $actionArgs];
+                'arguments' => $actionArgs, ];
         }
 
         return $gridColumns;
@@ -295,7 +293,8 @@ trait ColumnExtractionTrait
     /**
      * @return string|null
      */
-    protected function getIdColumn() {
+    protected function getIdColumn()
+    {
         static $identifier = false;
         if ($identifier !== false) {
             return $identifier;
@@ -304,9 +303,12 @@ trait ColumnExtractionTrait
         $metadata = $this->getClassMetadata();
         $identifier = $metadata->getIdentifier();
         $identifier = isset($identifier[0]) ? $identifier[0] : null;
+
         return $identifier;
     }
-    public function hasIdColumn() {
+
+    public function hasIdColumn()
+    {
         return $this->getIdColumn() ? true : false;
     }
 }

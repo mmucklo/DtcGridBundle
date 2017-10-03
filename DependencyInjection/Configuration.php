@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('js')
                             ->prototype('scalar')->end()
                             ->defaultValue(['https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js',
-                                            'https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js'])
+                                            'https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js', ])
                         ->end()
                     ->end()
                 ->end()

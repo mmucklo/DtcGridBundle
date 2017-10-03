@@ -2,5 +2,6 @@
 
 namespace Dtc\GridBundle\Annotation;
 
-interface Annotation {
+interface Annotation
+{
 }

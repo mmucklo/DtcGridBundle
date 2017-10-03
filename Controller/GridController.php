@@ -16,13 +16,14 @@ class GridController extends Controller
 
     /**
      * @Route("/grid", name="dtc_grid")
+     *
      * @param Request $request
      */
     public function gridAction(Request $request)
     {
         $class = $request->get('class');
         if (!$class) {
-            throw $this->createNotFoundException("No class passed in");
+            throw $this->createNotFoundException('No class passed in');
         }
 
         if ($rendererId = $request->get('renderer')) {
@@ -35,15 +36,15 @@ class GridController extends Controller
             if (!($view = $request->get('view'))) {
                 throw new \Exception("No view parameter specified for renderer $rendererId");
             }
-        }
-        else {
+        } else {
             $rendererType = $request->get('type', 'table');
             $renderer = $this->get('dtc_grid.renderer.factory')->create($rendererType);
-            $view = '@DtcGrid/Page/' . $rendererType . '.html.twig';
+            $view = '@DtcGrid/Page/'.$rendererType.'.html.twig';
         }
 
         $gridSource = $this->get('dtc_grid.manager.source')->get($class);
         $renderer->bind($gridSource);
+
         return $this->render($view, $renderer->getParams());
     }
 
@@ -57,8 +58,7 @@ class GridController extends Controller
             if (!($rendererService = $this->container->get($rendererService)) instanceof AbstractRenderer) {
                 throw new \Exception("$rendererService not instance of Dtc\GridBundle\Grid\Renderer\AbstractRenderer");
             }
-        }
-        else {
+        } else {
             $renderer = $this->get('dtc_grid.renderer.factory')->create($rendererService);
         }
         $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
@@ -103,10 +103,13 @@ class GridController extends Controller
 
     /**
      * @Route("/show", name="dtc_grid_show")
+     *
      * @param Request $request
+     *
      * @return JsonResponse|Response
      */
-    public function showAction(Request $request) {
+    public function showAction(Request $request)
+    {
         $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
         $id = $request->get('identifier');
         $result = $gridSource->find($id);
@@ -119,31 +122,35 @@ class GridController extends Controller
             foreach ($result as $key => $value) {
                 $responseResult[$this->fromCamelCase($key)] = $value;
             }
-        }
-        elseif (method_exists($gridSource, 'getClassMetadata')) {
+        } elseif (method_exists($gridSource, 'getClassMetadata')) {
             $classMetadata = $gridSource->getClassMetadata();
             $fieldNames = $classMetadata->getFieldNames();
             foreach ($fieldNames as $fieldName) {
-                $method = 'get' . ucfirst($fieldName);
+                $method = 'get'.ucfirst($fieldName);
                 if (method_exists($result, $method)) {
                     $responseResult[$this->fromCamelCase($fieldName)] = $result->$method();
                 }
             }
         }
+
         return new JsonResponse($responseResult);
     }
 
     /**
      * @Route("/delete", name="dtc_grid_delete")
+     *
      * @param Request $request
+     *
      * @return Response
      */
-    public function deleteAction(Request $request) {
+    public function deleteAction(Request $request)
+    {
         $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
         $id = $request->get('identifier');
         $gridSource->remove($id);
         $response = new Response();
         $response->setStatusCode(204);
+
         return $response;
     }
 }
