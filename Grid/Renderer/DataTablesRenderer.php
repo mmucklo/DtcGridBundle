@@ -73,6 +73,20 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         parent::getParams($params);
         $params['dtc_grid_datatables_css'] = $this->dataTablesCss;
         $params['dtc_grid_datatables_js'] = $this->dataTablesJs;
+        $cssList = ['css/dtc_grid_spinner.css'];
+        $jsList = ['js/jquery.datatable/DT_bootstrap.js',
+                                        'js/jquery.datatable/DT_action.js',
+                                        'js/jquery.datatable/jquery.jqtable.js'];
+
+        foreach($cssList as $css) {
+            $mtime = filemtime(__DIR__ . "/../../Resources/public/" . $css);
+            $params['dtc_grid_local_css'][] = $css . '?v=' . $mtime;
+        }
+
+        foreach($jsList as $js) {
+            $mtime = filemtime(__DIR__ . "/../../Resources/public/" . $js);
+            $params['dtc_grid_local_js'][] = $js . '?v=' . $mtime;
+        }
 
         return $params;
     }
