@@ -67,7 +67,7 @@ class DataTablesRenderer extends AbstractJqueryRenderer
      */
     public function getParams(array &$params = null)
     {
-        if ($params === null) {
+        if (null === $params) {
             $params = [];
         }
         parent::getParams($params);
@@ -76,16 +76,16 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         $cssList = ['css/dtc_grid_spinner.css'];
         $jsList = ['js/jquery.datatable/DT_bootstrap.js',
                                         'js/jquery.datatable/DT_action.js',
-                                        'js/jquery.datatable/jquery.jqtable.js'];
+                                        'js/jquery.datatable/jquery.jqtable.js', ];
 
-        foreach($cssList as $css) {
-            $mtime = filemtime(__DIR__ . "/../../Resources/public/" . $css);
-            $params['dtc_grid_local_css'][] = $css . '?v=' . $mtime;
+        foreach ($cssList as $css) {
+            $mtime = filemtime(__DIR__.'/../../Resources/public/'.$css);
+            $params['dtc_grid_local_css'][] = $css.'?v='.$mtime;
         }
 
-        foreach($jsList as $js) {
-            $mtime = filemtime(__DIR__ . "/../../Resources/public/" . $js);
-            $params['dtc_grid_local_js'][] = $js . '?v=' . $mtime;
+        foreach ($jsList as $js) {
+            $mtime = filemtime(__DIR__.'/../../Resources/public/'.$js);
+            $params['dtc_grid_local_js'][] = $js.'?v='.$mtime;
         }
 
         return $params;

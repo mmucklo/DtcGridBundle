@@ -13,11 +13,11 @@ class ArrayValueObject extends ArrayObject
         $total = count($params);
         $key = current($params);
 
-        if ($total === 0) {
+        if (0 === $total) {
             throw new Exception('requires at least 1 arg');
         }
 
-        if ($key === null) {
+        if (null === $key) {
             throw new Exception('requires non NULL args');
         }
         if (!is_scalar($key)) {
@@ -27,7 +27,7 @@ class ArrayValueObject extends ArrayObject
             return null;
         }
 
-        if ($total === 1) {
+        if (1 === $total) {
             return $data[$key];
         }
 

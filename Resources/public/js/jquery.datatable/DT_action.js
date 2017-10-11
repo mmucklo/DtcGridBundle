@@ -31,7 +31,14 @@ function dtc_grid_delete(context) {
     })
 }
 
-
+function dtc_grid_refresh(context) {
+    var id = $(context).attr('data-id');
+    var $table = $('#' + id);
+    if (!$table.get(0)) {
+        return;
+    }
+    $table.data('datatable').ajax.reload();
+}
 
 function dtc_grid_show(context) {
     var $table = $(context).parents('table');

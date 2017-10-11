@@ -20,7 +20,7 @@ abstract class AbstractRenderer
      */
     public function getParams(array &$params = null)
     {
-        if ($params === null) {
+        if (null === $params) {
             $params = [];
         }
 

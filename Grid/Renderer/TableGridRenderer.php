@@ -40,7 +40,7 @@ class TableGridRenderer extends AbstractRenderer
      */
     public function getParams(array &$params = null)
     {
-        if ($params === null) {
+        if (null === $params) {
             $params = [];
         }
         parent::getParams($params);

@@ -19,10 +19,11 @@ class RendererFactory
     protected $jQuery;
     protected $purl;
 
-    public function __construct(TwigEngine $twigEngine,
+    public function __construct(
+        TwigEngine $twigEngine,
                                 Router $router,
-                                array $config)
-    {
+                                array $config
+    ) {
         $this->twigEngine = $twigEngine;
         $this->router = $router;
         $this->themeCss = $config['theme.css'];

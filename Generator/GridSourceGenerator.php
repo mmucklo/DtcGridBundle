@@ -152,7 +152,7 @@ class GridSourceGenerator extends Generator
             }
 
             foreach ($metadata->associationMappings as $fieldName => $relation) {
-                if ($relation['type'] !== ClassMetadataInfo::ONE_TO_MANY) {
+                if (ClassMetadataInfo::ONE_TO_MANY !== $relation['type']) {
                     $fields[] = $fieldName;
                 }
             }
@@ -166,7 +166,7 @@ class GridSourceGenerator extends Generator
             foreach ($fields as $field) {
                 if ($identifier === $field) {
                     $mapping = $metadata->getFieldMapping($field);
-                    if (isset($mapping['strategy']) && $mapping['strategy'] == 'auto') {
+                    if (isset($mapping['strategy']) && 'auto' == $mapping['strategy']) {
                         continue;
                     }
                 }

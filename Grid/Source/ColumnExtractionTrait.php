@@ -126,14 +126,14 @@ trait ColumnExtractionTrait
             $this->populateAnnotationCacheFilename();
         }
 
-        if (!$this->debug && $this->annotationColumns !== null) {
+        if (!$this->debug && null !== $this->annotationColumns) {
             return $this->annotationColumns ?: null;
         }
 
         // Check mtime of class
         if (is_file($this->annotationCacheFilename)) {
             $result = $this->getCachedAnnotationColumns();
-            if ($result !== null) {
+            if (null !== $result) {
                 return $result;
             }
         }
@@ -280,7 +280,7 @@ trait ColumnExtractionTrait
             }
 
             if ($identifier === $field) {
-                if (isset($mapping['strategy']) && $mapping['strategy'] == 'auto') {
+                if (isset($mapping['strategy']) && 'auto' == $mapping['strategy']) {
                     continue;
                 }
             }
@@ -296,7 +296,7 @@ trait ColumnExtractionTrait
     protected function getIdColumn()
     {
         static $identifier = false;
-        if ($identifier !== false) {
+        if (false !== $identifier) {
             return $identifier;
         }
 
