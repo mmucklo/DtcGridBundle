@@ -4,7 +4,9 @@
     {% for stylesheet in dtc_grid_datatables_css %}
         <link rel="stylesheet" href="{{ stylesheet }}" />
     {% endfor %}
-    <link rel="stylesheet" href="/bundles/dtcgrid/css/dtc_grid_spinner.css" />
+    {% for stylesheet in dtc_grid_local_css %}
+       <link rel="stylesheet" href="/bundles/dtcgrid/{{ stylesheet }}" />
+    {% endfor %}
 {% endblock %}
 
 {% block dtc_grid_javascripts %}
@@ -12,7 +14,7 @@
     {% for javascript in dtc_grid_datatables_js %}
         <script src="{{ javascript }}"></script>
     {% endfor %}
-    <script src="/bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js"></script>
-    <script src="/bundles/dtcgrid/js/jquery.datatable/DT_action.js"></script>
-    <script src="/bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js"></script>
+    {% for javascript in dtc_grid_local_js %}
+        <script src="/bundles/dtcgrid/{{ javascript }}"></script>
+    {% endfor %}
 {% endblock %}

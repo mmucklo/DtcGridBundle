@@ -37,14 +37,14 @@ class ActionGridColumn extends AbstractGridColumn
                 case 'show':
                     $route = $this->router->generate('dtc_grid_show', ['identifier' => $id, 'id' => $this->gridSourceId]);
                     $route = htmlspecialchars($route);
-                    $content .= "<button class=\"btn-show\" data-route=\"$route\" data-id=\"$idHtml\"";
+                    $content .= "<button class=\"btn btn-primary grid-show\" data-route=\"$route\" data-id=\"$idHtml\"";
                     $content .= "onclick=\"dtc_grid_show(this)\">$label</button>";
                     break;
                 case 'delete':
                     $route = $this->router->generate('dtc_grid_delete', ['identifier' => $id, 'id' => $this->gridSourceId]);
                     $route = htmlspecialchars($route);
-                    $content .= "<button class=\"btn-delete\" data-route=\"$route\" data-id=\"$idHtml\"";
-                    $content .= "onclick=\"dtc_grid_delete(this)\">$label</button>";
+                    $content .= "<button class=\"btn btn-primary grid-delete\" data-route=\"$route\" data-id=\"$idHtml\"";
+                    $content .= "onclick=\"dtc_grid_delete(this)\"><i class=\"fa fa-circle-o-notch fa-spin hidden\"></i> $label</button>";
                     break;
             }
         }
