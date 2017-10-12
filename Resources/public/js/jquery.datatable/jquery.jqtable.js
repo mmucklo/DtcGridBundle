@@ -89,7 +89,6 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         }
         // Abort any current xhr
 
-        // console.log('oSettings', oSettings.jqXHR);
         if (oSettings.jqXHR) {
             oSettings.jqXHR.abort();
         }

@@ -1,3 +1,7 @@
+3.1.0
+   * Added a spinner to the delete action
+   * Added new Refresh button to bottom on datatables grid
+
 3.0.0
    * Requirement - add Dtc\GridBundle\Annotation\Grid for all auto-detected Entities or Documents
    * Remove custom_managers section from config.yml
@@ -105,10 +109,9 @@ class User {
    * Added @Grid\Grid annotation
    * Added action Annotations
       * Added a ShowAction
-      * 
+      * Added a DeleteAction
    * Deleted a bunch of images / css for doing pagination, and old formatting code (now uses bootstrap)
    * Created a new CSS file for spinner on Show
-   * Added a DeleteAction
    * If you want to able searching you have to set searchable=true on the @Grid\Column annotation
 Example:
 ```php

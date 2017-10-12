@@ -40,8 +40,8 @@ class GridSourceManager
     public function __construct(Reader $reader, $cacheDir, $debug = false)
     {
         $this->cacheDir = $cacheDir;
-        $this->debug = $debug;
         $this->reader = $reader;
+        $this->debug = $debug;
         $this->sources = array();
     }
 

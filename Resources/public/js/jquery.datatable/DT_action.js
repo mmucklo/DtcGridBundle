@@ -20,9 +20,7 @@ function dtc_grid_delete(context) {
     var $table = $(context).parents('table');
     var id = $table.attr('id');
     var route = $(context).attr('data-route');
-    console.log(context);
     $(context).find('i').removeClass('hidden');
-    console.log($(context).find('i'));
     $table.find('button').attr('disabled','disabled');
     $.ajax({
         url: route
