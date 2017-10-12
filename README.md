@@ -1,6 +1,9 @@
 DtcGridBundle
 ==============
+
 [![Build Status](https://travis-ci.org/mmucklo/DtcGridBundle.svg?branch=master)](https://travis-ci.org/mmucklo/DtcGridBundle)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mmucklo/DtcGridBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mmucklo/DtcGridBundle/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/mmucklo/DtcGridBundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/mmucklo/DtcGridBundle/?branch=master)
 
 Generate a searchable Grid from a Doctrine ORM Entity or Doctrine MongoDB Document
 
