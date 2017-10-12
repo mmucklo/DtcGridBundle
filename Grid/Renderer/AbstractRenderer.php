@@ -11,8 +11,8 @@ abstract class AbstractRenderer
 
     protected $options;
 
-    protected $bootstrapCss;
-    protected $bootstrapJs;
+    protected $themeCss;
+    protected $themeJs;
     protected $pageDivStyle;
 
     /**
@@ -20,13 +20,13 @@ abstract class AbstractRenderer
      */
     public function getParams(array &$params = null)
     {
-        if ($params === null) {
+        if (null === $params) {
             $params = [];
         }
 
         $params['dtc_grid'] = $this;
-        $params['dtc_grid_bootstrap_css'] = $this->bootstrapCss;
-        $params['dtc_grid_bootstrap_js'] = $this->bootstrapJs;
+        $params['dtc_grid_theme_css'] = $this->themeCss;
+        $params['dtc_grid_theme_js'] = $this->themeJs;
         $params['dtc_grid_page_div_style'] = $this->pageDivStyle;
 
         return $params;
@@ -62,33 +62,33 @@ abstract class AbstractRenderer
     /**
      * @return mixed
      */
-    public function getBootstrapCss()
+    public function getThemeCss()
     {
-        return $this->bootstrapCss;
+        return $this->themeCss;
     }
 
     /**
      * @param mixed $bootstrapCss
      */
-    public function setBootstrapCss($bootstrapCss)
+    public function setThemeCss(array $themeCss)
     {
-        $this->bootstrapCss = $bootstrapCss;
+        $this->themeCss = $themeCss;
     }
 
     /**
      * @return mixed
      */
-    public function getBootstrapJs()
+    public function getThemeJs()
     {
-        return $this->bootstrapJs;
+        return $this->themeJs;
     }
 
     /**
      * @param mixed $bootstrapJs
      */
-    public function setBootstrapJs($bootstrapJs)
+    public function setThemeJs(array $themeJs)
     {
-        $this->bootstrapJs = $bootstrapJs;
+        $this->themeJs = $themeJs;
     }
 
     /**

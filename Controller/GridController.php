@@ -2,20 +2,65 @@
 
 namespace Dtc\GridBundle\Controller;
 
+use Dtc\GridBundle\Grid\Renderer\AbstractRenderer;
+use Dtc\GridBundle\Util\CamelCaseTrait;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class GridController extends Controller
 {
+    use CamelCaseTrait;
+
     /**
-     * @Route("/data/")
+     * @Route("/grid", name="dtc_grid")
+     *
+     * @param Request $request
+     */
+    public function gridAction(Request $request)
+    {
+        $class = $request->get('class');
+        if (!$class) {
+            throw $this->createNotFoundException('No class passed in');
+        }
+
+        if ($rendererId = $request->get('renderer')) {
+            if (!$this->container->has($rendererId)) {
+                throw new \Exception("No renderer found with id $rendererId");
+            }
+            if (!($renderer = $this->container->has($rendererId)) instanceof AbstractRenderer) {
+                throw new \Exception("Rennderer $rendererId must be instanace of Dtc\GridBundle\Grid\Renderer\AbstractRenderer");
+            }
+            if (!($view = $request->get('view'))) {
+                throw new \Exception("No view parameter specified for renderer $rendererId");
+            }
+        } else {
+            $rendererType = $request->get('type', 'table');
+            $renderer = $this->get('dtc_grid.renderer.factory')->create($rendererType);
+            $view = '@DtcGrid/Page/'.$rendererType.'.html.twig';
+        }
+
+        $gridSource = $this->get('dtc_grid.manager.source')->get($class);
+        $renderer->bind($gridSource);
+
+        return $this->render($view, $renderer->getParams());
+    }
+
+    /**
+     * @Route("/data", name="dtc_grid_data")
      */
     public function dataAction(Request $request)
     {
-        $rendererService = $request->get('renderer', 'dtc_grid.renderer.datatables');
-        $renderer = $this->get($rendererService);
+        $rendererService = $request->get('renderer', 'datatables');
+        if ($this->container->has($rendererService)) {
+            if (!($rendererService = $this->container->get($rendererService)) instanceof AbstractRenderer) {
+                throw new \Exception("$rendererService not instance of Dtc\GridBundle\Grid\Renderer\AbstractRenderer");
+            }
+        } else {
+            $renderer = $this->get('dtc_grid.renderer.factory')->create($rendererService);
+        }
         $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
 
         $response = new Response();
@@ -57,86 +102,54 @@ class GridController extends Controller
     }
 
     /**
-     * @Route("/purl.js", name="dtc_grid_bundle_purl")
-     * @Route("/js/dataTables.{type}.js", name="dtc_grid_bundle_dataTables_extension", requirements={"type" = "\w+" })
-     * @Route("/js/jquery.dataTables.js", name="dtc_grid_bundle_dataTables")
-     * @Route("/css/jquery.dataTables.css", name="dtc_grid_bundle_dataTables_css")
-     * @Route("/css/jquery.dataTables_themeroller.css", name="dtc_grid_bundle_dataTables_themeroller_css")
-     * @Route("/js/jquery.js", name="dtc_grid_bundle_jquery")
-     * @Route("/css/dataTables.{type}.css", name="dtc_grid_bundle_dataTables_extension_css", requirements={"type" = "\w+" })
-     * @Route("/images/sort_{type}.png", name="dtc_grid_bundle_dataTables_images", requirements={"type" = "\w+" })
+     * @Route("/show", name="dtc_grid_show")
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse|Response
      */
-    public function mediaAction(Request $request, $type = null)
+    public function showAction(Request $request)
     {
-        $debug = $this->getParameter('kernel.debug');
-        $min = $debug ? '' : '.min';
+        $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
+        $id = $request->get('identifier');
+        $result = $gridSource->find($id);
 
-        $route = $request->get('_route');
-        switch ($route) {
-            case 'dtc_grid_bundle_purl':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/purl/purl.js'));
-            case 'dtc_grid_bundle_dataTables':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/js/jquery.dataTables'.$min.'.js'));
-            case 'dtc_grid_bundle_dataTables_css':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/css/jquery.dataTables'.$min.'.css'));
-            case 'dtc_grid_bundle_dataTables_themeroller_css':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/css/jquery.dataTables_themeroller.css'));
-            case 'dtc_grid_bundle_dataTables_extension':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/js/dataTables.'.$type.$min.'.js'));
-            case 'dtc_grid_bundle_jquery':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/js/jquery.js'));
-            case 'dtc_grid_bundle_dataTables_extension_css':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/css/dataTables.'.$type.$min.'.css'));
-            case 'dtc_grid_bundle_dataTables_images':
-                return $this->getResource($request, realpath(__DIR__.'/../Resources/external/DataTables/media/images/sort_'.$type.'.png'));
-            default:
-                $this->get('logger')->error(__METHOD__.' - Unknown route: '.$route);
-                throw $this->createNotFoundException();
+        $responseResult = [];
+        if (!$result) {
+            return new Response('Not Found', 404);
         }
+        if (is_array($result)) {
+            foreach ($result as $key => $value) {
+                $responseResult[$this->fromCamelCase($key)] = $value;
+            }
+        } elseif (method_exists($gridSource, 'getClassMetadata')) {
+            $classMetadata = $gridSource->getClassMetadata();
+            $fieldNames = $classMetadata->getFieldNames();
+            foreach ($fieldNames as $fieldName) {
+                $method = 'get'.ucfirst($fieldName);
+                if (method_exists($result, $method)) {
+                    $responseResult[$this->fromCamelCase($fieldName)] = $result->$method();
+                }
+            }
+        }
+
+        return new JsonResponse($responseResult);
     }
 
     /**
+     * @Route("/delete", name="dtc_grid_delete")
+     *
      * @param Request $request
-     * @param $filename
      *
      * @return Response
      */
-    protected function getResource(Request $request, $filename)
+    public function deleteAction(Request $request)
     {
+        $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
+        $id = $request->get('identifier');
+        $gridSource->remove($id);
         $response = new Response();
-        if ($filemtime = filemtime($filename)) {
-            $date = new \DateTime();
-            $date->setTimestamp($filemtime);
-            $response->setLastModified($date);
-            if ($response->isNotModified($request)) {
-                return $response;
-            }
-        }
-        $pathInfo = pathinfo($filename);
-        switch ($pathInfo['extension']) {
-            case 'css':
-                $mimeType = 'text/css';
-                break;
-            case 'js':
-                $mimeType = 'application/javascript';
-                break;
-            case 'png':
-                $mimeType = 'image/png';
-                break;
-            default:
-                $this->get('logger')->error(__METHOD__.' Unsupported file extension: '.$pathInfo['extension']);
-                throw $this->createNotFoundException();
-        }
-        if (!file_exists($filename)) {
-            throw $this->createNotFoundException();
-        }
-
-        $content = file_get_contents($filename);
-        $response->setPublic();
-        $response->setContent($content);
-        $response->setStatusCode(200);
-        $response->headers->set('Content-Type', $mimeType);
-        $response->setMaxAge(60);
+        $response->setStatusCode(204);
 
         return $response;
     }

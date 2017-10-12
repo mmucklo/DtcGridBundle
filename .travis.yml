@@ -7,8 +7,9 @@ php:
 
 before_script:
     - composer self-update
-    - if [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then extension="mongo"; echo "yes" | pecl install mongo; else extension="mongodb"; pecl install mongodb; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then extension="mongo"; echo "yes" | pecl install mongo; else extension="mongodb"; (pecl install mongodb || true); fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then (echo "extension=mongodb.so" > /home/travis/.phpenv/versions/7.1.10/etc/conf.d/mongodb.ini); fi
     - if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then composer require "alcaeus/mongo-php-adapter" --ignore-platform-reqs; fi
     - composer install
 
-script: bin/phpunit 
+script: bin/phpunit

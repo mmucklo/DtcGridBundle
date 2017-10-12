@@ -61,17 +61,17 @@ In your template file:
 			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 			{% block stylesheets %}
 				{% for stylesheet in [
-				path('dtc_grid_bundle_dataTables_extension_css', { 'type': 'bootstrap' }),
+				path('dtc_grid_dataTables_extension_css', { 'type': 'bootstrap' }),
 										] %}
 					<link rel="stylesheet" href="{{ stylesheet }}" />
 				{% endfor %}
 			{% endblock %}
 			{% block javascripts %}
 				{% for javascript in [
-				path('dtc_grid_bundle_jquery'),
-				path('dtc_grid_bundle_purl'),
-				path('dtc_grid_bundle_dataTables'),
-				path('dtc_grid_bundle_dataTables_extension', { 'type': 'bootstrap' }),
+				path('dtc_grid_jquery'),
+				path('dtc_grid_purl'),
+				path('dtc_grid_dataTables'),
+				path('dtc_grid_dataTables_extension', { 'type': 'bootstrap' }),
 				'/bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js',
 				'/bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
 					<script type="text/javascript" src="{{ javascript }}"></script>

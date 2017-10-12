@@ -1,0 +1,9 @@
+{% extends '@DtcGrid/layout.html.twig' %}
+
+{% block dtc_grid_javascripts %}
+    <script src="{{ dtc_grid_jquery.url }}"
+        {% if dtc_grid_jquery.integrity is not empty  %} integrity="{{ dtc_grid_jquery.integrity }}"{% endif %}
+        {% if dtc_grid_jquery.crossorigin is not empty  %} crossorigin="{{ dtc_grid_jquery.crossorigin }}"{% endif %}>
+    </script>
+    <script src="{{ dtc_grid_purl }}"></script>
+{% endblock %}

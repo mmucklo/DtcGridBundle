@@ -4,6 +4,10 @@ namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
+use Dtc\GridBundle\Annotation\Action;
+use Dtc\GridBundle\Annotation\DeleteAction;
+use Dtc\GridBundle\Annotation\Grid;
+use Dtc\GridBundle\Annotation\ShowAction;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 use Dtc\GridBundle\Util\CamelCaseTrait;
 
@@ -56,12 +60,12 @@ trait ColumnExtractionTrait
     {
         $annotationColumns = $this->getAnnotationColumns();
         if ($annotationColumns) {
-            $this->addColumns($annotationColumns);
+            $this->setColumns($annotationColumns);
 
             return;
         }
 
-        $this->addColumns($this->getReflectionColumns());
+        $this->setColumns($this->getReflectionColumns());
     }
 
     /**
@@ -122,14 +126,14 @@ trait ColumnExtractionTrait
             $this->populateAnnotationCacheFilename();
         }
 
-        if (!$this->debug && $this->annotationColumns !== null) {
+        if (!$this->debug && null !== $this->annotationColumns) {
             return $this->annotationColumns ?: null;
         }
 
         // Check mtime of class
         if (is_file($this->annotationCacheFilename)) {
             $result = $this->getCachedAnnotationColumns();
-            if ($result !== null) {
+            if (null !== $result) {
                 return $result;
             }
         }
@@ -156,6 +160,9 @@ trait ColumnExtractionTrait
         $filename = $reflectionClass->getFileName();
         if ($filename && is_file($filename)) {
             $mtime = filemtime($filename);
+            if (($currentfileMtime = filemtime(__FILE__)) > $mtime) {
+                $mtime = $currentfileMtime;
+            }
             $mtimeAnnotation = filemtime($this->annotationCacheFilename);
             if ($mtime && $mtimeAnnotation && $mtime <= $mtimeAnnotation) {
                 return $this->annotationColumns = include $this->annotationCacheFilename;
@@ -174,12 +181,18 @@ trait ColumnExtractionTrait
         if ($annotationColumns) {
             $output = "<?php\nreturn array(\n";
             foreach ($annotationColumns as $field => $info) {
-                $label = $info['label'];
-                $output .= "'$field' => new \Dtc\GridBundle\Grid\Column\GridColumn('$field', '$label'";
-                if ($info['sortable']) {
-                    $output .= ", null, ['sortable' => true]";
+                $class = $info['class'];
+                $output .= "'$field' => new $class(";
+                $first = true;
+                foreach ($info['arguments'] as $argument) {
+                    if ($first) {
+                        $first = false;
+                    } else {
+                        $output .= ',';
+                    }
+                    $output .= var_export($argument, true);
                 }
-                $output .= "),\n";
+                $output .= '),';
             }
             $output .= ");\n";
         } else {
@@ -200,15 +213,48 @@ trait ColumnExtractionTrait
         $reflectionClass = $metadata->getReflectionClass();
         $properties = $reflectionClass->getProperties();
 
+        /** @var Grid $gridAnnotation */
+        if ($gridAnnotation = $this->reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid')) {
+            $actions = $gridAnnotation->actions;
+        }
+
         $gridColumns = [];
         foreach ($properties as $property) {
-            /** @var \Dtc\GridBundle\Annotation\GridColumn $annotation */
-            $annotation = $this->reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\GridColumn');
+            /** @var \Dtc\GridBundle\Annotation\Column $annotation */
+            $annotation = $this->reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
             if ($annotation) {
                 $name = $property->getName();
-                $label = $annotation->getLabel() ?: $this->fromCamelCase($name);
-                $gridColumns[$name] = ['label' => $label, 'sortable' => $annotation->getSortable()];
+                $label = $annotation->label ?: $this->fromCamelCase($name);
+                $gridColumns[$name] = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$name, $label]];
+                $gridColumns[$name]['arguments'][] = null;
+                if ($annotation->sortable) {
+                    $gridColumns[$name]['arguments'][] = ['sortable' => true];
+                } else {
+                    $gridColumns[$name]['arguments'][] = [];
+                }
+                $gridColumns[$name]['arguments'][] = $annotation->searchable;
             }
+        }
+
+        /* @var Action $action */
+        if (isset($actions)) {
+            $field = '\$-action';
+            $actionArgs = [$field];
+            $actionDefs = [];
+            foreach ($actions as $action) {
+                $actionDef = ['label' => $action->label, 'route' => $action->route];
+                if ($action instanceof ShowAction) {
+                    $actionDef['action'] = 'show';
+                }
+                if ($action instanceof DeleteAction) {
+                    $actionDef['action'] = 'delete';
+                }
+                $actionDefs[] = $actionDef;
+            }
+            $actionArgs[] = $actionDefs;
+
+            $gridColumns[$field] = ['class' => '\Dtc\GridBundle\Grid\Column\ActionGridColumn',
+                'arguments' => $actionArgs, ];
         }
 
         return $gridColumns;
@@ -234,7 +280,7 @@ trait ColumnExtractionTrait
             }
 
             if ($identifier === $field) {
-                if (isset($mapping['strategy']) && $mapping['strategy'] == 'auto') {
+                if (isset($mapping['strategy']) && 'auto' == $mapping['strategy']) {
                     continue;
                 }
             }
@@ -242,5 +288,27 @@ trait ColumnExtractionTrait
         }
 
         return $columns;
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function getIdColumn()
+    {
+        static $identifier = false;
+        if (false !== $identifier) {
+            return $identifier;
+        }
+
+        $metadata = $this->getClassMetadata();
+        $identifier = $metadata->getIdentifier();
+        $identifier = isset($identifier[0]) ? $identifier[0] : null;
+
+        return $identifier;
+    }
+
+    public function hasIdColumn()
+    {
+        return $this->getIdColumn() ? true : false;
     }
 }

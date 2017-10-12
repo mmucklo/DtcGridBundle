@@ -19,17 +19,24 @@ class DtcGridExtension extends Extension
         $processor = new Processor();
 
         $config = $processor->processConfiguration($configuration, $configs);
-        $this->setCustomManagers($config, $container);
         $this->setJqGrid($config, $container);
-        $this->setBootstrap($config, $container);
+        $this->setTheme($config, $container);
+        $this->setDatatables($config, $container);
+        $this->setJquery($config, $container);
+        $this->setPurl($config, $container);
         $container->setParameter('dtc_grid.page_div_style', isset($config['page_div_style']) ? $config['page_div_style'] : null);
     }
 
-    public function setCustomManagers(array $config, ContainerBuilder $container)
+    public function setPurl(array $config, ContainerBuilder $container)
     {
-        if (isset($config['custom_managers'])) {
-            $container->setParameter('dtc_grid.custom_managers', $config['custom_managers']);
-        }
+        $purl = isset($config['purl']) ? $config['purl'] : [];
+        $container->setParameter('dtc_grid.purl', $purl);
+    }
+
+    public function setJquery(array $config, ContainerBuilder $container)
+    {
+        $jquery = isset($config['jquery']) ? $config['jquery'] : [];
+        $container->setParameter('dtc_grid.jquery', $jquery);
     }
 
     public function setJqGrid(array $config, ContainerBuilder $container)
@@ -37,17 +44,26 @@ class DtcGridExtension extends Extension
         $css = isset($config['jq_grid']['css']) ? $config['jq_grid']['css'] : [];
         $js = isset($config['jq_grid']['js']) ? $config['jq_grid']['js'] : [];
 
-        $container->setParameter('dtc_grid.jq_grid.stylesheets', $css);
-        $container->setParameter('dtc_grid.jq_grid.javascripts', $js);
+        $container->setParameter('dtc_grid.jq_grid.css', $css);
+        $container->setParameter('dtc_grid.jq_grid.js', $js);
     }
 
-    public function setBootstrap(array $config, ContainerBuilder $container)
+    public function setDataTables(array $config, ContainerBuilder $container)
     {
-        $css = isset($config['bootstrap']['css']) ? $config['bootstrap']['css'] : '';
-        $js = isset($config['bootstrap']['js']) ? $config['bootstrap']['js'] : '';
+        $css = isset($config['datatables']['css']) ? $config['datatables']['css'] : [];
+        $js = isset($config['datatables']['js']) ? $config['datatables']['js'] : [];
 
-        $container->setParameter('dtc_grid.jq_grid.bootstrap_css', $css);
-        $container->setParameter('dtc_grid.jq_grid.bootstrap_js', $js);
+        $container->setParameter('dtc_grid.datatables.css', $css);
+        $container->setParameter('dtc_grid.datatables.js', $js);
+    }
+
+    public function setTheme(array $config, ContainerBuilder $container)
+    {
+        $css = isset($config['theme']['css']) ? $config['theme']['css'] : [];
+        $js = isset($config['theme']['js']) ? $config['theme']['js'] : [];
+
+        $container->setParameter('dtc_grid.theme.css', $css);
+        $container->setParameter('dtc_grid.theme.js', $js);
     }
 
     public function getAlias()

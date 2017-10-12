@@ -9,6 +9,10 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+/**
+ * @deprecated
+ * Class GridSourceGenerator
+ */
 class GridSourceGenerator extends Generator
 {
     use CamelCaseTrait;
@@ -148,7 +152,7 @@ class GridSourceGenerator extends Generator
             }
 
             foreach ($metadata->associationMappings as $fieldName => $relation) {
-                if ($relation['type'] !== ClassMetadataInfo::ONE_TO_MANY) {
+                if (ClassMetadataInfo::ONE_TO_MANY !== $relation['type']) {
                     $fields[] = $fieldName;
                 }
             }
@@ -162,7 +166,7 @@ class GridSourceGenerator extends Generator
             foreach ($fields as $field) {
                 if ($identifier === $field) {
                     $mapping = $metadata->getFieldMapping($field);
-                    if (isset($mapping['strategy']) && $mapping['strategy'] == 'auto') {
+                    if (isset($mapping['strategy']) && 'auto' == $mapping['strategy']) {
                         continue;
                     }
                 }

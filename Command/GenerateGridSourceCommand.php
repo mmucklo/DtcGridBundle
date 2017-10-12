@@ -11,6 +11,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Sensio\Bundle\GeneratorBundle\Command\Validators;
 
+/**
+ * @deprecated
+ *
+ * Class GenerateGridSourceCommand
+ */
 class GenerateGridSourceCommand extends ContainerAwareCommand
 {
     protected function configure()
