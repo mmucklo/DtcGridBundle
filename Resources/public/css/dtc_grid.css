@@ -21,3 +21,7 @@
     border-top-color: #07d;
     animation: dtc-grid-spinner .6s linear infinite;
 }
+
+.btn {
+    margin: 5px 0 5px 0;
+}
