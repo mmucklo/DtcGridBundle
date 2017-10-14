@@ -1,3 +1,6 @@
+3.1.1
+   * Added some css for the buttons
+   * move dtc_grid_spinner.css to dtc_grid.css
 3.1.0
    * Added a spinner to the delete action
    * Added new Refresh button to bottom on datatables grid
