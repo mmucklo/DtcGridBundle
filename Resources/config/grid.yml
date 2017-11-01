@@ -2,7 +2,7 @@ services:
     dtc_grid.renderer.factory:
         class: Dtc\GridBundle\Grid\Renderer\RendererFactory
         arguments:
-            - "@templating"
+            - "@templating.engine.twig"
             - "@router"
             -
                 theme.css: '%dtc_grid.theme.css%'
