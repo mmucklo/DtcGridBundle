@@ -1,3 +1,5 @@
+3.1.2
+   * Change to templating.engine.twig due to bug
 3.1.1
    * Added some css for the buttons
    * move dtc_grid_spinner.css to dtc_grid.css
