@@ -1,3 +1,5 @@
+3.1.3
+   * Support for sensio/framework-extra-bundle 5
 3.1.2
    * Change to templating.engine.twig due to bug
 3.1.1
