@@ -17,7 +17,7 @@
         "php": ">=5.6.0",
         "sensio/generator-bundle": "2.*|3.*|4.*",
         "symfony/framework-bundle": "2.*|3.*|4.*",
-        "sensio/framework-extra-bundle": "2.*|3.*|4.*"
+        "sensio/framework-extra-bundle": "2.*|3.*|4.*|5.*"
     },
     "require-dev": {
         "doctrine/orm": "^2.4",
