@@ -11,7 +11,12 @@ namespace Dtc\GridBundle\Annotation;
 class Grid implements Annotation
 {
     /**
-     * @var array<Dtc\GridBundle\Annotation\Action>
+     * @var array<\Dtc\GridBundle\Annotation\Action>
      */
     public $actions;
+
+    /**
+     * @var \Dtc\GridBundle\Annotation\Sort
+     */
+    public $sort;
 }

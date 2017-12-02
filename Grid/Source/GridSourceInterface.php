@@ -45,4 +45,6 @@ interface GridSourceInterface
     public function find($id);
 
     public function remove($id);
+
+    public function getDefaultSort();
 }

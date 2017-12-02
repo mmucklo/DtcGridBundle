@@ -108,15 +108,23 @@ class DataTablesRenderer extends AbstractJqueryRenderer
                'fields' => $fields,
         );
 
+        $sortInfo = $this->gridSource->getDefaultSort();
+        $defaultSortColumn = isset($sortInfo['column']) ? $sortInfo['column'] : null;
+        $defaultSortDirection = isset($sortInfo['direction']) ? $sortInfo['direction'] : 'ASC';
+        $defaultSortDirection = strtolower($defaultSortDirection);
+        $defaultSortColumnIdx = 0;
+
         $url = $this->router->generate('dtc_grid_data', $params);
         $this->options['sAjaxSource'] = $url;
 
         $columnsDef = array();
         /** @var AbstractGridColumn $column */
+        $idx = 0;
         foreach ($this->gridSource->getColumns() as $index => $column) {
             $info = array();
+            $name = $column->getField();
             $info['bSortable'] = $column->getOption('sortable') ? true : false;
-            $info['sName'] = $column->getField();
+            $info['sName'] = $name;
 
             if ($width = $column->getOption('width')) {
                 $info['sWidth'] = $width;
@@ -125,8 +133,13 @@ class DataTablesRenderer extends AbstractJqueryRenderer
             $info['aTargets'] = array($index);
             $info = array_merge($info, $column->getOptions());
             $columnsDef[] = $info;
+            if ($index === $defaultSortColumn) {
+                $defaultSortColumnIdx = $idx;
+            }
+            ++$idx;
         }
 
+        $this->options['order'] = [[$defaultSortColumnIdx, $defaultSortDirection]];
         $this->options['aoColumns'] = $columnsDef;
     }
 

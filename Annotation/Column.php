@@ -24,4 +24,12 @@ class Column implements Annotation
      * @var bool
      */
     public $searchable = false;
+
+    /**
+     * Defaults to null
+     * If there are ordered and null-annotated columns, null ones will appear last.
+     *
+     * @var int
+     */
+    public $order;
 }

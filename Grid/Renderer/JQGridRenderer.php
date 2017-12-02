@@ -74,6 +74,13 @@ class JQGridRenderer extends AbstractJqueryRenderer
 
             $this->options['colModel'][] = $info;
         }
+
+        if ($sortInfo = $this->gridSource->getDefaultSort()) {
+            if ($sortInfo['column']) {
+                $this->options['sortname'] = $sortInfo['column'];
+                $this->options['sortorder'] = strtolower($sortInfo['direction'] ?: 'ASC');
+            }
+        }
     }
 
     public function getData()

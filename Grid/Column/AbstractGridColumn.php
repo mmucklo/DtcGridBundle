@@ -12,6 +12,7 @@ abstract class AbstractGridColumn
     protected $field;
     protected $label;
     protected $options = array();
+    protected $order;
 
     abstract public function format($object, GridSourceInterface $gridsource);
 
@@ -27,6 +28,11 @@ abstract class AbstractGridColumn
         }
 
         return null;
+    }
+
+    public function getOrder()
+    {
+        return $this->order;
     }
 
     public function setOptions(array $options)

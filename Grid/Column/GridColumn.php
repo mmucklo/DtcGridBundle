@@ -10,8 +10,24 @@ class GridColumn extends AbstractGridColumn
     protected $field;
     protected $label;
     protected $searchable;
+    protected $order;
 
-    public function __construct($field, $label = null, $formatter = null, array $options = null, $searchable = true)
+    /**
+     * GridColumn constructor.
+     *
+     * @param $field
+     * @param string|null $label
+     * @param mixed       $formatter
+     * @param array|null  $options
+     * @param bool        $searchable
+     * @param int|null    $order      If there are columns that have an order mixed with columns of 'null' order, the null ones will appear last
+     */
+    public function __construct($field,
+            $label = null,
+            $formatter = null,
+            array $options = null,
+            $searchable = true,
+            $order = null)
     {
         $this->field = $field;
 
@@ -26,6 +42,12 @@ class GridColumn extends AbstractGridColumn
         }
 
         $this->searchable = $searchable;
+
+        $this->order = $order;
+
+        if ($this->order !== null && !is_int($this->order)) {
+            throw new \InvalidArgumentException('$order must be an integer or null');
+        }
     }
 
     public function isSearchable()

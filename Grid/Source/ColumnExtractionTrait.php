@@ -8,6 +8,7 @@ use Dtc\GridBundle\Annotation\Action;
 use Dtc\GridBundle\Annotation\DeleteAction;
 use Dtc\GridBundle\Annotation\Grid;
 use Dtc\GridBundle\Annotation\ShowAction;
+use Dtc\GridBundle\Annotation\Sort;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 use Dtc\GridBundle\Util\CamelCaseTrait;
 
@@ -29,6 +30,11 @@ trait ColumnExtractionTrait
 
     /** @var array|null */
     protected $annotationColumns;
+
+    /**
+     * @var array|null
+     */
+    protected $annotationSort;
 
     public function setDebug($flag)
     {
@@ -66,6 +72,18 @@ trait ColumnExtractionTrait
         }
 
         $this->setColumns($this->getReflectionColumns());
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getDefaultSort()
+    {
+        if (null !== $this->getAnnotationColumns()) {
+            return $this->annotationSort;
+        }
+
+        return null;
     }
 
     /**
@@ -132,9 +150,9 @@ trait ColumnExtractionTrait
 
         // Check mtime of class
         if (is_file($this->annotationCacheFilename)) {
-            $result = $this->getCachedAnnotationColumns();
-            if (null !== $result) {
-                return $result;
+            $result = $this->tryIncludeAnnotationCache();
+            if ($result) {
+                return $this->annotationColumns;
             }
         }
 
@@ -145,14 +163,16 @@ trait ColumnExtractionTrait
     }
 
     /**
-     * Cached annotation columns from the file, if the mtime of the file has not changed (or if not in debug).
+     * Cached annotation info from the file, if the mtime of the file has not changed (or if not in debug).
      *
-     * @return mixed|null
+     * @return bool
      */
-    protected function getCachedAnnotationColumns()
+    protected function tryIncludeAnnotationCache()
     {
         if (!$this->debug) {
-            return $this->annotationColumns = include $this->annotationCacheFilename;
+            $this->includeAnnotationCache();
+
+            return true;
         }
 
         $metadata = $this->getClassMetadata();
@@ -165,11 +185,26 @@ trait ColumnExtractionTrait
             }
             $mtimeAnnotation = filemtime($this->annotationCacheFilename);
             if ($mtime && $mtimeAnnotation && $mtime <= $mtimeAnnotation) {
-                return $this->annotationColumns = include $this->annotationCacheFilename;
+                $this->includeAnnotationCache();
+
+                return true;
             }
         }
 
-        return null;
+        return false;
+    }
+
+    /**
+     * Retrieves the cached annotations from the cache file.
+     */
+    protected function includeAnnotationCache()
+    {
+        $annotationInfo = include $this->annotationCacheFilename;
+        $this->annotationColumns = $annotationInfo['columns'];
+        $this->annotationSort = $annotationInfo['sort'];
+        if ($this->annotationSort) {
+            $this->validateSortInfo($this->annotationSort, $this->annotationColumns);
+        }
     }
 
     /**
@@ -177,9 +212,12 @@ trait ColumnExtractionTrait
      */
     protected function populateAndCacheAnnotationColumns()
     {
-        $annotationColumns = $this->generateAnnotationColumns();
+        $gridAnnotations = $this->readGridAnnotations();
+        $annotationColumns = $gridAnnotations['columns'];
+
+        $sort = $gridAnnotations['sort'];
         if ($annotationColumns) {
-            $output = "<?php\nreturn array(\n";
+            $output = "<?php\nreturn array('columns' => array(\n";
             foreach ($annotationColumns as $field => $info) {
                 $class = $info['class'];
                 $output .= "'$field' => new $class(";
@@ -194,28 +232,39 @@ trait ColumnExtractionTrait
                 }
                 $output .= '),';
             }
-            $output .= ");\n";
+            $output .= "), 'sort' => array(";
+            foreach ($sort as $key => $value) {
+                $output .= "'$key'".' => ';
+                if ($value === null) {
+                    $output .= 'null,';
+                } else {
+                    $output .= "'$value',";
+                }
+            }
+            $output .= "));\n";
         } else {
             $output = "<?php\nreturn false;\n";
         }
         file_put_contents($this->annotationCacheFilename, $output);
-        $this->annotationColumns = include $this->annotationCacheFilename;
+        $this->includeAnnotationCache();
     }
 
     /**
      * Generates a list of proeprty name and labels based on finding the GridColumn annotation.
      *
-     * @return array
+     * @return array Hash of grid annotation results: ['columns' => array, 'sort' => string]
      */
-    protected function generateAnnotationColumns()
+    protected function readGridAnnotations()
     {
         $metadata = $this->getClassMetadata();
         $reflectionClass = $metadata->getReflectionClass();
         $properties = $reflectionClass->getProperties();
 
         /** @var Grid $gridAnnotation */
+        $sort = null;
         if ($gridAnnotation = $this->reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid')) {
             $actions = $gridAnnotation->actions;
+            $sort = $gridAnnotation->sort;
         }
 
         $gridColumns = [];
@@ -233,6 +282,7 @@ trait ColumnExtractionTrait
                     $gridColumns[$name]['arguments'][] = [];
                 }
                 $gridColumns[$name]['arguments'][] = $annotation->searchable;
+                $gridColumns[$name]['arguments'][] = $annotation->order;
             }
         }
 
@@ -257,7 +307,100 @@ trait ColumnExtractionTrait
                 'arguments' => $actionArgs, ];
         }
 
-        return $gridColumns;
+        $this->sortGridColumns($gridColumns);
+        try {
+            $sortInfo = $this->extractSortInfo($sort);
+            $this->validateSortInfo($sortInfo, $gridColumns);
+        } catch (\InvalidArgumentException $exception) {
+            throw new \InvalidArgumentException($reflectionClass->getName().' - '.$exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return ['columns' => $gridColumns, 'sort' => $sortInfo];
+    }
+
+    /**
+     * @param array $sortInfo
+     * @param array $gridColumns
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function validateSortInfo(array $sortInfo, array $gridColumns)
+    {
+        if ($sortInfo['direction']) {
+            switch ($sortInfo['direction']) {
+                case 'ASC':
+                case 'DESC':
+                    break;
+                default:
+                    throw new \InvalidArgumentException("Grid's sort annotation direction '{$sortInfo['direction']}' is invalid");
+            }
+        }
+
+        if (isset($sortInfo['column'])) {
+            $column = $sortInfo['column'];
+
+            if (!isset($sortInfo['direction'])) {
+                throw new \InvalidArgumentException("Grid's sort annotation column '$column' specified but a sort direction was not");
+            }
+            foreach (array_keys($gridColumns) as $name) {
+                if ($name === $column) {
+                    return;
+                }
+            }
+            throw new \InvalidArgumentException("Grid's sort annotation column '$column' not in list of columns (".implode(', ', $gridColumns).')');
+        }
+    }
+
+    /**
+     * @param Sort|null $sortAnnotation
+     *
+     * @return array
+     */
+    protected function extractSortInfo($sortAnnotation)
+    {
+        $sortInfo = ['direction' => null, 'column' => null];
+        if ($sortAnnotation) {
+            $direction = $sortAnnotation->direction;
+            $sortInfo['direction'] = $direction;
+            $column = $sortAnnotation->column;
+            $sortInfo['column'] = $column;
+        }
+
+        return $sortInfo;
+    }
+
+    protected function sortGridColumns(array &$columnDefs)
+    {
+        $unordered = [];
+        $ordered = [];
+        foreach ($columnDefs as $name => $columnDef) {
+            $columnParts = $columnDef['arguments'];
+            if (!isset($columnParts[5]) || $columnParts[5] === null) {
+                $unordered[$name] = $columnDef;
+                continue;
+            }
+            $ordered[$name] = $columnDef;
+        }
+
+        if (empty($ordered)) {
+            return;
+        }
+
+        uasort($ordered, function ($columnDef1, $columnDef2) {
+            $columnParts1 = $columnDef1['arguments'];
+            $columnParts2 = $columnDef2['arguments'];
+            $order1 = $columnParts1[5];
+            $order2 = $columnParts2[5];
+
+            return $order1 > $order2;
+        });
+
+        if ($unordered) {
+            foreach ($unordered as $name => $columnDef) {
+                $ordered[$name] = $columnDef;
+            }
+        }
+        $columnDefs = $ordered;
     }
 
     /**

@@ -48,6 +48,11 @@ abstract class AbstractGridSource implements GridSourceInterface
         }
     }
 
+    public function getDefaultSort()
+    {
+        return null;
+    }
+
     public function getId()
     {
         return $this->id;
