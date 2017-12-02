@@ -1,3 +1,6 @@
+3.2.0
+   * Support specifying an order for columns in the Column annotation
+   * Support a default sort column and direction in the Grid annotation
 3.1.3
    * Support for sensio/framework-extra-bundle 5
 3.1.2
