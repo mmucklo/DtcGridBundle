@@ -1,3 +1,5 @@
+3.2.1
+   * Fix 7.0 build
 3.2.0
    * Support specifying an order for columns in the Column annotation
    * Support a default sort column and direction in the Grid annotation
