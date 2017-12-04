@@ -1,3 +1,5 @@
+3.2.2
+   * Fix bug in error message
 3.2.1
    * Fix 7.0 build
 3.2.0
