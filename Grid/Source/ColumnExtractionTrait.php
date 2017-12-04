@@ -347,7 +347,7 @@ trait ColumnExtractionTrait
                     return;
                 }
             }
-            throw new \InvalidArgumentException("Grid's sort annotation column '$column' not in list of columns (".implode(', ', $gridColumns).')');
+            throw new \InvalidArgumentException("Grid's sort annotation column '$column' not in list of columns (".implode(', ', array_keys($gridColumns)).')');
         }
     }
 
