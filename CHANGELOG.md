@@ -1,3 +1,5 @@
+3.3.0
+   * Expose some of the compiler pass logic as a static method
 3.2.2
    * Fix bug in error message
 3.2.1
