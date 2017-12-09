@@ -1,5 +1,6 @@
 services:
     dtc_grid.renderer.factory:
+        public: true
         class: Dtc\GridBundle\Grid\Renderer\RendererFactory
         arguments:
             - "@templating.engine.twig"
@@ -15,12 +16,14 @@ services:
                 datatables.css: '%dtc_grid.datatables.css%'
                 datatables.js: '%dtc_grid.datatables.js%'
     dtc_grid.manager.source:
+        public: true
         class: Dtc\GridBundle\Manager\GridSourceManager
         arguments:
             - "@annotation_reader"
             - "%kernel.cache_dir%"
             - "%kernel.debug%"
     dtc_grid.twig.extension:
+        public: true
         class: Dtc\GridBundle\Twig\Extension\TwigExtension
         tags:
             - { name: twig.extension }
