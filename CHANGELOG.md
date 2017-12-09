@@ -1,3 +1,5 @@
+4.0.0
+   * Remove SensioGeneratorBundle dependency for symfony4 support
 3.3.0
    * Expose some of the compiler pass logic as a static method
 3.2.2
