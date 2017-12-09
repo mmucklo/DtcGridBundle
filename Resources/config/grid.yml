@@ -23,7 +23,6 @@ services:
             - "%kernel.cache_dir%"
             - "%kernel.debug%"
     dtc_grid.twig.extension:
-        public: true
         class: Dtc\GridBundle\Twig\Extension\TwigExtension
         tags:
             - { name: twig.extension }

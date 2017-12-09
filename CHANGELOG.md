@@ -1,5 +1,5 @@
 4.0.1
-   * Make services public
+   * Make services public except the twig extension
 4.0.0
    * Remove SensioGeneratorBundle dependency for symfony4 support
 3.3.0
