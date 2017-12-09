@@ -1,3 +1,5 @@
+4.0.2
+   * Require templating, fix a text wrap issue during "show"
 4.0.1
    * Make services public except the twig extension
 4.0.0

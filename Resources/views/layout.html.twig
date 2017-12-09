@@ -3,6 +3,7 @@
 <head>
     {% block head %}
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>{% block title %}{% endblock %}</title>
         {% block stylesheets %}
             {% for stylesheet in dtc_grid_theme_css %}
                 <link rel="stylesheet" href="{{ stylesheet }}">

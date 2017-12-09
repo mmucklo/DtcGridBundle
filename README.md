@@ -22,6 +22,36 @@ Supports both Doctrine ORM and Doctrine MongoDB ODM
 
 Installation
 ------------
+
+### Symfony 4
+
+First -
+
+   * Inside of config/packages/framework.yaml, make sure you have the twig engine turned on:
+
+```yaml
+framework:
+    # ...
+    templating:
+        engines: ['twig']
+```
+
+Then
+
+```
+    composer.phar require mmucklo/grid-bundle
+```
+
+Then
+
+Add this to your config/routes.yaml file:
+
+```yaml
+dtc_grid:
+    resource: '@DtcGridBundle/Resources/config/routing.yml'
+```
+
+### symfony 2/3
     
 Add this to your AppKernel.php file:
 
