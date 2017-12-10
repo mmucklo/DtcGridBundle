@@ -56,7 +56,7 @@ class RendererFactory
     {
         $twigEngine = $this->getTwigEngine();
         if (!$twigEngine) {
-            throw new \Exception('Twig Engine not found.  Please see README.md for instructions.');
+            throw new \Exception('Twig Engine not found.  Please see https://github.com/mmucklo/DtcGridBundle/README.md for instructions.');
         }
         switch ($type) {
             case 'datatables':
