@@ -45,7 +45,7 @@ class GridColumn extends AbstractGridColumn
 
         $this->order = $order;
 
-        if ($this->order !== null && !is_int($this->order)) {
+        if (null !== $this->order && !is_int($this->order)) {
             throw new \InvalidArgumentException('$order must be an integer or null');
         }
     }

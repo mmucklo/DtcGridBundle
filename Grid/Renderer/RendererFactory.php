@@ -20,11 +20,9 @@ class RendererFactory
     protected $purl;
 
     public function __construct(
-        TwigEngine $twigEngine,
                                 Router $router,
                                 array $config
     ) {
-        $this->twigEngine = $twigEngine;
         $this->router = $router;
         $this->themeCss = $config['theme.css'];
         $this->themeJs = $config['theme.js'];
@@ -37,6 +35,16 @@ class RendererFactory
         $this->jqGridJs = $config['jq_grid.js'];
     }
 
+    public function setTwigEngine(TwigEngine $twigEngine)
+    {
+        $this->twigEngine = $twigEngine;
+    }
+
+    public function getTwigEngine()
+    {
+        return $this->twigEngine;
+    }
+
     /**
      * Creates a new renderer of type $type, throws an exception if it's not known how to create a renderer of type $type.
      *
@@ -46,6 +54,10 @@ class RendererFactory
      */
     public function create($type)
     {
+        $twigEngine = $this->getTwigEngine();
+        if (!$twigEngine) {
+            throw new \Exception('Twig Engine not found.  Please see README.md for instructions.');
+        }
         switch ($type) {
             case 'datatables':
                 $renderer = new DataTablesRenderer($this->twigEngine, $this->router);

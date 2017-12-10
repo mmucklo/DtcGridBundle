@@ -235,7 +235,7 @@ trait ColumnExtractionTrait
             $output .= "), 'sort' => array(";
             foreach ($sort as $key => $value) {
                 $output .= "'$key'".' => ';
-                if ($value === null) {
+                if (null === $value) {
                     $output .= 'null,';
                 } else {
                     $output .= "'$value',";
@@ -375,7 +375,7 @@ trait ColumnExtractionTrait
         $ordered = [];
         foreach ($columnDefs as $name => $columnDef) {
             $columnParts = $columnDef['arguments'];
-            if (!isset($columnParts[5]) || $columnParts[5] === null) {
+            if (!isset($columnParts[5]) || null === $columnParts[5]) {
                 $unordered[$name] = $columnDef;
                 continue;
             }

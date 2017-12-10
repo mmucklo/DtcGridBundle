@@ -1,3 +1,5 @@
+4.0.3
+   * Make twig engine dependency injected during the compiler pass so that just requiring the service wont break a fresh Symfony 4 install.
 4.0.2
    * Require templating, fix a text wrap issue during "show"
 4.0.1

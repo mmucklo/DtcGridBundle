@@ -10,6 +10,20 @@ class GridSourceCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        $this->addDoctrine($container);
+
+        if ($container->has('templating.engine.twig')) {
+            $container->getDefinition('dtc_grid.renderer.factory')->addMethodCall('setTwigEngine', [new Reference('templating.engine.twig')]);
+        }
+
+        // Add each worker to workerManager, make sure each worker has instance to work
+        foreach ($container->findTaggedServiceIds('dtc_grid.source') as $id => $attributes) {
+            self::addGridSource($container, $id);
+        }
+    }
+
+    public function addDoctrine(ContainerBuilder $container)
+    {
         $sourceManager = $container->getDefinition('dtc_grid.manager.source');
 
         if ($container->has('doctrine')) {
@@ -19,14 +33,10 @@ class GridSourceCompilerPass implements CompilerPassInterface
         if ($container->has('doctrine_mongodb')) {
             $sourceManager->addMethodCall('setMongodbRegistry', [new Reference('doctrine_mongodb')]);
         }
-
-        // Add each worker to workerManager, make sure each worker has instance to work
-        foreach ($container->findTaggedServiceIds('dtc_grid.source') as $id => $attributes) {
-            self::addGridSource($container, $id);
-        }
     }
 
-    public static function addGridSource(ContainerBuilder $container, $id) {
+    public static function addGridSource(ContainerBuilder $container, $id)
+    {
         $sourceManager = $container->getDefinition('dtc_grid.manager.source');
         $gridSourceDefinition = $container->getDefinition($id);
         $class = $gridSourceDefinition->getClass();

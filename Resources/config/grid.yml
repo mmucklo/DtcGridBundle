@@ -3,7 +3,6 @@ services:
         public: true
         class: Dtc\GridBundle\Grid\Renderer\RendererFactory
         arguments:
-            - "@templating.engine.twig"
             - "@router"
             -
                 theme.css: '%dtc_grid.theme.css%'
