@@ -35,7 +35,13 @@ function dtc_grid_refresh(context) {
     if (!$table.get(0)) {
         return;
     }
-    $table.data('datatable').ajax.reload();
+    $(context).find('i').removeClass('hidden');
+    $(context).attr('disabled','disabled');
+    $table.find('button').attr('disabled','disabled');
+    $table.data('datatable').ajax.reload(function () {
+      $(context).find('i').addClass('hidden');
+      $(context).attr('disabled',false);
+    });
 }
 
 function dtc_grid_show(context) {
