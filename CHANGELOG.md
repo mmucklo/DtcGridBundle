@@ -1,5 +1,7 @@
-4.0.4
+4.0.5
    * More reactive Refresh button
+4.0.4
+   * Update exception message
 4.0.3
    * Make twig engine dependency injected during the compiler pass so that just requiring the service wont break a fresh Symfony 4 install.
 4.0.2
