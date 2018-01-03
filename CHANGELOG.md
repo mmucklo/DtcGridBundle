@@ -1,3 +1,5 @@
+4.0.6
+   * fix null in show
 4.0.5
    * More reactive Refresh button
 4.0.4
