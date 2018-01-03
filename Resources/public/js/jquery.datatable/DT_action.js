@@ -1,6 +1,9 @@
 function dtc_grid_tablize(value) {
     var table = "<table class=\"table table-bordered\"><thead><th>Column</th><th>Value</th></thead></thead><tbody>";
     var stringifyValue = function (value) {
+        if (value === null) {
+            return '<div><em>null</em></div>';
+        }
         if (typeof(value) === 'object') {
             return dtc_grid_tablize(value);
         }

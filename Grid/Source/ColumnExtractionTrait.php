@@ -250,7 +250,7 @@ trait ColumnExtractionTrait
     }
 
     /**
-     * Generates a list of proeprty name and labels based on finding the GridColumn annotation.
+     * Generates a list of property name and labels based on finding the GridColumn annotation.
      *
      * @return array Hash of grid annotation results: ['columns' => array, 'sort' => string]
      */

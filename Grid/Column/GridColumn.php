@@ -22,13 +22,14 @@ class GridColumn extends AbstractGridColumn
      * @param bool        $searchable
      * @param int|null    $order      If there are columns that have an order mixed with columns of 'null' order, the null ones will appear last
      */
-    public function __construct($field,
+    public function __construct(
+        $field,
             $label = null,
             $formatter = null,
             array $options = null,
             $searchable = true,
-            $order = null)
-    {
+            $order = null
+    ) {
         $this->field = $field;
 
         if (!$label) {
