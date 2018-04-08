@@ -62,6 +62,16 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         return $this->dataTablesJs;
     }
 
+    public function setDataTablesClass($class)
+    {
+        $this->options['table_attr']['class'] = $class;
+    }
+
+    public function getDataTablesClass()
+    {
+        return isset($this->options['table_attr']['class']) ? $this->options['table_attr']['class'] : null;
+    }
+
     /**
      * @param array|null $params
      */

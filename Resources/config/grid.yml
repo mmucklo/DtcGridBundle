@@ -14,6 +14,7 @@ services:
                 jq_grid.js: '%dtc_grid.jq_grid.js%'
                 datatables.css: '%dtc_grid.datatables.css%'
                 datatables.js: '%dtc_grid.datatables.js%'
+                datatables.class: '%dtc_grid.datatables.class%'
     dtc_grid.manager.source:
         public: true
         class: Dtc\GridBundle\Manager\GridSourceManager

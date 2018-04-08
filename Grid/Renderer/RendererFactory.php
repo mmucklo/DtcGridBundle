@@ -16,6 +16,7 @@ class RendererFactory
     protected $jqGridCss;
     protected $dataTablesCss;
     protected $dataTablesJs;
+    protected $dataTablesClass;
     protected $jQuery;
     protected $purl;
 
@@ -31,6 +32,7 @@ class RendererFactory
         $this->purl = $config['purl'];
         $this->dataTablesCss = $config['datatables.css'];
         $this->dataTablesJs = $config['datatables.js'];
+        $this->dataTablesClass = $config['datatables.class'];
         $this->jqGridCss = $config['jq_grid.css'];
         $this->jqGridJs = $config['jq_grid.js'];
     }
@@ -106,6 +108,10 @@ class RendererFactory
 
         if (method_exists($renderer, 'setDataTablesJs')) {
             $renderer->setDataTablesJs($this->dataTablesJs);
+        }
+
+        if (method_exists($renderer, 'setDatatablesClass') && $this->dataTablesClass) {
+            $renderer->setDatatablesClass($this->dataTablesClass);
         }
 
         return $renderer;

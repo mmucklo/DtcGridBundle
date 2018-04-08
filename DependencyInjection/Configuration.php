@@ -49,6 +49,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('datatables')
                     ->addDefaultsIfNotSet()
                     ->children()
+                        ->scalarNode('class')->defaultNull()->end()
                         ->arrayNode('css')
                             ->prototype('scalar')->end()
                             ->defaultValue(['https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css'])
