@@ -50,7 +50,7 @@ class DtcGridExtension extends Extension
 
     public function setDataTables(array $config, ContainerBuilder $container)
     {
-        $class = isset($config['datatables']['class']) ? $config['datatables']['css'] : [];
+        $class = isset($config['datatables']['class']) ? $config['datatables']['class'] : [];
         $css = isset($config['datatables']['css']) ? $config['datatables']['css'] : [];
         $js = isset($config['datatables']['js']) ? $config['datatables']['js'] : [];
 
