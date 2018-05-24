@@ -26,3 +26,11 @@ services:
         class: Dtc\GridBundle\Twig\Extension\TwigExtension
         tags:
             - { name: twig.extension }
+    dtc_grid.command.source.list:
+        class: Dtc\GridBundle\Command\SourceListCommand
+        tags:
+            - { name: 'console.command' }
+    dtc_grid.command.source.generate:
+        class: Dtc\GridBundle\Command\GenerateGridSourceCommand
+        tags:
+            - { name: 'console.command' }
