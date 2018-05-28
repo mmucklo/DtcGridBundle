@@ -42,13 +42,20 @@ Then
     composer.phar require mmucklo/grid-bundle
 ```
 
-Then
+You may see something like this (please answer 'y' to the question if prompted):
 
-Add this to your config/routes.yaml file:
+```
+  -  WARNING  mmucklo/grid-bundle (>=4.0): From github.com/symfony/recipes-contrib:master
+    The recipe for this package comes from the "contrib" repository, which is open to community contributions.
+    Review the recipe at https://github.com/symfony/recipes-contrib/tree/master/mmucklo/grid-bundle/4.0
 
-```yaml
-dtc_grid:
-    resource: '@DtcGridBundle/Resources/config/routing.yml'
+    Do you want to execute this recipe?
+    [y] Yes
+    [n] No
+    [a] Yes for all packages, only for the current installation session
+    [p] Yes permanently, never ask again for this project
+    (defaults to n): y
+  - Configuring mmucklo/grid-bundle (>=4.0): From github.com/symfony/recipes-contrib:master
 ```
 
 ### symfony 2/3
