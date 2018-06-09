@@ -286,11 +286,20 @@ trait ColumnExtractionTrait
             }
         }
 
-        /* @var Action $action */
+        // Fall back to default column list if list is not specified
+        if (!$gridColumns) {
+            $gridColumnList = $this->getReflectionColumns();
+            /** @var GridColumn $gridColumn */
+            foreach ($gridColumnList as $field => $gridColumn) {
+                $gridColumns[$field] = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$field, $gridColumn->getLabel(), null, ['sortable' => true], true, null]];
+            }
+        }
+
         if (isset($actions)) {
             $field = '\$-action';
             $actionArgs = [$field];
             $actionDefs = [];
+            /* @var Action $action */
             foreach ($actions as $action) {
                 $actionDef = ['label' => $action->label, 'route' => $action->route];
                 if ($action instanceof ShowAction) {

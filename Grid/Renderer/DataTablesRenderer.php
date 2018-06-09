@@ -15,7 +15,6 @@ class DataTablesRenderer extends AbstractJqueryRenderer
             'table_attr' => array(
                     'class' => 'display table table-striped table-bordered small-font',
                 ),
-            'sPaginationType' => 'bootstrap',
             'bServerSide' => true,
             'oLanguage' => array(
                 'sLengthMenu' => '_MENU_ records per page',
@@ -84,9 +83,8 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         $params['dtc_grid_datatables_css'] = $this->dataTablesCss;
         $params['dtc_grid_datatables_js'] = $this->dataTablesJs;
         $cssList = ['css/dtc_grid.css'];
-        $jsList = ['js/jquery.datatable/DT_bootstrap.js',
-                                        'js/jquery.datatable/DT_action.js',
-                                        'js/jquery.datatable/jquery.jqtable.js', ];
+        $jsList = ['js/jquery.datatable/DT_action.js',
+            'js/jquery.datatable/jquery.jqtable.js'];
 
         foreach ($cssList as $css) {
             $mtime = filemtime(__DIR__.'/../../Resources/public/'.$css);

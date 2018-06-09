@@ -6,7 +6,7 @@
     to {transform: rotate(360deg);}
 }
 
-table td {
+table.dataTable td {
     word-wrap: break-word;
     word-break: break-all;
 }
@@ -27,6 +27,17 @@ table td {
     animation: dtc-grid-spinner .6s linear infinite;
 }
 
-.btn {
-    margin: 5px 0 5px 0;
+table.dataTable .btn {
+    margin: 5px 0;
+}
+
+.dtc-grid-hidden {
+    display: none;
+}
+
+/**
+ * https://datatables.net/forums/discussion/50132/bootstrap-4-styling-issue-from-examples-page/p1?new=1
+ */
+table.dataTable.table-bordered {
+    border-collapse: collapse !important;
 }

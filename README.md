@@ -86,10 +86,11 @@ Usage
 
 After installation, all entities and documents that have a Grid annotation should be available off the dtc_grid route:
 
+(NOTE: symfony4 example below, for symfony2/3, the namespace for the class may be different - e.g. AppBundle instead of App)
 ```php
 <?php
 
-namespace AppBundle\Entity;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Dtc\GridBundle\Annotation as Grid;
@@ -98,35 +99,46 @@ use Dtc\GridBundle\Annotation as Grid;
  * Class User
  * @Grid\Grid
  * @ORM\Entity
- * @package AppBundle\Entity
+ * @package App\Entity
  */
 class User {
     //...
 }
 ```
 
+Now after adding the annotation, you may need to do:
+
+```
+    bin/console cache:clear
+    bin/console cache:warmup
+```
+
+## To access the grid:
+
+You can access the grid without embedding it anywhere by going to the following url(s):
+
   * Route: dtc_grid
   * Parameters:
       * class=[document_or_entity]
          * This can be in either a fully-namespaced class name or symfony-style entity/document format separated by ':'
-            * e.g. either: 'AppBundle:User' or 'AppBundle\Entity\User'
+            * e.g. either: 'App:User' or 'App\Entity\User'
       * type=[datatables|table|jq_grid]
 
 #### Examples:
 ```
 # A default HTML-based table
-# (warning: if you table is large, skip to datatables below)
-/dtc_grid/grid?class=AppBundle:User
- 
+# (warning: if your table is large, skip this example, and try the paginated datatables path below)
+/dtc_grid/grid?class=App:User
+
 # Datatables
-/dtc_grid/grid?class=AppBundle:User&type=datatables
+/dtc_grid/grid?class=App:User&type=datatables
 
 # Full Class syntax 
-/dtc_grid/grid?class=AppBundle\Entity\User&type=datatables
+/dtc_grid/grid?class=App\Entity\User&type=datatables
  
 # MongoDB ODM examples
-/dtc_grid/grid?class=AppBundle:Event&type=datatables
-/dtc_grid/grid?class=AppBundle\Document\Event&type=datatables
+/dtc_grid/grid?class=App:Event&type=datatables
+/dtc_grid/grid?class=App\Document\Event&type=datatables
  
 ```
 
@@ -151,7 +163,7 @@ These must be added as annotations to the Grid annotation.
 ```php
 <?php
 
-namespace AppBundle\Entity;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Dtc\GridBundle\Annotation as Grid;
@@ -160,7 +172,7 @@ use Dtc\GridBundle\Annotation as Grid;
  * Class User
  * @Grid\Grid(actions={@Grid\ShowAction(), @Grid\DeleteAction()})
  * @ORM\Entity
- * @package AppBundle\Entity
+ * @package App\Entity
  */
 class User {
     //...
@@ -175,7 +187,7 @@ class User {
  */
 public function usersAction(Request $request) {
     $renderer = $this->get('dtc_grid.renderer.factory')->create('datatables');
-    $gridSource = $this->get('dtc_grid.manager.source')->get('AppBundle:User');
+    $gridSource = $this->get('dtc_grid.manager.source')->get('App:User');
     $renderer->bind($gridSource);
     return $this->render('@DtcGrid/Page/datatables.html.twig', $renderer->getParams());
 }
@@ -189,7 +201,7 @@ public function usersAction(Request $request) {
  */
 public function usersAction(Request $request) {
     $renderer = $this->get('dtc_grid.renderer.factory')->create('table');
-    $gridSource = $this->get('dtc_grid.manager.source')->get('AppBundle:User');
+    $gridSource = $this->get('dtc_grid.manager.source')->get('App:User');
     $renderer->bind($gridSource);
     return $this->render('@DtcGrid/Page/datatables.html.twig', $renderer->getParams());
 }
@@ -203,7 +215,7 @@ There's a @Column annotation that lives in Dtc\GridBundle\Annotation that you pl
 
 <?php
 
-namespace AppBundle\Entity;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Dtc\GridBundle\Annotation as Grid;
@@ -212,7 +224,7 @@ use Dtc\GridBundle\Annotation as Grid;
  * Class User
  * @Grid\Grid
  * @ORM\Entity
- * @package AppBundle\Entity
+ * @package App\Entity
  */
 class User {
 
@@ -288,7 +300,7 @@ dtc_grid:
      */
     public function usersAction(Request $request) {
         $renderer = $this->get('dtc_grid.renderer.factory')->create('jq_grid');
-        $gridSource = $this->get('dtc_grid.manager.source')->get('AppBundle:User');
+        $gridSource = $this->get('dtc_grid.manager.source')->get('App:User');
         $renderer->bind($gridSource);
         return $this->render('@DtcGrid/Page/datatables.html.twig', $renderer->getParams());
     }
@@ -401,7 +413,7 @@ jobs.html.twig (a little complicated as styles and javascript has to be included
     path('dtc_grid_purl'),
     path('dtc_grid_dataTables'),
     path('dtc_grid_dataTables_extension', { 'type': 'bootstrap' }),
-    '/bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js',
+    'js/jquery.datatable/DT_action.js',
     '/bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
         <script type="text/javascript" src="{{ javascript }}"></script>
     {% endfor %}
@@ -432,7 +444,7 @@ public function usersCustomAction(Request $request) {
 
     $renderer = $this->get('dtc_grid.renderer.factory')->create('datatables'); // or whichever renderer you want to use
 
-    $gridSource = $this->get('dtc_grid.manager.source')->get('AppBundle:User');
+    $gridSource = $this->get('dtc_grid.manager.source')->get('App:User');
     $renderer->bind($gridSource);
 
     $renderer->getParams($params); // This will add the grid-specific params (mainly 'grid', and the bootstrap urls)
@@ -467,7 +479,7 @@ public function usersCustomAction(Request $request) {
         path('dtc_grid_purl'),
         path('dtc_grid_dataTables'),
         path('dtc_grid_dataTables_extension', { 'type': 'bootstrap' }),
-        'bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js',
+        'js/jquery.datatable/DT_action.js',
         'bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
             <script type="text/javascript" src="{{ javascript }}"></script>
         {% endfor %}

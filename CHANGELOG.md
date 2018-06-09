@@ -1,3 +1,6 @@
+4.1.0
+   * Bootstrap 4 full compatibility
+   * Default columns when showing grid
 4.0.6
    * fix null in show
 4.0.5

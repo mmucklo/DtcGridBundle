@@ -72,7 +72,7 @@ In your template file:
 				path('dtc_grid_purl'),
 				path('dtc_grid_dataTables'),
 				path('dtc_grid_dataTables_extension', { 'type': 'bootstrap' }),
-				'/bundles/dtcgrid/js/jquery.datatable/DT_bootstrap.js',
+                'js/jquery.datatable/DT_action.js',
 				'/bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
 					<script type="text/javascript" src="{{ javascript }}"></script>
 				{% endfor %}

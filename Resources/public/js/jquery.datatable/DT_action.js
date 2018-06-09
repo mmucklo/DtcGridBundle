@@ -8,7 +8,7 @@ function dtc_grid_tablize(value) {
             return dtc_grid_tablize(value);
         }
         return $('<div />').text(value).html();
-    }
+    };
 
     for (var prop in value) {
         if (value.hasOwnProperty(prop)) {
@@ -23,7 +23,7 @@ function dtc_grid_delete(context) {
     var $table = $(context).parents('table');
     var id = $table.attr('id');
     var route = $(context).attr('data-route');
-    $(context).find('i').removeClass('hidden');
+    $(context).find('i').removeClass('dtc-grid-hidden');
     $table.find('button').attr('disabled','disabled');
     $.ajax({
         url: route
@@ -38,11 +38,11 @@ function dtc_grid_refresh(context) {
     if (!$table.get(0)) {
         return;
     }
-    $(context).find('i').removeClass('hidden');
+    $(context).find('i').removeClass('dtc-grid-hidden');
     $(context).attr('disabled','disabled');
     $table.find('button').attr('disabled','disabled');
     $table.data('datatable').ajax.reload(function () {
-      $(context).find('i').addClass('hidden');
+      $(context).find('i').addClass('dtc-grid-hidden');
       $(context).attr('disabled',false);
     });
 }
