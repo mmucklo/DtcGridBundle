@@ -106,7 +106,11 @@ class EntityGridSource extends AbstractGridSource
 
     public function getCount()
     {
+        $oldOrderBy = $this->orderBy;
+        $this->orderBy = [];
         $qb = $this->getQueryBuilder();
+        $this->orderBy = $oldOrderBy;
+
         $qb->add('select', 'count(u)')
             ->setFirstResult(null)
             ->setMaxResults(null);

@@ -84,7 +84,7 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         $params['dtc_grid_datatables_js'] = $this->dataTablesJs;
         $cssList = ['css/dtc_grid.css'];
         $jsList = ['js/jquery.datatable/DT_action.js',
-            'js/jquery.datatable/jquery.jqtable.js'];
+            'js/jquery.datatable/jquery.jqtable.js', ];
 
         foreach ($cssList as $css) {
             $mtime = filemtime(__DIR__.'/../../Resources/public/'.$css);

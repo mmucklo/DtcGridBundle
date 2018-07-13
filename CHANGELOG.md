@@ -1,3 +1,6 @@
+4.2.0
+   * Hack to fix on postgres
+   * Create a default yaml file to be used with symfony-recipies
 4.1.0
    * Bootstrap 4 full compatibility
    * Default columns when showing grid
