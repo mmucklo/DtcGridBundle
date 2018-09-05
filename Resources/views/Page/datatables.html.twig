@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="{{ stylesheet }}" />
     {% endfor %}
     {% for stylesheet in dtc_grid_local_css %}
-       <link rel="stylesheet" href="/bundles/dtcgrid/{{ stylesheet }}" />
+       <link rel="stylesheet" href="{{ app.request.baseUrl }}/bundles/dtcgrid/{{ stylesheet }}" />
     {% endfor %}
 {% endblock %}
 
@@ -15,6 +15,6 @@
         <script src="{{ javascript }}"></script>
     {% endfor %}
     {% for javascript in dtc_grid_local_js %}
-        <script src="/bundles/dtcgrid/{{ javascript }}"></script>
+        <script src="{{ app.request.baseUrl }}/bundles/dtcgrid/{{ javascript }}"></script>
     {% endfor %}
 {% endblock %}
