@@ -2,7 +2,7 @@
 
 namespace Dtc\GridBundle\Grid\Renderer;
 
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
 class RendererFactory
@@ -21,7 +21,7 @@ class RendererFactory
     protected $purl;
 
     public function __construct(
-                                Router $router,
+                                RouterInterface $router,
                                 array $config
     ) {
         $this->router = $router;
