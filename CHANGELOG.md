@@ -1,3 +1,5 @@
+4.2.2
+   * Build for 7.3
 4.2.1
    * Change way to get baseUrl for assets: PR #12
 4.2.0
