@@ -1,4 +1,10 @@
-checks:
-    php:
-        code_rating: true
-        duplication: true
+build:
+    nodes:
+        analysis:
+            tests:
+                override:
+                    - php-scrutinizer-run
+
+filter:
+    excluded_paths:
+        - "Tests/"
