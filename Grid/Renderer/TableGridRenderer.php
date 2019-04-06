@@ -2,7 +2,7 @@
 
 namespace Dtc\GridBundle\Grid\Renderer;
 
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
 class TableGridRenderer extends AbstractRenderer
@@ -15,7 +15,7 @@ class TableGridRenderer extends AbstractRenderer
                 ),
         );
 
-    public function __construct(TwigEngine $twigEngine, Router $router)
+    public function __construct(TwigEngine $twigEngine, RouterInterface $router)
     {
         $this->twigEngine = $twigEngine;
         $this->router = $router;
