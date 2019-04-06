@@ -1,3 +1,5 @@
+4.2.1
+   * Change way to get baseUrl for assets: PR #12
 4.2.0
    * Hack to fix on postgres
    * Create a default yaml file to be used with symfony-recipies
