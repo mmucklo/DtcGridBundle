@@ -6,9 +6,7 @@ use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 
 class JQGridRenderer extends AbstractJqueryRenderer
 {
-    protected $jqGridCss = [];
-    protected $jqGridJs = [];
-    protected $options = array(
+    public static $defaultOptions = array(
             'datatype' => 'json',
             'jsonReader' => array(
                     'root' => 'rows',
@@ -20,14 +18,14 @@ class JQGridRenderer extends AbstractJqueryRenderer
 
             'url' => null,
             'cell' => '',
-            'width' => '840',
-            'height' => '400',
+            'width' => 840,
+            'height' => 400,
             'loadui' => 'disable',
             'altRows' => true,
             'viewrecords' => true,
             'multiselect' => true,
-            'styleUI' => 'Bootstrap',
-
+            'styleUI' => 'Bootstrap4',
+            'iconSet' => 'Octicons',
             // Paging params
             'prmNames' => array(
                     'page' => 'page',
@@ -44,11 +42,10 @@ class JQGridRenderer extends AbstractJqueryRenderer
 
             // Pager Config
             'pager' => 'grid-pager',
-            'recordtext' => 'View {0} - {1} of {2}',
-            'emptyrecords' => 'No records to view',
-            'loadtext' => 'Loading...',
-            'pgtext' => 'Page {0} of {1}',
     );
+
+    protected $jqGridCss = [];
+    protected $jqGridJs = [];
 
     protected function afterBind()
     {
@@ -151,8 +148,8 @@ class JQGridRenderer extends AbstractJqueryRenderer
                 'id' => $id,
         );
 
-        $template = 'DtcGridBundle:Grid:jq_grid.html.twig';
+        $template = '@DtcGrid/Grid/jq_grid.html.twig';
 
-        return $this->twigEngine->render($template, $params);
+        return $this->twig->render($template, $params);
     }
 }

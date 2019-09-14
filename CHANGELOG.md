@@ -1,3 +1,8 @@
+5.0.0
+   * Support for other languages (Issue #14) - see [dtc_grid.yaml](Resources/config/dtc_grid.yaml) for more info
+   * Default reflection support for all entities (using an allow_entities config - see [dtc_grid.yaml](Resources/config/dtc_grid.yaml))
+   * Push grid options up into configuration file with defaults set for backwards-compatibility
+   * Bootstrap4 support for jqGrid
 4.2.2
    * Build for 7.3
 4.2.1

@@ -3,28 +3,34 @@
 namespace Dtc\GridBundle\Grid\Renderer;
 
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Bundle\TwigBundle\TwigEngine;
+use Twig\Environment;
 
 class RendererFactory
 {
-    protected $twigEngine;
+    protected $twig;
     protected $router;
+    protected $translator;
     protected $themeCss;
     protected $themeJs;
     protected $pageDivStyle;
     protected $jqGridJs;
     protected $jqGridCss;
+    protected $jqGridOptions;
+    protected $tableOptions;
     protected $dataTablesCss;
     protected $dataTablesJs;
     protected $dataTablesClass;
+    protected $dataTablesOptions;
     protected $jQuery;
     protected $purl;
 
     public function __construct(
-                                RouterInterface $router,
-                                array $config
+        RouterInterface $router,
+        $translator,
+        array $config
     ) {
         $this->router = $router;
+        $this->translator = $translator;
         $this->themeCss = $config['theme.css'];
         $this->themeJs = $config['theme.js'];
         $this->pageDivStyle = $config['page_div_style'];
@@ -33,18 +39,21 @@ class RendererFactory
         $this->dataTablesCss = $config['datatables.css'];
         $this->dataTablesJs = $config['datatables.js'];
         $this->dataTablesClass = $config['datatables.class'];
+        $this->dataTablesOptions = $config['datatables.options'];
         $this->jqGridCss = $config['jq_grid.css'];
         $this->jqGridJs = $config['jq_grid.js'];
+        $this->jqGridOptions = $config['jq_grid.options'];
+        $this->tableOptions = $config['table.options'];
     }
 
-    public function setTwigEngine(TwigEngine $twigEngine)
+    public function setTwigEnvironment(Environment $twig)
     {
-        $this->twigEngine = $twigEngine;
+        $this->twig = $twig;
     }
 
-    public function getTwigEngine()
+    public function getTwigEnvironment()
     {
-        return $this->twigEngine;
+        return $this->twig;
     }
 
     /**
@@ -53,22 +62,24 @@ class RendererFactory
      * @param $type
      *
      * @return AbstractRenderer
+     *
+     * @throws \Exception
      */
     public function create($type)
     {
-        $twigEngine = $this->getTwigEngine();
-        if (!$twigEngine) {
+        $twig = $this->getTwigEnvironment();
+        if (!$twig) {
             throw new \Exception('Twig Engine not found.  Please see https://github.com/mmucklo/DtcGridBundle/README.md for instructions.');
         }
         switch ($type) {
             case 'datatables':
-                $renderer = new DataTablesRenderer($this->twigEngine, $this->router);
+                $renderer = new DataTablesRenderer($this->twig, $this->router, $this->translator, $this->dataTablesOptions);
                 break;
             case 'jq_grid':
-                $renderer = new JQGridRenderer($this->twigEngine, $this->router);
+                $renderer = new JQGridRenderer($this->twig, $this->router, $this->translator, $this->jqGridOptions);
                 break;
             case 'table':
-                $renderer = new TableGridRenderer($this->twigEngine, $this->router);
+                $renderer = new TableGridRenderer($this->twig, $this->router, $this->translator, $this->tableOptions);
                 break;
             default:
                 throw new \Exception("No renderer for type '$type''");

@@ -32,15 +32,21 @@ class GridSourceManager
     protected $extraGridSources;
 
     /**
+     * @var array|null Null means all entities allowed, empty array means no entities allowed
+     */
+    protected $reflectionAllowedEntities;
+
+    /**
      * GridSourceManager constructor.
      *
      * @param string $cacheDir
      * @param bool   $debug
      */
-    public function __construct(Reader $reader, $cacheDir, $debug = false)
+    public function __construct(Reader $reader, $allowedEntities, $cacheDir, $debug = false)
     {
         $this->cacheDir = $cacheDir;
         $this->reader = $reader;
+        $this->reflectionAllowedEntities = is_array($allowedEntities) ? array_flip($allowedEntities) : ('*' === $allowedEntities ? null : []);
         $this->debug = $debug;
         $this->sources = array();
     }
@@ -91,7 +97,7 @@ class GridSourceManager
             $name = $classMetadata->getName();
             $reflectionClass = $classMetadata->getReflectionClass();
             $annotation = $this->reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid');
-            if (!$annotation) {
+            if (!$annotation && !isset($this->reflectionAllowedEntities[$entityOrDocument]) && null !== $this->reflectionAllowedEntities) {
                 throw new \Exception("GridSource requested for '$entityOrDocument' but no Grid annotation found");
             }
             if ($manager instanceof EntityManagerInterface) {

@@ -12,8 +12,8 @@ class GridSourceCompilerPass implements CompilerPassInterface
     {
         $this->addDoctrine($container);
 
-        if ($container->has('templating.engine.twig')) {
-            $container->getDefinition('dtc_grid.renderer.factory')->addMethodCall('setTwigEngine', [new Reference('templating.engine.twig')]);
+        if ($container->has('twig')) {
+            $container->getDefinition('dtc_grid.renderer.factory')->addMethodCall('setTwigEnvironment', [new Reference('twig')]);
         }
 
         // Add each worker to workerManager, make sure each worker has instance to work

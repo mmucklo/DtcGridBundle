@@ -19,6 +19,12 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->arrayNode('reflection')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->variableNode('allowed_entities')->defaultNull()->end()
+                    ->end()
+                ->end()
                 ->arrayNode('jq_grid')
                     ->children()
                         ->arrayNode('css')
@@ -27,6 +33,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('js')
                             ->prototype('scalar')->end()
                         ->end()
+                        ->variableNode('options')->end()
                     ->end()
                 ->end()
                 ->scalarNode('purl')
@@ -59,6 +66,12 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(['https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
                                             'https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js', ])
                         ->end()
+                        ->variableNode('options')->end()
+                    ->end()
+                ->end()
+                ->arrayNode('table')
+                    ->children()
+                        ->variableNode('options')->end()
                     ->end()
                 ->end()
                 ->arrayNode('theme')

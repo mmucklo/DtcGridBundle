@@ -25,19 +25,6 @@ Installation
 
 ### Symfony 4
 
-First -
-
-   * Inside of config/packages/framework.yaml, make sure you have the twig engine turned on:
-
-```yaml
-framework:
-    # ...
-    templating:
-        engines: ['twig']
-```
-
-Then
-
 ```
     composer.phar require mmucklo/grid-bundle
 ```
@@ -45,7 +32,7 @@ Then
 You may see something like this (please answer 'y' to the question if prompted):
 
 ```
-  -  WARNING  mmucklo/grid-bundle (>=4.0): From github.com/symfony/recipes-contrib:master
+  -  WARNING  mmucklo/grid-bundle (>=5.0): From github.com/symfony/recipes-contrib:master
     The recipe for this package comes from the "contrib" repository, which is open to community contributions.
     Review the recipe at https://github.com/symfony/recipes-contrib/tree/master/mmucklo/grid-bundle/4.0
 
@@ -55,7 +42,7 @@ You may see something like this (please answer 'y' to the question if prompted):
     [a] Yes for all packages, only for the current installation session
     [p] Yes permanently, never ask again for this project
     (defaults to n): y
-  - Configuring mmucklo/grid-bundle (>=4.0): From github.com/symfony/recipes-contrib:master
+  - Configuring mmucklo/grid-bundle (>=5.0): From github.com/symfony/recipes-contrib:master
 ```
 
 ### symfony 2/3
@@ -87,6 +74,17 @@ Usage
 After installation, all entities and documents that have a Grid annotation should be available off the dtc_grid route:
 
 (NOTE: symfony4 example below, for symfony2/3, the namespace for the class may be different - e.g. AppBundle instead of App)
+
+There are two recommended ways to setup a grid for a page, through Annotations, or through Reflection
+
+#### Reflection
+
+Automatic Grid setup is possible by setting the reflections: allowed_entities: [...] parameter in the config/packages/dtc_grid.yaml configuration file (or config.yml for symfony <= 3.4)
+
+#### Annotation Simple Example
+
+Note: this example still uses reflection to discover the columns, however if you want to customize the columns shown, and even which ones are shown, read on below in the section titled Customize Columns
+
 ```php
 <?php
 
@@ -117,7 +115,7 @@ Now after adding the annotation, you may need to do:
 
 You can access the grid without embedding it anywhere by going to the following url(s):
 
-  * Route: dtc_grid
+  * Route: dtc_grid/dtc_grid/grid?class=App:User
   * Parameters:
       * class=[document_or_entity]
          * This can be in either a fully-namespaced class name or symfony-style entity/document format separated by ':'
@@ -128,7 +126,7 @@ You can access the grid without embedding it anywhere by going to the following 
 ```
 # A default HTML-based table
 # (warning: if your table is large, skip this example, and try the paginated datatables path below)
-/dtc_grid/grid?class=App:User
+
 
 # Datatables
 /dtc_grid/grid?class=App:User&type=datatables
@@ -139,6 +137,11 @@ You can access the grid without embedding it anywhere by going to the following 
 # MongoDB ODM examples
 /dtc_grid/grid?class=App:Event&type=datatables
 /dtc_grid/grid?class=App\Document\Event&type=datatables
+
+# Other types of tables
+/dtc_grid/grid?class=App:Event&type=jq_grid
+/dtc_grid/grid?class=App:Event&type=table
+
  
 ```
 
@@ -557,7 +560,7 @@ public function usersCustomAction(Request $request) {
 
 Documentation
 -------------
-There is additional documentation stored in `Resources/doc/`
+There is additional (somewhat legacy at this point) documentation stored in `Resources/doc/`
 
 #### Legacy:
 You used to have to use a "Generator" to create the grid.source service, however this is no longer necessary, however documentation on how to use it is still available in the Resources/doc/ area.

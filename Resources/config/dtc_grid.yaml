@@ -1,4 +1,11 @@
 dtc_grid:
+    reflection:
+        # allow any entity to be shown via the /dtc_grid route
+        # allowed_entities: ~, '*', or an array of entity names [ 'App:Product', 'App:Category', ... ]
+        #  ~ - no entities allowed for reflection
+        #  * - all entities allowed for reflection
+        #  [ 'App:Product', 'App:Category' ] - only App:Product and App:Category allowed
+        allowed_entities: ~
     purl: 'https://cdnjs.cloudflare.com/ajax/libs/purl/2.3.1/purl.min.js'
     jquery:
         url: 'https://code.jquery.com/jquery-3.3.1.min.js'
@@ -10,6 +17,66 @@ dtc_grid:
         js:
             - 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js'
             - 'https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js'
+        options:
+            # datatables options
+            processing: true,
+            searchDelay: 350,
+            table_attr:
+                class: "display table table-striped table-bordered small-font"
+            serverSide: true
+            columns:
+                width: 20%
+            language:
+                # # Example language change:
+                # url: "https://cdn.datatables.net/plug-ins/1.10.19/i18n/German.json"
+                # # See more here: https://datatables.net/plug-ins/i18n/
+                #
+                # NOTE: If using an alternate language than english, feel free to remove or comment-out the below line:
+                lengthMenu: _MENU_ records per page
+    jq_grid:
+        css:
+            - https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.css
+            # - 'path_or_url_to/prettify.css'
+            # - 'path_or_url_to/ui.jqgrid-bootstrap4.css'
+        js:
+            # - 'path_or_url_to/grid.locale-en.js'
+            # # If using other languages include a locale like below:
+            # - 'path_or_url_to/grid.locale-de.js'
+            # - 'path_or_url_to/jquery.jqGrid.js'
+        options:
+            # # Example language change:
+            # regional: de
+            datatype: json
+            jsonReader:
+                root: rows
+                total: total
+                records: records
+                page: page
+                repeatitems: false
+            url: ~
+            cell: ""
+            width: 840
+            height: 400
+            loadui: disable
+            altRows: true
+            viewrecords: true
+            multiselect: true
+            styleUI: 'Bootstrap4'
+            iconSet: 'Octicons'
+            prmNames:
+                page: page
+                rows: limit
+                sort: sort_column
+                order: sort_order
+                nd: ~
+            ajaxGridOptions:
+                cache: false,
+                ifModified: false,
+            pager: grid-pager
+    table:
+        options:
+            table_attr:
+                class: display table table-striped table-bordered small-font
     theme:
         css:
             - 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'

@@ -6,25 +6,23 @@ use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 
 class DataTablesRenderer extends AbstractJqueryRenderer
 {
+    public static $defaultOptions = array(
+        'processing' => true,
+        'searchDelay' => 350,
+        'table_attr' => array(
+                'class' => 'display table table-striped table-bordered small-font',
+            ),
+        'serverSide' => true,
+        'columns' => array(array(
+            'width' => '20%',
+        )),
+        'language' => array(
+            'lengthMenu' => '_MENU_ records per page',
+        ),
+    );
+
     protected $dataTablesCss = [];
     protected $dataTablesJs = [];
-
-    protected $options = array(
-            'bProcessing' => true,
-            'searchDelay' => 350,
-            'table_attr' => array(
-                    'class' => 'display table table-striped table-bordered small-font',
-                ),
-            'bServerSide' => true,
-            'oLanguage' => array(
-                'sLengthMenu' => '_MENU_ records per page',
-            ),
-            'aoColumns' => array(array(
-                'bSortable' => false,
-                'sWidth' => '20%',
-                'aTargets' => array(-1),
-            )),
-        );
 
     const MODE_AJAX = 1;
     const MODE_SERVER = 2;
@@ -204,8 +202,8 @@ class DataTablesRenderer extends AbstractJqueryRenderer
                 'id' => $id,
         );
 
-        $template = 'DtcGridBundle:Grid:datatables.html.twig';
+        $template = '@DtcGrid/Grid/datatables.html.twig';
 
-        return $this->twigEngine->render($template, $params);
+        return $this->twig->render($template, $params);
     }
 }

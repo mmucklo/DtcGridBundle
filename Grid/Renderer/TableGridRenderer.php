@@ -3,22 +3,27 @@
 namespace Dtc\GridBundle\Grid\Renderer;
 
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Bundle\TwigBundle\TwigEngine;
+use Twig\Environment;
 
 class TableGridRenderer extends AbstractRenderer
 {
-    protected $twigEngine;
-    protected $router;
-    protected $options = array(
-            'table_attr' => array(
-                    'class' => 'display table table-striped table-bordered small-font',
-                ),
-        );
+    public static $defaultOptions = array(
+        'table_attr' => array(
+            'class' => 'display table table-striped table-bordered small-font',
+        ),
+    );
 
-    public function __construct(TwigEngine $twigEngine, RouterInterface $router)
+    protected $twig;
+    protected $router;
+    protected $translator;
+    protected $options;
+
+    public function __construct(Environment $twig, RouterInterface $router, $translator, array $options)
     {
-        $this->twigEngine = $twigEngine;
+        $this->translator = $translator;
+        $this->twig = $twig;
         $this->router = $router;
+        $this->options = $options;
     }
 
     public function render()
@@ -30,9 +35,9 @@ class TableGridRenderer extends AbstractRenderer
                 'source' => $this->gridSource,
         );
 
-        $template = 'DtcGridBundle:Grid:table.html.twig';
+        $template = '@DtcGrid/Grid/table.html.twig';
 
-        return $this->twigEngine->render($template, $params);
+        return $this->twig->render($template, $params);
     }
 
     /**

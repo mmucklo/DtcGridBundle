@@ -226,7 +226,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     /**
      * @param $id
      *
-     * @return null|mixed returns the row identified by Id if found
+     * @return mixed|null returns the row identified by Id if found
      */
     public function find($id)
     {

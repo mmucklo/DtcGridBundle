@@ -24,11 +24,11 @@ class GridColumn extends AbstractGridColumn
      */
     public function __construct(
         $field,
-            $label = null,
-            $formatter = null,
-            array $options = null,
-            $searchable = true,
-            $order = null
+        $label = null,
+        $formatter = null,
+        array $options = null,
+        $searchable = true,
+        $order = null
     ) {
         $this->field = $field;
 
