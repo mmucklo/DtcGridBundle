@@ -2,6 +2,7 @@
 
 namespace Dtc\GridBundle\Grid\Source;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 use Dtc\GridBundle\Grid\Pager\GridSourcePager;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,16 @@ abstract class AbstractGridSource implements GridSourceInterface
     protected $id = 'grid';
     protected $columns;
     protected $parameters;
+    protected $objectManager;
+    protected $idColumn;
+    protected $objectName;
+
+    public function __construct(ObjectManager $objectManager, $objectName, $idColumn)
+    {
+        $this->objectManager = $objectManager;
+        $this->idColumn = $idColumn;
+        $this->objectName = $objectName;
+    }
 
     public function bind(Request $request)
     {
@@ -220,7 +231,7 @@ abstract class AbstractGridSource implements GridSourceInterface
      */
     public function hasIdColumn()
     {
-        return false;
+        return $this->idColumn ? true : false;
     }
 
     /**

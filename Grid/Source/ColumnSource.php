@@ -3,7 +3,8 @@
 namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Dtc\GridBundle\Annotation\Action;
 use Dtc\GridBundle\Annotation\DeleteAction;
 use Dtc\GridBundle\Annotation\Grid;
@@ -12,7 +13,7 @@ use Dtc\GridBundle\Annotation\Sort;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 use Dtc\GridBundle\Util\CamelCaseTrait;
 
-trait ColumnExtractionTrait
+class ColumnSource
 {
     use CamelCaseTrait;
 
@@ -30,6 +31,22 @@ trait ColumnExtractionTrait
 
     /** @var array|null */
     protected $annotationColumns;
+
+    protected $objectManager;
+
+    protected $classMetadata;
+
+    protected $objectName;
+
+    protected $columns;
+
+    protected $idColumn;
+
+    public function __construct(ObjectManager $objectManager, $objectName)
+    {
+        $this->objectManager = $objectManager;
+        $this->objectName = $objectName;
+    }
 
     /**
      * @var array|null
@@ -58,10 +75,40 @@ trait ColumnExtractionTrait
     }
 
     /**
-     * @return ClassMetadataInfo|ClassMetadataInfo
+     * @return ClassMetadata
      */
-    abstract public function getClassMetadata();
+    public function getClassMetadata()
+    {
+        if ($this->classMetadata) {
+            return $this->classMetadata;
+        }
+        $metaFactory = $this->objectManager->getMetadataFactory();
 
+        return $this->classMetadata = $metaFactory->getMetadataFor($this->objectName);
+    }
+
+    /**
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function getColumns()
+    {
+        if (!$this->columns) {
+            $this->autoDiscoverColumns();
+        }
+
+        return $this->columns;
+    }
+
+    public function setColumns($columns)
+    {
+        $this->columns = $columns;
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function autoDiscoverColumns()
     {
         $annotationColumns = $this->getAnnotationColumns();
@@ -76,6 +123,8 @@ trait ColumnExtractionTrait
 
     /**
      * @return array|null
+     *
+     * @throws \Exception
      */
     public function getDefaultSort()
     {
@@ -422,6 +471,10 @@ trait ColumnExtractionTrait
         $identifier = $metadata->getIdentifier();
         $identifier = isset($identifier[0]) ? $identifier[0] : null;
 
+        if (!method_exists($metadata, 'getFieldMapping')) {
+            return array();
+        }
+
         $columns = array();
         foreach ($fields as $field) {
             $mapping = $metadata->getFieldMapping($field);
@@ -445,18 +498,15 @@ trait ColumnExtractionTrait
     /**
      * @return string|null
      */
-    protected function getIdColumn()
+    public function getIdColumn()
     {
-        static $identifier = false;
-        if (false !== $identifier) {
-            return $identifier;
+        if (null !== $this->idColumn) {
+            $metadata = $this->getClassMetadata();
+            $identifier = $metadata->getIdentifier();
+            $this->idColumn = isset($identifier[0]) ? $identifier[0] : false;
         }
 
-        $metadata = $this->getClassMetadata();
-        $identifier = $metadata->getIdentifier();
-        $identifier = isset($identifier[0]) ? $identifier[0] : null;
-
-        return $identifier;
+        return $this->idColumn ?: null;
     }
 
     public function hasIdColumn()

@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Dtc\GridBundle\Grid\Source\ColumnSource;
 use Dtc\GridBundle\Grid\Source\DocumentGridSource;
 use Dtc\GridBundle\Grid\Source\EntityGridSource;
 use Dtc\GridBundle\Grid\Source\GridSourceInterface;
@@ -87,6 +88,8 @@ class GridSourceManager
      * @param $entityOrDocument
      *
      * @return DocumentGridSource|EntityGridSource|null
+     *
+     * @throws \Exception
      */
     protected function getGridSource($manager, $entityOrDocument)
     {
@@ -100,16 +103,20 @@ class GridSourceManager
             if (!$annotation && !isset($this->reflectionAllowedEntities[$entityOrDocument]) && null !== $this->reflectionAllowedEntities) {
                 throw new \Exception("GridSource requested for '$entityOrDocument' but no Grid annotation found");
             }
-            if ($manager instanceof EntityManagerInterface) {
-                $gridSource = new EntityGridSource($manager, $name);
-            } else {
-                $gridSource = new DocumentGridSource($manager, $name);
-            }
-            $gridSource->setAnnotationReader($this->reader);
-            $gridSource->setCacheDir($this->cacheDir);
+            $columnSource = new ColumnSource($manager, $name);
+            $columnSource->setAnnotationReader($this->reader);
+            $columnSource->setCacheDir($this->cacheDir);
+            $columnSource->setDebug($this->debug);
 
-            $gridSource->setDebug($this->debug);
-            $gridSource->autoDiscoverColumns();
+            if ($manager instanceof EntityManagerInterface) {
+                $gridSource = new EntityGridSource($manager, $name, $columnSource->getIdColumn());
+            } else {
+                if (!$manager instanceof DocumentManager) {
+                    throw new \Exception('Unknown ObjectManager type: '.get_class($manager));
+                }
+                $gridSource = new DocumentGridSource($manager, $name, $columnSource->getIdColumn());
+            }
+            $gridSource->setColumns($columnSource->getColumns());
             $this->sourcesByName[$name] = $gridSource;
             $this->sourcesByClass[$className] = $gridSource;
             $gridSource->setId($className);
