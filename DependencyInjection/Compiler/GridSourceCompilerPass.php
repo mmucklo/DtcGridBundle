@@ -35,6 +35,12 @@ class GridSourceCompilerPass implements CompilerPassInterface
         }
     }
 
+    /**
+     * @param ContainerBuilder $container
+     * @param $id
+     *
+     * @throws \ReflectionException
+     */
     public static function addGridSource(ContainerBuilder $container, $id)
     {
         $sourceManager = $container->getDefinition('dtc_grid.manager.source');

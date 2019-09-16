@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 
-class EntityGridSource extends AbstractGridSource
+class EntityGridSource extends AbstractDoctrineGridSource
 {
     /**
      * @return \Doctrine\ORM\QueryBuilder

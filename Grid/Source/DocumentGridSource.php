@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 
-class DocumentGridSource extends AbstractGridSource
+class DocumentGridSource extends AbstractDoctrineGridSource
 {
     protected $repository;
     protected $findCache;

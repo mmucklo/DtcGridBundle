@@ -136,6 +136,39 @@ class ColumnSource
     }
 
     /**
+     * @param $cacheDir
+     * @param $fqn
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    public static function createCacheFilename($cacheDir, $fqn)
+    {
+        $directory = $cacheDir.'/DtcGridBundle';
+        $umask = decoct(umask());
+        $umask = str_pad($umask, 4, '0', STR_PAD_LEFT);
+
+        // Is there a better way to do this?
+        $permissions = '0777';
+        $permissions[1] = intval($permissions[1]) - intval($umask[1]);
+        $permissions[2] = intval($permissions[2]) - intval($umask[2]);
+        $permissions[3] = intval($permissions[3]) - intval($umask[3]);
+
+        $name = str_replace('\\', DIRECTORY_SEPARATOR, $fqn);
+        $filename = $directory.DIRECTORY_SEPARATOR.$name.'.php';
+
+        if (($dir = dirname($filename)) && !is_dir($dir) && !mkdir($dir, octdec($permissions), true)) {
+            throw new \Exception("Can't create: ".$dir);
+        }
+        if (!is_writable($dir)) {
+            throw new \Exception("Can't write to: ".$dir);
+        }
+
+        return $filename;
+    }
+
+    /**
      * Populates the filename for the annotationCache.
      *
      * @return string
@@ -147,31 +180,11 @@ class ColumnSource
         if (isset($this->annotationCacheFilename)) {
             return $this->annotationCacheFilename;
         }
-        $directory = $this->cacheDir.'/DtcGridBundle';
         $metadata = $this->getClassMetadata();
         $reflectionClass = $metadata->getReflectionClass();
         $name = $reflectionClass->getName();
-        $namespace = $reflectionClass->getNamespaceName();
-        $namespace = str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
-        $namespaceDir = $directory.DIRECTORY_SEPARATOR.$namespace;
 
-        $umask = decoct(umask());
-        $umask = str_pad($umask, 4, '0', STR_PAD_LEFT);
-
-        // Is there a better way to do this?
-        $permissions = '0777';
-        $permissions[1] = intval($permissions[1]) - intval($umask[1]);
-        $permissions[2] = intval($permissions[2]) - intval($umask[2]);
-        $permissions[3] = intval($permissions[3]) - intval($umask[3]);
-
-        if (!is_dir($namespaceDir) && !mkdir($namespaceDir, octdec($permissions), true)) {
-            throw new \Exception("Can't create: ".$namespaceDir);
-        }
-
-        $name = str_replace('\\', DIRECTORY_SEPARATOR, $name);
-        $this->annotationCacheFilename = $directory.DIRECTORY_SEPARATOR.$name.'.php';
-
-        return $this->annotationCacheFilename;
+        return $this->annotationCacheFilename = self::createCacheFilename($this->cacheDir, $name);
     }
 
     /**
