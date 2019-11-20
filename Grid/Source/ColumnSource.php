@@ -6,17 +6,19 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Dtc\GridBundle\Annotation\Action;
+use Dtc\GridBundle\Annotation\Column;
 use Dtc\GridBundle\Annotation\DeleteAction;
 use Dtc\GridBundle\Annotation\Grid;
 use Dtc\GridBundle\Annotation\ShowAction;
 use Dtc\GridBundle\Annotation\Sort;
 use Dtc\GridBundle\Grid\Column\GridColumn;
-use Dtc\GridBundle\Util\CamelCaseTrait;
+use Dtc\GridBundle\Util\CamelCase;
+use Dtc\GridBundle\Util\ColumnUtil;
+use Exception;
+use InvalidArgumentException;
 
 class ColumnSource
 {
-    use CamelCaseTrait;
-
     /** @var Reader|null */
     protected $reader;
 
@@ -27,10 +29,10 @@ class ColumnSource
     protected $debug = false;
 
     /** @var string */
-    protected $annotationCacheFilename;
+    protected $cacheFilename;
 
     /** @var array|null */
-    protected $annotationColumns;
+    protected $cachedColumns;
 
     protected $objectManager;
 
@@ -51,7 +53,7 @@ class ColumnSource
     /**
      * @var array|null
      */
-    protected $annotationSort;
+    protected $cachedSort;
 
     public function setDebug($flag)
     {
@@ -90,7 +92,7 @@ class ColumnSource
     /**
      * @return mixed
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getColumns()
     {
@@ -107,13 +109,13 @@ class ColumnSource
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function autoDiscoverColumns()
     {
-        $annotationColumns = $this->getAnnotationColumns();
-        if ($annotationColumns) {
-            $this->setColumns($annotationColumns);
+        $cachedColumns = $this->getCachedColumns();
+        if ($cachedColumns) {
+            $this->setColumns($cachedColumns);
 
             return;
         }
@@ -124,48 +126,15 @@ class ColumnSource
     /**
      * @return array|null
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getDefaultSort()
     {
-        if (null !== $this->getAnnotationColumns()) {
-            return $this->annotationSort;
+        if (null !== $this->getCachedColumns()) {
+            return $this->cachedSort;
         }
 
         return null;
-    }
-
-    /**
-     * @param $cacheDir
-     * @param $fqn
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    public static function createCacheFilename($cacheDir, $fqn)
-    {
-        $directory = $cacheDir.'/DtcGridBundle';
-        $umask = decoct(umask());
-        $umask = str_pad($umask, 4, '0', STR_PAD_LEFT);
-
-        // Is there a better way to do this?
-        $permissions = '0777';
-        $permissions[1] = intval($permissions[1]) - intval($umask[1]);
-        $permissions[2] = intval($permissions[2]) - intval($umask[2]);
-        $permissions[3] = intval($permissions[3]) - intval($umask[3]);
-
-        $name = str_replace('\\', DIRECTORY_SEPARATOR, $fqn);
-        $filename = $directory.DIRECTORY_SEPARATOR.$name.'.php';
-
-        if (($dir = dirname($filename)) && !is_dir($dir) && !mkdir($dir, octdec($permissions), true)) {
-            throw new \Exception("Can't create: ".$dir);
-        }
-        if (!is_writable($dir)) {
-            throw new \Exception("Can't write to: ".$dir);
-        }
-
-        return $filename;
     }
 
     /**
@@ -173,26 +142,26 @@ class ColumnSource
      *
      * @return string
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function populateAnnotationCacheFilename()
+    protected function populateCacheFilename()
     {
-        if (isset($this->annotationCacheFilename)) {
-            return $this->annotationCacheFilename;
+        if (isset($this->cacheFilename)) {
+            return $this->cacheFilename;
         }
         $metadata = $this->getClassMetadata();
         $reflectionClass = $metadata->getReflectionClass();
         $name = $reflectionClass->getName();
 
-        return $this->annotationCacheFilename = self::createCacheFilename($this->cacheDir, $name);
+        return $this->cacheFilename = ColumnUtil::createCacheFilename($this->cacheDir, $name);
     }
 
     /**
      * Attempt to discover columns using the GridColumn annotation.
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function getAnnotationColumns()
+    protected function getCachedColumns()
     {
         if (!isset($this->reader)) {
             return null;
@@ -202,37 +171,37 @@ class ColumnSource
             return null;
         }
 
-        if (!isset($this->annotationCacheFilename)) {
-            $this->populateAnnotationCacheFilename();
+        if (!isset($this->cacheFilename)) {
+            $this->populateCacheFilename();
         }
 
-        if (!$this->debug && null !== $this->annotationColumns) {
-            return $this->annotationColumns ?: null;
+        if (!$this->debug && null !== $this->cachedColumns) {
+            return $this->cachedColumns ?: null;
         }
 
         // Check mtime of class
-        if (is_file($this->annotationCacheFilename)) {
-            $result = $this->tryIncludeAnnotationCache();
+        if (is_file($this->cacheFilename)) {
+            $result = $this->tryIncludeColumnCache();
             if ($result) {
-                return $this->annotationColumns;
+                return $this->cachedColumns;
             }
         }
 
         // cache annotation
         $this->populateAndCacheAnnotationColumns();
 
-        return $this->annotationColumns ?: null;
+        return $this->cachedColumns ?: null;
     }
 
     /**
      * Cached annotation info from the file, if the mtime of the file has not changed (or if not in debug).
-     *
      * @return bool
+     * @throws Exception
      */
-    protected function tryIncludeAnnotationCache()
+    protected function tryIncludeColumnCache()
     {
         if (!$this->debug) {
-            $this->includeAnnotationCache();
+            $this->includeColumnCache();
 
             return true;
         }
@@ -245,9 +214,9 @@ class ColumnSource
             if (($currentfileMtime = filemtime(__FILE__)) > $mtime) {
                 $mtime = $currentfileMtime;
             }
-            $mtimeAnnotation = filemtime($this->annotationCacheFilename);
+            $mtimeAnnotation = filemtime($this->cacheFilename);
             if ($mtime && $mtimeAnnotation && $mtime <= $mtimeAnnotation) {
-                $this->includeAnnotationCache();
+                $this->includeColumnCache();
 
                 return true;
             }
@@ -257,58 +226,47 @@ class ColumnSource
     }
 
     /**
-     * Retrieves the cached annotations from the cache file.
+     * @param string $cacheDir
+     * @param string $filename
+     * @throws Exception
      */
-    protected function includeAnnotationCache()
+    public static function cacheClassesFromFile($cacheDir, $filename) {
+        $classes = ColumnUtil::extractClassesFromFile($filename);
+        foreach ($classes as $class => $columnInfo) {
+            $filename = ColumnUtil::createCacheFilename($cacheDir, $class);
+            ColumnUtil::populateCacheFile($filename, $columnInfo);
+        }
+    }
+
+    /**
+     * Retrieves the cached annotations from the cache file.
+     * @throws Exception
+     */
+    protected function includeColumnCache()
     {
-        $annotationInfo = include $this->annotationCacheFilename;
-        $this->annotationColumns = $annotationInfo['columns'];
-        $this->annotationSort = $annotationInfo['sort'];
-        if ($this->annotationSort) {
-            $this->validateSortInfo($this->annotationSort, $this->annotationColumns);
+        $columnInfo = include $this->cacheFilename;
+        if (!isset($columnInfo['columns'])) {
+            throw new Exception("Bad column cache, missing columns: {$this->cacheFilename}");
+        }
+        if (!isset($columnInfo['sort'])) {
+            throw new Exception("Bad column cache, missing sort: {$this->cacheFilename}");
+        }
+        $this->cachedColumns = $columnInfo['columns'];
+        $this->cachedSort = $columnInfo['sort'];
+        if ($this->cachedSort) {
+            $this->validateSortInfo($this->cachedSort, $this->cachedColumns);
         }
     }
 
     /**
      * Caches the annotation columns result into a file.
+     * @throws Exception
      */
     protected function populateAndCacheAnnotationColumns()
     {
         $gridAnnotations = $this->readGridAnnotations();
-        $annotationColumns = $gridAnnotations['columns'];
-
-        $sort = $gridAnnotations['sort'];
-        if ($annotationColumns) {
-            $output = "<?php\nreturn array('columns' => array(\n";
-            foreach ($annotationColumns as $field => $info) {
-                $class = $info['class'];
-                $output .= "'$field' => new $class(";
-                $first = true;
-                foreach ($info['arguments'] as $argument) {
-                    if ($first) {
-                        $first = false;
-                    } else {
-                        $output .= ',';
-                    }
-                    $output .= var_export($argument, true);
-                }
-                $output .= '),';
-            }
-            $output .= "), 'sort' => array(";
-            foreach ($sort as $key => $value) {
-                $output .= "'$key'".' => ';
-                if (null === $value) {
-                    $output .= 'null,';
-                } else {
-                    $output .= "'$value',";
-                }
-            }
-            $output .= "));\n";
-        } else {
-            $output = "<?php\nreturn false;\n";
-        }
-        file_put_contents($this->annotationCacheFilename, $output);
-        $this->includeAnnotationCache();
+        ColumnUtil::populateCacheFile($this->cacheFilename, $gridAnnotations);
+        $this->includeColumnCache();
     }
 
     /**
@@ -324,20 +282,22 @@ class ColumnSource
 
         /** @var Grid $gridAnnotation */
         $sort = null;
+        $sortMulti = null;
         if ($gridAnnotation = $this->reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid')) {
             $actions = $gridAnnotation->actions;
             $sort = $gridAnnotation->sort;
+            $sortMulti = $gridAnnotation->sortMulti;
         }
 
         $gridColumns = [];
         foreach ($properties as $property) {
-            /** @var \Dtc\GridBundle\Annotation\Column $annotation */
+            /** @var Column $annotation */
             $annotation = $this->reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
             if ($annotation) {
                 $name = $property->getName();
-                $label = $annotation->label ?: $this->fromCamelCase($name);
+                $label = $annotation->label ?: CamelCase::fromCamelCase($name);
                 $gridColumns[$name] = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$name, $label]];
-                $gridColumns[$name]['arguments'][] = null;
+                $gridColumns[$name]['arguments'][] = isset($annotation->formatter) ? $annotation->formatter : null;
                 if ($annotation->sortable) {
                     $gridColumns[$name]['arguments'][] = ['sortable' => true];
                 } else {
@@ -379,31 +339,45 @@ class ColumnSource
         }
 
         $this->sortGridColumns($gridColumns);
-        try {
-            $sortInfo = $this->extractSortInfo($sort);
-            $this->validateSortInfo($sortInfo, $gridColumns);
-        } catch (\InvalidArgumentException $exception) {
-            throw new \InvalidArgumentException($reflectionClass->getName().' - '.$exception->getMessage(), $exception->getCode(), $exception);
+
+        if ($sort) {
+            if ($sortMulti) {
+                throw new InvalidArgumentException($reflectionClass->getName().' - '. "Can't have sort and sortMulti defined on Grid annotation");
+            }
+            $sortMulti = [$sort];
         }
 
-        return ['columns' => $gridColumns, 'sort' => $sortInfo];
+        $sortList = [];
+        try {
+            foreach ($sortMulti as $sortDef) {
+                $sortInfo = $this->extractSortInfo($sortDef);
+                $this->validateSortInfo($sortInfo, $gridColumns);
+                if (isset($sortInfo['column'])) {
+                    $sortList[$sortInfo['column']] = $sortInfo['direction'];
+                }
+            }
+        } catch (InvalidArgumentException $exception) {
+            throw new InvalidArgumentException($reflectionClass->getName().' - '.$exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return ['columns' => $gridColumns, 'sort' => $sortList];
     }
 
     /**
      * @param array $sortInfo
      * @param array $gridColumns
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function validateSortInfo(array $sortInfo, array $gridColumns)
     {
-        if ($sortInfo['direction']) {
+        if (isset($sortInfo['direction'])) {
             switch ($sortInfo['direction']) {
                 case 'ASC':
                 case 'DESC':
                     break;
                 default:
-                    throw new \InvalidArgumentException("Grid's sort annotation direction '{$sortInfo['direction']}' is invalid");
+                    throw new InvalidArgumentException("Grid's sort annotation direction '{$sortInfo['direction']}' is invalid");
             }
         }
 
@@ -411,14 +385,12 @@ class ColumnSource
             $column = $sortInfo['column'];
 
             if (!isset($sortInfo['direction'])) {
-                throw new \InvalidArgumentException("Grid's sort annotation column '$column' specified but a sort direction was not");
+                throw new InvalidArgumentException("Grid's sort annotation column '$column' specified but a sort direction was not");
             }
-            foreach (array_keys($gridColumns) as $name) {
-                if ($name === $column) {
-                    return;
-                }
+            if (isset($gridColumns[$column])) {
+                return;
             }
-            throw new \InvalidArgumentException("Grid's sort annotation column '$column' not in list of columns (".implode(', ', array_keys($gridColumns)).')');
+            throw new InvalidArgumentException("Grid's sort annotation column '$column' not in list of columns (".implode(', ', array_keys($gridColumns)).')');
         }
     }
 
@@ -494,7 +466,7 @@ class ColumnSource
             if (isset($mapping['options']) && isset($mapping['options']['label'])) {
                 $label = $mapping['options']['label'];
             } else {
-                $label = $this->fromCamelCase($field);
+                $label = CamelCase::fromCamelCase($field);
             }
 
             if ($identifier === $field) {
