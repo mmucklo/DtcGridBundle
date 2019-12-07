@@ -3,7 +3,7 @@
 namespace Dtc\GridBundle\Generator;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
-use Dtc\GridBundle\Util\CamelCaseTrait;
+use Dtc\GridBundle\Util\CamelCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  */
 class GridSourceGenerator extends Generator
 {
-    use CamelCaseTrait;
 
     private $saveCache;
     private $skeletonDir;
@@ -42,7 +41,7 @@ class GridSourceGenerator extends Generator
 
         $fields = array();
         foreach ($this->getFieldsFromMetadata($metadata) as $field) {
-            $fields[$field] = $this->fromCamelCase($field);
+            $fields[$field] = CamelCase::fromCamelCase($field);
         }
 
         $params = array(
