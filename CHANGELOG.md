@@ -1,3 +1,5 @@
+5.1.1
+   * Fix travis and scrutinizer.
 5.1.0
    * Backwards compatibility fix for reflection allowed entities.
 5.0.0
