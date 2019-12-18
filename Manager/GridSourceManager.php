@@ -43,13 +43,20 @@ class GridSourceManager
      * @param string $cacheDir
      * @param bool   $debug
      */
-    public function __construct(Reader $reader, $allowedEntities, $cacheDir, $debug = false)
+    public function __construct(Reader $reader, $cacheDir, $debug = false)
     {
         $this->cacheDir = $cacheDir;
         $this->reader = $reader;
-        $this->reflectionAllowedEntities = is_array($allowedEntities) ? array_flip($allowedEntities) : ('*' === $allowedEntities ? null : []);
+        $this->reflectionAllowedEntities = [];
         $this->debug = $debug;
         $this->sources = array();
+    }
+
+    /**
+     * @param array|string $allowedEntities Array of allowed entities or string '*' to allow all entities. Use empty array to specify no entities allowed for reflection.
+     */
+    public function setReflectionAllowedEntities($allowedEntities) {
+        $this->reflectionAllowedEntities = is_array($allowedEntities) ? array_flip($allowedEntities) : ('*' === $allowedEntities ? null : []);
     }
 
     public function setRegistry(AbstractManagerRegistry $registry)

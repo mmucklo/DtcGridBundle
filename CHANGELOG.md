@@ -1,3 +1,5 @@
+5.1.0
+   * Backwards compatibility fix for reflection allowed entities.
 5.0.0
    * Support for other languages (Issue #14) - see [dtc_grid.yaml](Resources/config/dtc_grid.yaml) for more info
    * Default reflection support for all entities (using an allow_entities config - see [dtc_grid.yaml](Resources/config/dtc_grid.yaml))

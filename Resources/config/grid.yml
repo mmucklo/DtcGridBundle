@@ -24,9 +24,10 @@ services:
         class: Dtc\GridBundle\Manager\GridSourceManager
         arguments:
             - "@annotation_reader"
-            - '%dtc_grid.reflection.allowed_entities%'
             - "%kernel.cache_dir%"
             - "%kernel.debug%"
+        calls:
+            - [ 'setReflectionAllowedEntities', ['%dtc_grid.reflection.allowed_entities%']]
     dtc_grid.twig.extension:
         class: Dtc\GridBundle\Twig\Extension\TwigExtension
         tags:
