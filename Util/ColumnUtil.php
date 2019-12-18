@@ -104,10 +104,10 @@ class ColumnUtil {
                 continue;
             }
             $class = ltrim($class, "\\");
-            $classes[$class]['columns'] = [];
             if (!class_exists($class)) {
                 throw new Exception("$class - class does not exist");
             }
+            $classes[$class]['columns'] = [];
             foreach ($info['columns'] as $name => $columnDef) {
                 $label = isset($columnDef['label']) ? $columnDef['label'] : CamelCase::fromCamelCase($name);
                 $column = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$name, $label]];
