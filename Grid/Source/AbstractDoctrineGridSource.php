@@ -10,13 +10,15 @@ abstract class AbstractDoctrineGridSource extends AbstractGridSource
     protected $idColumn;
     protected $objectName;
 
-    public function __construct(ObjectManager $objectManager, $objectName, $idColumn)
+    public function __construct(ObjectManager $objectManager, $objectName)
     {
         $this->objectManager = $objectManager;
-        $this->idColumn = $idColumn;
         $this->objectName = $objectName;
     }
 
+    public function setIdColumn($idColumn) {
+        $this->idColumn = $idColumn;
+    }
     public function hasIdColumn()
     {
         return $this->idColumn ? true : false;

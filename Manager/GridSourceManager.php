@@ -116,13 +116,14 @@ class GridSourceManager
             $columnSource->setDebug($this->debug);
 
             if ($manager instanceof EntityManagerInterface) {
-                $gridSource = new EntityGridSource($manager, $name, $columnSource->getIdColumn());
+                $gridSource = new EntityGridSource($manager, $name);
             } else {
                 if (!$manager instanceof DocumentManager) {
                     throw new \Exception('Unknown ObjectManager type: '.get_class($manager));
                 }
-                $gridSource = new DocumentGridSource($manager, $name, $columnSource->getIdColumn());
+                $gridSource = new DocumentGridSource($manager, $name);
             }
+            $gridSource->setIdColumn($columnSource->getIdColumn());
             $gridSource->setColumns($columnSource->getColumns());
             $this->sourcesByName[$name] = $gridSource;
             $this->sourcesByClass[$className] = $gridSource;

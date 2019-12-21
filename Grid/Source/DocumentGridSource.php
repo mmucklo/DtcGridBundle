@@ -11,9 +11,9 @@ class DocumentGridSource extends AbstractDoctrineGridSource
     protected $repository;
     protected $findCache;
 
-    public function __construct(DocumentManager $documentManager, $documentName, $idColumn)
+    public function __construct(DocumentManager $documentManager, $documentName)
     {
-        parent::__construct($documentManager, $documentName, $idColumn);
+        parent::__construct($documentManager, $documentName);
         $this->repository = $documentManager->getRepository($documentName);
     }
 
