@@ -112,7 +112,7 @@ class ColumnUtil {
                 $label = isset($columnDef['label']) ? $columnDef['label'] : CamelCase::fromCamelCase($name);
                 $column = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$name, $label]];
                 $column['arguments'][] = isset($columnDef['formatter']) ? $columnDef['formatter'] : null;
-                if ($columnDef['sortable']) {
+                if (isset($columnDef['sortable'])) {
                     $column['arguments'][] = ['sortable' => $columnDef['sortable'] ? true : false];
                 } else {
                     $column['arguments'][] = [];
