@@ -161,12 +161,8 @@ class ColumnSource
      *
      * @throws Exception
      */
-    protected function getCachedColumns()
+    public function getCachedColumns()
     {
-        if (!isset($this->reader)) {
-            return null;
-        }
-
         if (!isset($this->cacheDir)) {
             return null;
         }
@@ -179,7 +175,7 @@ class ColumnSource
             return $this->cachedColumns ?: null;
         }
 
-        // Check mtime of class
+        // Try to include them from the cached file if exists.
         if (is_file($this->cacheFilename)) {
             $result = $this->tryIncludeColumnCache();
             if ($result) {
@@ -187,8 +183,10 @@ class ColumnSource
             }
         }
 
-        // cache annotation
-        $this->populateAndCacheAnnotationColumns();
+        // Try annotations.
+        if (isset($this->reader)) {
+            $this->populateAndCacheAnnotationColumns();
+        }
 
         return $this->cachedColumns ?: null;
     }
@@ -200,7 +198,8 @@ class ColumnSource
      */
     protected function tryIncludeColumnCache()
     {
-        if (!$this->debug) {
+        // In production, or if we're sure there's no annotaitons, just include the cache.
+        if (!$this->debug || !isset($this->reader)) {
             $this->includeColumnCache();
 
             return true;
@@ -485,7 +484,7 @@ class ColumnSource
      */
     public function getIdColumn()
     {
-        if (null !== $this->idColumn) {
+        if (!isset($this->idColumn)) {
             $metadata = $this->getClassMetadata();
             $identifier = $metadata->getIdentifier();
             $this->idColumn = isset($identifier[0]) ? $identifier[0] : false;

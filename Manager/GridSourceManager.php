@@ -107,13 +107,19 @@ class GridSourceManager
             $name = $classMetadata->getName();
             $reflectionClass = $classMetadata->getReflectionClass();
             $annotation = $this->reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid');
-            if (!$annotation && !isset($this->reflectionAllowedEntities[$entityOrDocument]) && null !== $this->reflectionAllowedEntities) {
-                throw new \Exception("GridSource requested for '$entityOrDocument' but no Grid annotation found");
-            }
+            /** @TODO make the classes below dependency injected, if possible. */
+
             $columnSource = new ColumnSource($manager, $name);
-            $columnSource->setAnnotationReader($this->reader);
             $columnSource->setCacheDir($this->cacheDir);
             $columnSource->setDebug($this->debug);
+            if (!$annotation && !isset($this->reflectionAllowedEntities[$entityOrDocument]) && null !== $this->reflectionAllowedEntities) {
+                if (!$columnSource->getCachedColumns()) {
+                    throw new \Exception("GridSource requested for '$entityOrDocument' but no Grid annotation found");
+                }
+            } else {
+                $columnSource->setAnnotationReader($this->reader);
+            }
+
 
             if ($manager instanceof EntityManagerInterface) {
                 $gridSource = new EntityGridSource($manager, $name);
