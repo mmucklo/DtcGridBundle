@@ -193,7 +193,9 @@ class ColumnSource
 
     /**
      * Cached annotation info from the file, if the mtime of the file has not changed (or if not in debug).
+     *
      * @return bool
+     *
      * @throws Exception
      */
     protected function tryIncludeColumnCache()
@@ -227,9 +229,11 @@ class ColumnSource
     /**
      * @param string $cacheDir
      * @param string $filename
+     *
      * @throws Exception
      */
-    public static function cacheClassesFromFile($cacheDir, $filename) {
+    public static function cacheClassesFromFile($cacheDir, $filename)
+    {
         $classes = ColumnUtil::extractClassesFromFile($filename);
         foreach ($classes as $class => $columnInfo) {
             $filename = ColumnUtil::createCacheFilename($cacheDir, $class);
@@ -239,6 +243,7 @@ class ColumnSource
 
     /**
      * Retrieves the cached annotations from the cache file.
+     *
      * @throws Exception
      */
     protected function includeColumnCache()
@@ -259,6 +264,7 @@ class ColumnSource
 
     /**
      * Caches the annotation columns result into a file.
+     *
      * @throws Exception
      */
     protected function populateAndCacheAnnotationColumns()
@@ -341,7 +347,7 @@ class ColumnSource
 
         if ($sort) {
             if ($sortMulti) {
-                throw new InvalidArgumentException($reflectionClass->getName().' - '. "Can't have sort and sortMulti defined on Grid annotation");
+                throw new InvalidArgumentException($reflectionClass->getName().' - '."Can't have sort and sortMulti defined on Grid annotation");
             }
             $sortMulti = [$sort];
         }

@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  */
 class GridSourceGenerator extends Generator
 {
-
     private $saveCache;
     private $skeletonDir;
 

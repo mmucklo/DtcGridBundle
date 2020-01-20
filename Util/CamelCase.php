@@ -11,7 +11,9 @@ class CamelCase
      */
     public static function fromCamelCase($str)
     {
-        $value = preg_replace_callback('/([A-Z])/', function ($str) { return ' '.$str[0]; }, $str);
+        $value = preg_replace_callback('/([A-Z])/', function ($str) {
+            return ' '.$str[0];
+        }, $str);
         $value = ucfirst($value);
 
         return trim($value);

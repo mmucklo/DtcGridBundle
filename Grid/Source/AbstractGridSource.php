@@ -216,7 +216,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return bool Returns true if this GridSource has an ID or false otherwise.
+     * @return bool returns true if this GridSource has an ID or false otherwise
      */
     public function hasIdColumn()
     {
@@ -226,7 +226,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     /**
      * @param $id
      *
-     * @return mixed|null Returns the row identified by Id if found.
+     * @return mixed|null returns the row identified by Id if found
      */
     public function find($id)
     {

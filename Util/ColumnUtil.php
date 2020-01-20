@@ -6,7 +6,8 @@ use Dtc\GridBundle\Annotation\Action;
 use Symfony\Component\Yaml\Yaml;
 use Exception;
 
-class ColumnUtil {
+class ColumnUtil
+{
     /**
      * @param $cacheDir
      * @param $fqn
@@ -43,9 +44,10 @@ class ColumnUtil {
 
     /**
      * @param string $filename
-     * @param array $classInfo
+     * @param array  $classInfo
      */
-    public static function populateCacheFile($filename, array $classInfo) {
+    public static function populateCacheFile($filename, array $classInfo)
+    {
         $columns = isset($classInfo['columns']) ? $classInfo['columns'] : [];
         $sort = isset($classInfo['sort']) ? $classInfo['sort'] : [];
 
@@ -83,10 +85,13 @@ class ColumnUtil {
 
     /**
      * @param string $filename
+     *
      * @return array
+     *
      * @throws Exception
      */
-    public static function extractClassesFromFile($filename) {
+    public static function extractClassesFromFile($filename)
+    {
         // @TODO probably break this into multiple functions
         if (!is_readable($filename)) {
             throw new Exception("Can't read {$filename}");
@@ -103,7 +108,7 @@ class ColumnUtil {
                 // @TODO some kind of warning here - or try to read using reflection?
                 continue;
             }
-            $class = ltrim($class, "\\");
+            $class = ltrim($class, '\\');
             if (!class_exists($class)) {
                 throw new Exception("$class - class does not exist");
             }
@@ -129,16 +134,16 @@ class ColumnUtil {
                 /* @var Action $action */
                 foreach ($info['actions'] as $action) {
                     if (!isset($action['label'])) {
-                        throw new Exception("$class - action definition missing 'label' ". print_r($action, true));
+                        throw new Exception("$class - action definition missing 'label' ".print_r($action, true));
                     }
                     if (!isset($action['route'])) {
-                        throw new Exception("$class - action definition missing 'route' ". print_r($action, true));
+                        throw new Exception("$class - action definition missing 'route' ".print_r($action, true));
                     }
                     if (!isset($action['type'])) {
-                        throw new Exception("$class - action definition missing 'type' ". print_r($action, true));
+                        throw new Exception("$class - action definition missing 'type' ".print_r($action, true));
                     }
                     $actionDef = ['label' => $action['label'], 'route' => $action['route']];
-                    switch($action['type']) {
+                    switch ($action['type']) {
                         case 'show':
                             $actionDef['action'] = 'show';
                             break;
@@ -146,19 +151,19 @@ class ColumnUtil {
                             $actionDef['action'] = 'delete';
                             break;
                         default:
-                            throw new Exception("$class - action definition unknown 'type' {$action['type']} ". print_r($action, true));
+                            throw new Exception("$class - action definition unknown 'type' {$action['type']} ".print_r($action, true));
                     }
                     $actionDefs[] = $actionDef;
                 }
                 $actionArgs[] = $actionDefs;
-                $classes[$class]['columns'][$field] = ['class' => '\Dtc\GridBundle\Grid\Column\ActionGridColumn', 'arguments' => $actionArgs, ];
+                $classes[$class]['columns'][$field] = ['class' => '\Dtc\GridBundle\Grid\Column\ActionGridColumn', 'arguments' => $actionArgs];
             }
             if (isset($info['sort'])) {
-                foreach($info['sort'] as $key => $value) {
+                foreach ($info['sort'] as $key => $value) {
                     if (!isset($info['columns'][$key])) {
                         throw new Exception("$class - can't find sort column $key in list of columns.");
                     }
-                    switch($value) {
+                    switch ($value) {
                         case 'ASC':
                             break;
                         case 'DESC':
@@ -170,7 +175,7 @@ class ColumnUtil {
                 $classes[$class]['sort'] = $info['sort'];
             }
         }
+
         return $classes;
     }
-
 }

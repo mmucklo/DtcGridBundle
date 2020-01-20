@@ -55,7 +55,8 @@ class GridSourceManager
     /**
      * @param array|string $allowedEntities Array of allowed entities or string '*' to allow all entities. Use empty array to specify no entities allowed for reflection.
      */
-    public function setReflectionAllowedEntities($allowedEntities) {
+    public function setReflectionAllowedEntities($allowedEntities)
+    {
         $this->reflectionAllowedEntities = is_array($allowedEntities) ? array_flip($allowedEntities) : ('*' === $allowedEntities ? null : []);
     }
 
@@ -108,7 +109,6 @@ class GridSourceManager
             $reflectionClass = $classMetadata->getReflectionClass();
             $annotation = $this->reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid');
             /** @TODO make the classes below dependency injected, if possible. */
-
             $columnSource = new ColumnSource($manager, $name);
             $columnSource->setCacheDir($this->cacheDir);
             $columnSource->setDebug($this->debug);
@@ -119,7 +119,6 @@ class GridSourceManager
             } else {
                 $columnSource->setAnnotationReader($this->reader);
             }
-
 
             if ($manager instanceof EntityManagerInterface) {
                 $gridSource = new EntityGridSource($manager, $name);
