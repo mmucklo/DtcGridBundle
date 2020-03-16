@@ -71,39 +71,27 @@ class GridSourceCompilerPass implements CompilerPassInterface
     {
         $cacheDir = $container->getParameter('kernel.cache_dir');
         if ($container->hasParameter('kernel.project_dir')) {
-            $directory = $container->getParameter('kernel.project_dir').\DIRECTORY_SEPARATOR.'config'.\DIRECTORY_SEPARATOR.'dtc_grid';
-            self::cacheAllFilesInDirectory($cacheDir, [$directory]);
+            $directory = $container->getParameter('kernel.project_dir').'/config/dtc_grid';
+            if (is_dir($directory)) {
+                $finder = new Finder();
+                $finder->files()->in($directory);
+                self::cacheAllFiles($cacheDir, $finder);
+            }
         } elseif ($container->hasParameter('kernel.root_dir')) {
-            $searchDirectories[] = $container->getParameter('kernel.root_dir').\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'src'.\DIRECTORY_SEPARATOR.'Resources'.\DIRECTORY_SEPARATOR.'config';
-            $searchDirectories[] = $container->getParameter('kernel.root_dir').\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'src'.\DIRECTORY_SEPARATOR.'*'.\DIRECTORY_SEPARATOR.'Resources'.\DIRECTORY_SEPARATOR.'config';
-            $searchDirectories[] = $container->getParameter('kernel.root_dir').\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'src'.\DIRECTORY_SEPARATOR.'*'.\DIRECTORY_SEPARATOR.'*'.\DIRECTORY_SEPARATOR.'Resources'.\DIRECTORY_SEPARATOR.'config';
-            $searchDirectories[] = $container->getParameter('kernel.root_dir').\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'src'.\DIRECTORY_SEPARATOR.'*'.\DIRECTORY_SEPARATOR.'*'.\DIRECTORY_SEPARATOR.'*'.\DIRECTORY_SEPARATOR.'Resources'.\DIRECTORY_SEPARATOR.'config';
-            self::cacheAllFilesInDirectory($cacheDir, $searchDirectories, function ($filename) {
-                if ('dtc_grid.yaml' === $filename || 'dtc_grid.yml' === $filename) {
-                    return true;
-                }
-
-                return false;
-            });
+            $directory = $container->getParameter('kernel.root_dir').'/../src';
+            $finder = new Finder();
+            $finder->files()->in($directory)->name('dtc_grid.yaml')->name('dtc_grid.yml')->path('Resources/config');
+            self::cacheAllFiles($cacheDir, $finder);
         }
     }
 
     /**
      * @param $cacheDir
-     * @param $directory
-     * @param \Closure|null $checkFunc
-     *
+     * @param Finder $finder
      * @throws \Exception
      */
-    private static function cacheAllFilesInDirectories($cacheDir, array $directories, \Closure $checkFunc = null)
-    {
-        $finder = new Finder();
-        $finder->ignoreUnreadableDirs()->files()->in($directories);
+    private static function cacheAllFiles($cacheDir, Finder $finder) {
         foreach ($finder as $file) {
-            $filename = $file->getFilename();
-            if (null !== $checkFunc && !$checkFunc($filename)) {
-                continue;
-            }
             ColumnUtil::cacheClassesFromFile($cacheDir, $file->getRealPath());
         }
     }
