@@ -25,6 +25,8 @@ class Column implements Annotation
      */
     public $searchable = false;
 
+    public $formatter;
+
     /**
      * Defaults to null
      * If there are ordered and null-annotated columns, null ones will appear last.

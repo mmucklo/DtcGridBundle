@@ -23,7 +23,7 @@ Supports both Doctrine ORM and Doctrine MongoDB ODM
 Installation
 ------------
 
-### Symfony 4
+### Symfony 4/5
 
 ```
     composer.phar require mmucklo/grid-bundle
@@ -45,7 +45,7 @@ You may see something like this (please answer 'y' to the question if prompted):
   - Configuring mmucklo/grid-bundle (>=5.0): From github.com/symfony/recipes-contrib:master
 ```
 
-### symfony 2/3
+### Symfony 2/3
     
 Add this to your AppKernel.php file:
 
@@ -73,13 +73,87 @@ Usage
 
 After installation, all entities and documents that have a Grid annotation should be available off the dtc_grid route:
 
-(NOTE: symfony4 example below, for symfony2/3, the namespace for the class may be different - e.g. AppBundle instead of App)
+(NOTE: symfony5 example below, for symfony2/3, the namespace for the class may be different - e.g. AppBundle instead of App)
 
 There are two recommended ways to setup a grid for a page, through Annotations, or through Reflection
 
 #### Reflection
 
 Automatic Grid setup is possible by setting the reflections: allowed_entities: [...] parameter in the config/packages/dtc_grid.yaml configuration file (or config.yml for symfony <= 3.4)
+
+```yaml
+dtc_grid:
+    reflection:
+        # allow any entity to be shown via the /dtc_grid route
+        # allowed_entities: ~, '*', or an array of entity names [ 'App:Product', 'App:Category', ... ]
+        #  ~ - no entities allowed for reflection
+        #  * - all entities allowed for reflection
+        #  [ 'App:Product', 'App:Category' ] - only App:Product and App:Category allowed
+        allowed_entities: ~
+```
+
+#### (New in 6.0) grid yaml file definition
+
+You can place the grid column definitions in a custom yaml file:
+
+##### Step 1 - create the yaml file:
+```yaml
+# File location(s):
+#   - symfony 4+: config/dtc_grid/*.yaml (will load all *.yaml files in this directory)
+#   - symfony 2/3: src/*/*/Resources/config/dtc_grid.yaml (will only load files with this name or the name 'dtc_grid.yml')
+#   - custom (bundles): add the following to a CompilerPass:
+#        # $cacheDir = $container->getParameter('kernel.cache_dir');
+#        \Dtc\GridBundle\Grid\Source\ColumnSource::cacheClassesFromFile($cacheDir, $filename);
+App\User:
+  columns:
+    id:
+      sortable: true
+    username:
+      sortable: true
+      searchable: true
+    email:
+      searchable: true
+    createdAt:
+      sortable: true
+    updatedAt:
+      sortable: true
+    status:
+      sortable: true
+      searchable: true
+  actions:
+    -
+      label: Show
+      type: show
+      route: dtc_grid_show
+    -
+      label: Archive
+      type: delete
+      route: dtc_grid_delete
+  sort:
+    id: ASC
+
+App\Article:
+  columns:
+    id:
+      sortable: true
+    userId:
+      sortable: true
+    createdAt:
+      sortable: true
+    updatedAt:
+      sortable: true
+    subject:
+      searchable: true
+    status:
+      sortable: true
+  actions:
+    -
+      label: Show
+      type: show
+      route: dtc_grid_show
+  sort:
+    createdAt: DESC
+```
 
 #### Annotation Simple Example
 

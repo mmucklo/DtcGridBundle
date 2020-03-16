@@ -6,28 +6,28 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 
-class DocumentGridSource extends AbstractGridSource
+class DocumentGridSource extends AbstractDoctrineGridSource
 {
-    use ColumnExtractionTrait;
-
-    protected $documentManager;
     protected $repository;
     protected $findCache;
-    protected $documentName;
 
     public function __construct(DocumentManager $documentManager, $documentName)
     {
-        $this->documentManager = $documentManager;
+        parent::__construct($documentManager, $documentName);
         $this->repository = $documentManager->getRepository($documentName);
-        $this->documentName = $documentName;
     }
 
     /**
      * @return \Doctrine\ODM\MongoDB\Query\Builder
+     *
+     * @throws \Exception
      */
     protected function getQueryBuilder()
     {
-        $qb = $this->documentManager->createQueryBuilder($this->documentName);
+        if (!$this->objectManager instanceof DocumentManager) {
+            throw new \Exception("Should be DocumentManager, instead it's ".get_class($this->objectManager));
+        }
+        $qb = $this->objectManager->createQueryBuilder($this->objectName);
 
         /** @var ClassMetadata $classMetaData */
         $classMetaData = $this->getClassMetadata();
@@ -88,15 +88,23 @@ class DocumentGridSource extends AbstractGridSource
 
     /**
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function getClassMetadata()
     {
-        $metaFactory = $this->documentManager->getMetadataFactory();
-        $classInfo = $metaFactory->getMetadataFor($this->documentName);
+        $metaFactory = $this->objectManager->getMetadataFactory();
+        $classInfo = $metaFactory->getMetadataFor($this->objectName);
 
         return $classInfo;
     }
 
+    /**
+     * @return mixed
+     *
+     * @throws \Doctrine\ODM\MongoDB\MongoDBException
+     * @throws \Exception
+     */
     public function getCount()
     {
         $result = $this->getQueryBuilder()->limit(0)->skip(0)->count()->getQuery()->execute();
@@ -104,35 +112,60 @@ class DocumentGridSource extends AbstractGridSource
         return $result;
     }
 
+    /**
+     * @return mixed
+     *
+     * @throws \Doctrine\ODM\MongoDB\MongoDBException
+     * @throws \Exception
+     */
     public function getRecords()
     {
         return $this->getQueryBuilder()->getQuery()->execute()->toArray(false);
     }
 
+    /**
+     * @param $id
+     *
+     * @return mixed|null
+     *
+     * @throws \Exception
+     */
     public function find($id)
     {
-        if (!$this->hasIdColumn()) {
-            throw new \Exception('No id column found for '.$this->documentName);
+        if (!$this->objectManager instanceof DocumentManager) {
+            throw new \Exception('should be DocumentManager, instead'.get_class($this->objectManager));
         }
-        $qb = $this->documentManager->createQueryBuilder($this->documentName);
-        $idColumn = $this->getIdColumn();
-        $qb->field($idColumn)->equals($id);
+        if (!$this->hasIdColumn()) {
+            throw new \Exception('No id column found for '.$this->objectName);
+        }
+        $qb = $this->objectManager->createQueryBuilder($this->objectName);
+        $qb->field($this->idColumn)->equals($id);
         $result = $qb->getQuery()->execute()->toArray(false);
         if (isset($result[0])) {
             return $result[0];
         }
     }
 
+    /**
+     * @param $id
+     * @param bool   $soft
+     * @param string $softColumn
+     * @param string $softColumnType
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
     public function remove($id, $soft = false, $softColumn = 'deletedAt', $softColumnType = 'datetime')
     {
         if (!$this->hasIdColumn()) {
-            throw new \Exception('No id column found for '.$this->documentName);
+            throw new \Exception('No id column found for '.$this->objectName);
         }
-        $repository = $this->documentManager->getRepository($this->documentName);
+        $repository = $this->objectManager->getRepository($this->objectName);
         $document = $repository->find($id);
         if ($document) {
-            $this->documentManager->remove($document);
-            $this->documentManager->flush();
+            $this->objectManager->remove($document);
+            $this->objectManager->flush();
 
             return true;
         }

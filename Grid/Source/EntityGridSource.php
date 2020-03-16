@@ -6,21 +6,19 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 
-class EntityGridSource extends AbstractGridSource
+class EntityGridSource extends AbstractDoctrineGridSource
 {
-    use ColumnExtractionTrait;
-
-    protected $entityManager;
-    protected $entityName;
-
-    public function __construct(EntityManager $entityManager, $entityName)
-    {
-        $this->entityManager = $entityManager;
-        $this->entityName = $entityName;
-    }
-
+    /**
+     * @return \Doctrine\ORM\QueryBuilder
+     *
+     * @throws \Exception
+     */
     protected function getQueryBuilder()
     {
+        if (!$this->objectManager instanceof EntityManager) {
+            throw new \Exception("Expected EntityManager, instead it's: ", get_class($this->objectManager));
+        }
+
         $columns = $this->getColumns();
         $fieldList = [];
         foreach ($columns as $column) {
@@ -29,14 +27,14 @@ class EntityGridSource extends AbstractGridSource
             }
         }
 
-        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $this->objectManager->createQueryBuilder();
         $orderBy = array();
         foreach ($this->orderBy as $key => $value) {
             $orderBy[] = "u.{$key} {$value}";
         }
 
         $qb->add('select', 'u')
-            ->add('from', "{$this->entityName} u")
+            ->add('from', "{$this->objectName} u")
             ->setFirstResult($this->offset)
             ->setMaxResults($this->limit);
 
@@ -95,15 +93,24 @@ class EntityGridSource extends AbstractGridSource
 
     /**
      * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     *
+     * @throws \Exception
      */
     public function getClassMetadata()
     {
-        $metaFactory = $this->entityManager->getMetadataFactory();
-        $classInfo = $metaFactory->getMetadataFor($this->entityName);
+        $metaFactory = $this->objectManager->getMetadataFactory();
+        $classInfo = $metaFactory->getMetadataFor($this->objectName);
 
         return $classInfo;
     }
 
+    /**
+     * @return mixed
+     *
+     * @throws \Exception
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
     public function getCount()
     {
         $oldOrderBy = $this->orderBy;
@@ -119,40 +126,62 @@ class EntityGridSource extends AbstractGridSource
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return array
+     *
+     * @throws \Exception
+     */
     public function getRecords()
     {
         return $this->getQueryBuilder()->getQuery()
             ->getResult();
     }
 
+    /**
+     * @param $id
+     *
+     * @return mixed|null
+     *
+     * @throws \Exception
+     */
     public function find($id)
     {
-        if (!$this->hasIdColumn()) {
-            throw new \Exception('No id column found for '.$this->entityName);
+        if (!$this->objectManager instanceof EntityManager) {
+            throw new \Exception("Expected EntityManager, instead it's: ", get_class($this->objectManager));
         }
-        $qb = $this->entityManager->createQueryBuilder();
-        $idColumn = $this->getIdColumn();
-        $qb->from($this->entityName, 'a');
+
+        if (!$this->hasIdColumn()) {
+            throw new \Exception('No id column found for '.$this->objectName);
+        }
+        $qb = $this->objectManager->createQueryBuilder();
+        $qb->from($this->objectName, 'a');
         $qb->select('a.'.implode(',a.', $this->getClassMetadata()->getFieldNames()));
-        $qb->where('a.'.$idColumn.' = :id')->setParameter(':id', $id);
+        $qb->where('a.'.$this->idColumn.' = :id')->setParameter(':id', $id);
         $result = $qb->getQuery()->execute();
         if (isset($result[0])) {
             return $result[0];
         }
     }
 
+    /**
+     * @param $id
+     *
+     * @return bool
+     *
+     * @throws \Exception|\Doctrine\ORM\OptimisticLockException
+     */
     public function remove($id)
     {
         if (!$this->hasIdColumn()) {
-            throw new \Exception('No id column found for '.$this->entityName);
+            throw new \Exception('No id column found for '.$this->objectName);
         }
 
-        $repository = $this->entityManager->getRepository($this->entityName);
+        $repository = $this->objectManager->getRepository($this->objectName);
         $entity = $repository->find($id);
 
         if ($entity) {
-            $this->entityManager->remove($entity);
-            $this->entityManager->flush();
+            $this->objectManager->remove($entity);
+            $this->objectManager->flush();
 
             return true;
         }

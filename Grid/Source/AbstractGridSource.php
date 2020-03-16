@@ -16,10 +16,11 @@ abstract class AbstractGridSource implements GridSourceInterface
     protected $id = 'grid';
     protected $columns;
     protected $parameters;
+    protected $defaultSort;
 
     public function bind(Request $request)
     {
-        // Change limit, offset
+        // Change limit, offset.
         if ($limit = $request->get('limit')) {
             $this->limit = $limit;
         }
@@ -48,9 +49,14 @@ abstract class AbstractGridSource implements GridSourceInterface
         }
     }
 
+    public function setDefaultSort($sort)
+    {
+        $this->defaultSort = $sort;
+    }
+
     public function getDefaultSort()
     {
-        return null;
+        return $this->defaultSort;
     }
 
     public function getId()
@@ -121,7 +127,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return $limit
+     * @return int $limit
      */
     public function getLimit()
     {
@@ -137,7 +143,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return $offset
+     * @return int $offset
      */
     public function getOffset()
     {
@@ -153,7 +159,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return $filter
+     * @return array $filter
      */
     public function getFilter()
     {
@@ -161,15 +167,15 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @param $filter
+     * @param array $filter
      */
-    public function setFilter($filter)
+    public function setFilter(array $filter)
     {
         $this->filter = $filter;
     }
 
     /**
-     * @return $orderBy
+     * @return array $orderBy
      */
     public function getOrderBy()
     {
@@ -177,9 +183,9 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @param $orderBy
+     * @param array $orderBy
      */
-    public function setOrderBy($orderBy)
+    public function setOrderBy(array $orderBy)
     {
         $this->orderBy = $orderBy;
     }
@@ -200,7 +206,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @return $parameters
+     * @return array $parameters
      */
     public function getParameters()
     {
@@ -208,15 +214,15 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @param $parameters
+     * @param array $parameters
      */
-    public function setParameters($parameters)
+    public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
     }
 
     /**
-     * @return bool Returns true if this GridSource has an ID or false otherise
+     * @return bool returns true if this GridSource has an ID or false otherwise
      */
     public function hasIdColumn()
     {

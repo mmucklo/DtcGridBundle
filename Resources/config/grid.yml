@@ -19,14 +19,20 @@ services:
                 datatables.js: '%dtc_grid.datatables.js%'
                 datatables.class: '%dtc_grid.datatables.class%'
                 datatables.options: '%dtc_grid.datatables.options%'
+    dtc_grid.column.source:
+        public: true
+        class: Dtc\GridBundle\Grid\Column\ColumnSource
+        arguments:
+            - "%kernel.cache_dir%"
+            - "%kernel.debug%"
     dtc_grid.manager.source:
         public: true
         class: Dtc\GridBundle\Manager\GridSourceManager
         arguments:
-            - "@annotation_reader"
             - "%kernel.cache_dir%"
             - "%kernel.debug%"
         calls:
+            - [ 'setReader', ['@?annotation_reader']]
             - [ 'setReflectionAllowedEntities', ['%dtc_grid.reflection.allowed_entities%']]
     dtc_grid.twig.extension:
         class: Dtc\GridBundle\Twig\Extension\TwigExtension

@@ -15,11 +15,11 @@
     ],
     "require": {
         "php": ">=5.6.0",
-        "symfony/framework-bundle": "2.*|3.*|4.*",
-        "sensio/framework-extra-bundle": "2.*|3.*|4.*|5.*",
-        "symfony/templating": "2.*|3.*|4.*",
-        "symfony/translation": "2.*|3.*|4.*",
-        "symfony/twig-bundle": "2.*|3.*|4.*",
+        "symfony/framework-bundle": "2.*|3.*|4.*|5.*",
+        "sensio/framework-extra-bundle": "2.*|3.*|4.*|5.*|6.*",
+        "symfony/templating": "2.*|3.*|4.*|5.*",
+        "symfony/translation": "2.*|3.*|4.*|5.*",
+        "symfony/twig-bundle": "2.*|3.*|4.*|5.*",
         "twig/twig": "^1.0||^2.0"
     },
     "require-dev": {

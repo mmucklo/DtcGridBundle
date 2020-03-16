@@ -1,3 +1,9 @@
+6.0.0
+   * Symfony 5.0 support.
+   * Support for specifying grid definitions via Yaml.
+   * Fix sorting so that default sorting by multiple columns should now work properly.
+   * Allow formatter to be specified in annotations.
+   * Deprecate ColumnSourceTrait.
 5.1.1
    * Fix travis and scrutinizer.
 5.1.0

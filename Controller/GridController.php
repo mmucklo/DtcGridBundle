@@ -3,7 +3,7 @@
 namespace Dtc\GridBundle\Controller;
 
 use Dtc\GridBundle\Grid\Renderer\AbstractRenderer;
-use Dtc\GridBundle\Util\CamelCaseTrait;
+use Dtc\GridBundle\Util\CamelCase;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,8 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class GridController extends Controller
 {
-    use CamelCaseTrait;
-
     /**
      * @Route("/grid", name="dtc_grid")
      *
@@ -120,7 +118,7 @@ class GridController extends Controller
         }
         if (is_array($result)) {
             foreach ($result as $key => $value) {
-                $responseResult[$this->fromCamelCase($key)] = $value;
+                $responseResult[CamelCase::fromCamelCase($key)] = $value;
             }
         } elseif (method_exists($gridSource, 'getClassMetadata')) {
             $classMetadata = $gridSource->getClassMetadata();
@@ -128,7 +126,7 @@ class GridController extends Controller
             foreach ($fieldNames as $fieldName) {
                 $method = 'get'.ucfirst($fieldName);
                 if (method_exists($result, $method)) {
-                    $responseResult[$this->fromCamelCase($fieldName)] = $result->$method();
+                    $responseResult[CamelCase::fromCamelCase($fieldName)] = $result->$method();
                 }
             }
         }

@@ -19,4 +19,9 @@ class Grid implements Annotation
      * @var \Dtc\GridBundle\Annotation\Sort
      */
     public $sort;
+
+    /**
+     * @var array<\Dtc\GridBundle\Annotation\Sort>
+     */
+    public $sortMulti;
 }

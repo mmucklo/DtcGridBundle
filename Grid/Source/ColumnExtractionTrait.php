@@ -10,12 +10,15 @@ use Dtc\GridBundle\Annotation\Grid;
 use Dtc\GridBundle\Annotation\ShowAction;
 use Dtc\GridBundle\Annotation\Sort;
 use Dtc\GridBundle\Grid\Column\GridColumn;
-use Dtc\GridBundle\Util\CamelCaseTrait;
+use Dtc\GridBundle\Util\CamelCase;
 
+/**
+ * Trait ColumnExtractionTrait.
+ *
+ * @deprecated
+ */
 trait ColumnExtractionTrait
 {
-    use CamelCaseTrait;
-
     /** @var Reader|null */
     protected $reader;
 
@@ -273,7 +276,7 @@ trait ColumnExtractionTrait
             $annotation = $this->reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
             if ($annotation) {
                 $name = $property->getName();
-                $label = $annotation->label ?: $this->fromCamelCase($name);
+                $label = $annotation->label ?: CamelCase::fromCamelCase($name);
                 $gridColumns[$name] = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$name, $label]];
                 $gridColumns[$name]['arguments'][] = null;
                 if ($annotation->sortable) {
@@ -428,7 +431,7 @@ trait ColumnExtractionTrait
             if (isset($mapping['options']) && isset($mapping['options']['label'])) {
                 $label = $mapping['options']['label'];
             } else {
-                $label = $this->fromCamelCase($field);
+                $label = CamelCase::fromCamelCase($field);
             }
 
             if ($identifier === $field) {
