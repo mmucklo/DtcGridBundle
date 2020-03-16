@@ -45,7 +45,7 @@ You may see something like this (please answer 'y' to the question if prompted):
   - Configuring mmucklo/grid-bundle (>=5.0): From github.com/symfony/recipes-contrib:master
 ```
 
-### symfony 2/3
+### Symfony 2/3
     
 Add this to your AppKernel.php file:
 
