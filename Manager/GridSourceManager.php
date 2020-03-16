@@ -9,6 +9,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Dtc\GridBundle\Grid\Source\ColumnSource;
+use Dtc\GridBundle\Grid\Source\ColumnSourceInfo;
 use Dtc\GridBundle\Grid\Source\DocumentGridSource;
 use Dtc\GridBundle\Grid\Source\EntityGridSource;
 use Dtc\GridBundle\Grid\Source\GridSourceInterface;
@@ -19,8 +20,6 @@ class GridSourceManager
     protected $sourcesByName;
 
     protected $reader;
-    protected $cacheDir;
-    protected $debug;
 
     /** @var AbstractManagerRegistry */
     protected $registry;
@@ -32,6 +31,7 @@ class GridSourceManager
 
     protected $extraGridSources;
 
+    protected $columnSource;
     /**
      * @var array|null Null means all entities allowed, empty array means no entities allowed
      */
@@ -39,17 +39,17 @@ class GridSourceManager
 
     /**
      * GridSourceManager constructor.
-     *
-     * @param string $cacheDir
-     * @param bool   $debug
      */
-    public function __construct(Reader $reader, $cacheDir, $debug = false)
+    public function __construct(ColumnSource $columnSource)
     {
-        $this->cacheDir = $cacheDir;
-        $this->reader = $reader;
+        $this->columnSource = $columnSource;
         $this->reflectionAllowedEntities = [];
-        $this->debug = $debug;
         $this->sources = array();
+    }
+
+    public function setReader(Reader $reader)
+    {
+        $this->reader = $reader;
     }
 
     /**
@@ -70,22 +70,6 @@ class GridSourceManager
         $this->mongodbRegistry = $registry;
     }
 
-    /**
-     * @return string
-     */
-    protected function getCacheDir()
-    {
-        return $this->cacheDir;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function getDebug()
-    {
-        return $this->debug;
-    }
-
     public function add($id, GridSourceInterface $gridSource)
     {
         $this->extraGridSources[$id] = $gridSource;
@@ -94,6 +78,7 @@ class GridSourceManager
     /**
      * @param ObjectManager $manager
      * @param $entityOrDocument
+     *z
      *
      * @return DocumentGridSource|EntityGridSource|null
      *
@@ -105,39 +90,48 @@ class GridSourceManager
         if ($repository) {
             $className = $repository->getClassName();
             $classMetadata = $manager->getClassMetadata($className);
+            $params = [$manager, $entityOrDocument, null === $this->reflectionAllowedEntities || isset($this->reflectionAllowedEntities[$entityOrDocument])];
+            if ($this->reader) {
+                $params[] = $this->reader;
+            }
+            $columnSourceInfo = call_user_func_array([$this->columnSource, 'getColumnSourceInfo'], $params);
             $name = $classMetadata->getName();
-            $reflectionClass = $classMetadata->getReflectionClass();
-            $annotation = $this->reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid');
-            /** @TODO make the classes below dependency injected, if possible. */
-            $columnSource = new ColumnSource($manager, $name);
-            $columnSource->setCacheDir($this->cacheDir);
-            $columnSource->setDebug($this->debug);
-            if (!$annotation && !isset($this->reflectionAllowedEntities[$entityOrDocument]) && null !== $this->reflectionAllowedEntities) {
-                if (!$columnSource->getCachedColumns()) {
-                    throw new \Exception("GridSource requested for '$entityOrDocument' but no Grid annotation found");
-                }
-            } else {
-                $columnSource->setAnnotationReader($this->reader);
+            if ($columnSourceInfo) {
+                return $this->getGridSourceFromColumnSourceInfo($manager, $className, $name, $columnSourceInfo);
             }
-
-            if ($manager instanceof EntityManagerInterface) {
-                $gridSource = new EntityGridSource($manager, $name);
-            } else {
-                if (!$manager instanceof DocumentManager) {
-                    throw new \Exception('Unknown ObjectManager type: '.get_class($manager));
-                }
-                $gridSource = new DocumentGridSource($manager, $name);
-            }
-            $gridSource->setIdColumn($columnSource->getIdColumn());
-            $gridSource->setColumns($columnSource->getColumns());
-            $this->sourcesByName[$name] = $gridSource;
-            $this->sourcesByClass[$className] = $gridSource;
-            $gridSource->setId($className);
-
-            return $gridSource;
         }
 
         return null;
+    }
+
+    /**
+     * @param $manager
+     * @param $className
+     * @param $name
+     * @param ColumnSourceInfo $columnSourceInfo
+     *
+     * @return DocumentGridSource|EntityGridSource
+     *
+     * @throws \Exception
+     */
+    private function getGridSourceFromColumnSourceInfo($manager, $className, $name, ColumnSourceInfo $columnSourceInfo)
+    {
+        if ($manager instanceof EntityManagerInterface) {
+            $gridSource = new EntityGridSource($manager, $name);
+        } else {
+            if (!$manager instanceof DocumentManager) {
+                throw new \Exception('Unknown ObjectManager type: '.get_class($manager));
+            }
+            $gridSource = new DocumentGridSource($manager, $name);
+        }
+        $gridSource->setIdColumn($columnSourceInfo->idColumn);
+        $gridSource->setColumns($columnSourceInfo->columns);
+        $this->sourcesByName[$name] = $gridSource;
+        $this->sourcesByClass[$className] = $gridSource;
+        $gridSource->setId($className);
+        $gridSource->setDefaultSort($columnSourceInfo->sort);
+
+        return $gridSource;
     }
 
     /**

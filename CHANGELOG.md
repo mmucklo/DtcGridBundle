@@ -1,3 +1,6 @@
+6.0.0
+   * Symfony 5.0 support.
+   * Support for specifying grid definitions via Yaml.
 5.1.0
    * Backwards compatibility fix for reflection allowed entities.
 5.0.0

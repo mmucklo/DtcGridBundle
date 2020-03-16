@@ -16,6 +16,7 @@ abstract class AbstractGridSource implements GridSourceInterface
     protected $id = 'grid';
     protected $columns;
     protected $parameters;
+    protected $defaultSort;
 
     public function bind(Request $request)
     {
@@ -48,9 +49,14 @@ abstract class AbstractGridSource implements GridSourceInterface
         }
     }
 
+    public function setDefaultSort($sort)
+    {
+        $this->defaultSort = $sort;
+    }
+
     public function getDefaultSort()
     {
-        return null;
+        return $this->defaultSort;
     }
 
     public function getId()

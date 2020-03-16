@@ -84,6 +84,21 @@ class ColumnUtil
     }
 
     /**
+     * @param string $cacheDir
+     * @param string $filename
+     *
+     * @throws Exception
+     */
+    public static function cacheClassesFromFile($cacheDir, $filename)
+    {
+        $classes = self::extractClassesFromFile($filename);
+        foreach ($classes as $class => $columnInfo) {
+            $filename = ColumnUtil::createCacheFilename($cacheDir, $class);
+            self::populateCacheFile($filename, $columnInfo);
+        }
+    }
+
+    /**
      * @param string $filename
      *
      * @return array
