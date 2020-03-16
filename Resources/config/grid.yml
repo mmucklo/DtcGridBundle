@@ -29,8 +29,7 @@ services:
         public: true
         class: Dtc\GridBundle\Manager\GridSourceManager
         arguments:
-            - "%kernel.cache_dir%"
-            - "%kernel.debug%"
+            - "@dtc_grid.column.source"
         calls:
             - [ 'setReader', ['@?annotation_reader']]
             - [ 'setReflectionAllowedEntities', ['%dtc_grid.reflection.allowed_entities%']]
