@@ -4,6 +4,7 @@ namespace Dtc\GridBundle\DependencyInjection\Compiler;
 
 use Dtc\GridBundle\Util\ColumnUtil;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -77,9 +78,9 @@ class GridSourceCompilerPass implements CompilerPassInterface
                 $finder = new Finder();
                 $finder->files()->in(str_replace(\DIRECTORY_SEPARATOR, '/', $directory));
                 self::cacheAllFiles($cacheDir, $finder);
+                $container->addResource(new DirectoryResource($directory));
             }
-
-            $container->addResource(new DirectoryResource($directory));
+            $container->addResource(new FileExistenceResource($directory));
         } elseif ($container->hasParameter('kernel.root_dir')) {
             // Typically Symfony versions < 4 using the older directory layout.
             $directory = str_replace(\DIRECTORY_SEPARATOR, '/', $container->getParameter('kernel.root_dir')).'/../src';

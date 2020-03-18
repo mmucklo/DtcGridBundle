@@ -1,3 +1,5 @@
+6.0.1
+   * Fix compiler pass error.
 6.0.0
    * Symfony 5.0 support.
    * Support for specifying grid definitions via Yaml.
