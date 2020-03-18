@@ -1,3 +1,5 @@
+6.0.2
+   * Fix column source issue with timestamps.
 6.0.1
    * Fix compiler pass error.
 6.0.0

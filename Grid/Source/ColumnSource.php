@@ -169,7 +169,7 @@ class ColumnSource
             if (($currentfileMtime = filemtime(__FILE__)) > $mtime) {
                 $mtime = $currentfileMtime;
             }
-            $mtimeAnnotation = filemtime($columnCacheFilename);
+            $mtimeAnnotation = file_exists($columnCacheFilename) ? filemtime($columnCacheFilename) : null;
             if ($mtime && $mtimeAnnotation && $mtime <= $mtimeAnnotation) {
                 return true;
             }
