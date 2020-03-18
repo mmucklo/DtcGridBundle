@@ -1,6 +1,6 @@
 {
     "name": "mmucklo/grid-bundle",
-    "description": "Datagrid for symfony2 or symfony3 or symfony4",
+    "description": "Datagrid for symfony2 or symfony3 or symfony4 or symfony5",
     "keywords": ["grid", "jQGrid", "table"],
     "type": "symfony-bundle",
     "license": "MIT",
