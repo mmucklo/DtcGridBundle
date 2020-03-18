@@ -21,7 +21,7 @@ services:
                 datatables.options: '%dtc_grid.datatables.options%'
     dtc_grid.column.source:
         public: true
-        class: Dtc\GridBundle\Grid\Column\ColumnSource
+        class: Dtc\GridBundle\Grid\Source\ColumnSource
         arguments:
             - "%kernel.cache_dir%"
             - "%kernel.debug%"
