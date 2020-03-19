@@ -1,9 +1,11 @@
+6.0.3
+   * Issue #19 - more fixes for Symfony 5.
 6.0.2
    * Fix column source issue with timestamps.
 6.0.1
    * Fix compiler pass error.
 6.0.0
-   * Symfony 5.0 support.
+   * Issue #19 - Symfony 5.0 support.
    * Support for specifying grid definitions via Yaml.
    * Fix sorting so that default sorting by multiple columns should now work properly.
    * Allow formatter to be specified in annotations.

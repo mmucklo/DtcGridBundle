@@ -4,20 +4,20 @@ namespace Dtc\GridBundle\Controller;
 
 use Dtc\GridBundle\Grid\Renderer\AbstractRenderer;
 use Dtc\GridBundle\Util\CamelCase;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-class GridController extends Controller
+class GridController
 {
-    /**
-     * @Route("/grid", name="dtc_grid")
-     *
-     * @param Request $request
-     */
-    public function gridAction(Request $request)
+    private $container;
+
+    public function __construct(ContainerInterface $container) {
+        $this->container = $container;
+    }
+
+    public function grid(Request $request)
     {
         $class = $request->get('class');
         if (!$class) {
@@ -28,7 +28,7 @@ class GridController extends Controller
             if (!$this->container->has($rendererId)) {
                 throw new \Exception("No renderer found with id $rendererId");
             }
-            if (!($renderer = $this->container->has($rendererId)) instanceof AbstractRenderer) {
+            if (!($renderer = $this->container->get($rendererId)) instanceof AbstractRenderer) {
                 throw new \Exception("Rennderer $rendererId must be instanace of Dtc\GridBundle\Grid\Renderer\AbstractRenderer");
             }
             if (!($view = $request->get('view'))) {
@@ -36,20 +36,23 @@ class GridController extends Controller
             }
         } else {
             $rendererType = $request->get('type', 'table');
-            $renderer = $this->get('dtc_grid.renderer.factory')->create($rendererType);
+            $renderer = $this->container->get('dtc_grid.renderer.factory')->create($rendererType);
             $view = '@DtcGrid/Page/'.$rendererType.'.html.twig';
         }
 
-        $gridSource = $this->get('dtc_grid.manager.source')->get($class);
+        $gridSource = $this->container->get('dtc_grid.manager.source')->get($class);
         $renderer->bind($gridSource);
 
-        return $this->render($view, $renderer->getParams());
+        if ($this->container->has('templating')) {
+            return new Response($this->container->get('templating')->render($view, $renderer->getParams()));
+        } else if ($this->container->has('twig')) {
+            return new Response($this->container->get('twig')->render($view, $renderer->getParams()));
+        }
+
+        throw new \Exception("Need Twig Bundle or Templating component installed");
     }
 
-    /**
-     * @Route("/data", name="dtc_grid_data")
-     */
-    public function dataAction(Request $request)
+    public function data(Request $request)
     {
         $rendererService = $request->get('renderer', 'datatables');
         if ($this->container->has($rendererService)) {
@@ -57,9 +60,9 @@ class GridController extends Controller
                 throw new \Exception("$rendererService not instance of Dtc\GridBundle\Grid\Renderer\AbstractRenderer");
             }
         } else {
-            $renderer = $this->get('dtc_grid.renderer.factory')->create($rendererService);
+            $renderer = $this->container->get('dtc_grid.renderer.factory')->create($rendererService);
         }
-        $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
+        $gridSource = $this->container->get('dtc_grid.manager.source')->get($request->get('id'));
 
         $response = new Response();
         $gridSource->bind($request); // Sets limit, offset, sort, filter, etc
@@ -100,15 +103,14 @@ class GridController extends Controller
     }
 
     /**
-     * @Route("/show", name="dtc_grid_show")
      *
      * @param Request $request
      *
      * @return JsonResponse|Response
      */
-    public function showAction(Request $request)
+    public function show(Request $request)
     {
-        $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
+        $gridSource = $this->container->get('dtc_grid.manager.source')->get($request->get('id'));
         $id = $request->get('identifier');
         $result = $gridSource->find($id);
 
@@ -135,15 +137,14 @@ class GridController extends Controller
     }
 
     /**
-     * @Route("/delete", name="dtc_grid_delete")
      *
      * @param Request $request
      *
      * @return Response
      */
-    public function deleteAction(Request $request)
+    public function delete(Request $request)
     {
-        $gridSource = $this->get('dtc_grid.manager.source')->get($request->get('id'));
+        $gridSource = $this->container->get('dtc_grid.manager.source')->get($request->get('id'));
         $id = $request->get('identifier');
         $gridSource->remove($id);
         $response = new Response();

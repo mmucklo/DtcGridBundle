@@ -45,3 +45,8 @@ services:
         class: Dtc\GridBundle\Command\GenerateGridSourceCommand
         tags:
             - { name: 'console.command' }
+    dtc_grid.controller.grid:
+        public: true
+        class: Dtc\GridBundle\Controller\GridController
+        arguments:
+            - "@service_container"
