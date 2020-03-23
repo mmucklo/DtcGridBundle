@@ -1,3 +1,5 @@
+6.0.8
+   * Issue #19 - fix typo.
 6.0.7
    * Issue #19 - fix TwigExtension.
 6.0.6
