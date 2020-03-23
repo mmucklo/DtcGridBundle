@@ -83,24 +83,26 @@ class DtcGridExtension extends Extension
     {
         if (!empty($config[$directory]['local'][$type])) {
             $container->setParameter('dtc_grid.'.$directory.'.local.'.$type, $config[$directory]['local'][$type]);
+
             return;
         }
 
-        $path = __DIR__ . \DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'Resources'.\DIRECTORY_SEPARATOR.'public'.\DIRECTORY_SEPARATOR.$type.\DIRECTORY_SEPARATOR.$directory;
+        $path = __DIR__.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'Resources'.\DIRECTORY_SEPARATOR.'public'.\DIRECTORY_SEPARATOR.$type.\DIRECTORY_SEPARATOR.$directory;
         if (!is_dir($path)) {
             $container->setParameter('dtc_grid.'.$directory.'.local.'.$type, []);
+
             return;
         }
         $finder = new Finder();
         $finder->files()->in(str_replace(\DIRECTORY_SEPARATOR, '/', $path));
         $localCss = [];
         $files = [];
-        foreach($finder as $fileInfo) {
+        foreach ($finder as $fileInfo) {
             $fileUrlpath = '/bundles/dtcgrid/'.$type.'/'.$directory.'/'.$fileInfo->getFilename();
             $filepath = $path.\DIRECTORY_SEPARATOR.$fileInfo->getFilename();
             $files[] = $filepath;
             $mtime = filemtime($filepath);
-            $localCss []= $fileUrlpath.'?v='.$mtime;
+            $localCss[] = $fileUrlpath.'?v='.$mtime;
         }
         $container->setParameter('dtc_grid.'.$directory.'.local.'.$type, $localCss);
         $container->setParameter('dtc_grid.'.$directory.'.local.files.'.$type, $files);

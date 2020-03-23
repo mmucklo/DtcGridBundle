@@ -13,7 +13,8 @@ class GridController
 {
     private $container;
 
-    public function __construct(ContainerInterface $container) {
+    public function __construct(ContainerInterface $container)
+    {
         $this->container = $container;
     }
 
@@ -45,11 +46,11 @@ class GridController
 
         if ($this->container->has('templating')) {
             return new Response($this->container->get('templating')->render($view, $renderer->getParams()));
-        } else if ($this->container->has('twig')) {
+        } elseif ($this->container->has('twig')) {
             return new Response($this->container->get('twig')->render($view, $renderer->getParams()));
         }
 
-        throw new \Exception("Need Twig Bundle or Templating component installed");
+        throw new \Exception('Need Twig Bundle or Templating component installed');
     }
 
     public function data(Request $request)
@@ -103,7 +104,6 @@ class GridController
     }
 
     /**
-     *
      * @param Request $request
      *
      * @return JsonResponse|Response
@@ -137,7 +137,6 @@ class GridController
     }
 
     /**
-     *
      * @param Request $request
      *
      * @return Response

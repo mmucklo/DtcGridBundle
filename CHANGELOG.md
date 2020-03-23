@@ -1,3 +1,5 @@
+6.0.7
+   * Issue #19 - fix TwigExtension.
 6.0.6
    * Issue #19 - fix TreeBuilder instantiation.
 6.0.5

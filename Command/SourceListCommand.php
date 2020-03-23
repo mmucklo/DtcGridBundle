@@ -24,7 +24,8 @@ class SourceListCommand extends Command
         ;
     }
 
-    public function setGridSourceManager(GridSourceManager $gridSourceManager) {
+    public function setGridSourceManager(GridSourceManager $gridSourceManager)
+    {
         $this->gridSourceManager = $gridSourceManager;
     }
 

@@ -35,6 +35,13 @@ class GridSourceCompilerPass implements CompilerPassInterface
         self::addGridFiles($container);
         self::addLocalCssJs($container, 'css');
         self::addLocalCssJs($container, 'js');
+        self::legacyTwigExtension($container);
+    }
+
+    private static function legacyTwigExtension(ContainerBuilder $container) {
+        if (!class_exists('Twig\Extension\AbstractExtension')) {
+            $container->getDefinition('dtc_grid.twig.extension')->setClass('Dtc\GridBundle\Twig\Extension\TwigExtensionLegacy')
+        }
     }
 
     private static function addDoctrine(ContainerBuilder $container)

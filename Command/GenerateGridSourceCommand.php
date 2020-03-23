@@ -39,19 +39,23 @@ class GenerateGridSourceCommand extends Command
         ;
     }
 
-    public function setRegistry(Registry $registry) {
+    public function setRegistry(Registry $registry)
+    {
         $this->registry = $registry;
     }
 
-    public function setEntityManager(EntityManagerInterface $entityManager) {
+    public function setEntityManager(EntityManagerInterface $entityManager)
+    {
         $this->entityManager = $entityManager;
     }
 
-    public function setDocumentManager(DocumentManager $documentManager) {
+    public function setDocumentManager(DocumentManager $documentManager)
+    {
         $this->documentManager = $documentManager;
     }
 
-    public function setMongoDBRegistry(ManagerRegistry $mongoDBRegistry) {
+    public function setMongoDBRegistry(ManagerRegistry $mongoDBRegistry)
+    {
         $this->mongoDBRegistry = $mongoDBRegistry;
     }
 

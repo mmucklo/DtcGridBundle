@@ -4,7 +4,6 @@ namespace Dtc\GridBundle\Generator;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Dtc\GridBundle\Util\CamelCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;

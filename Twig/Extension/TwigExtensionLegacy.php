@@ -2,21 +2,17 @@
 
 namespace Dtc\GridBundle\Twig\Extension;
 
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
-use Twig\TwigFunction;
-
-class TwigExtension extends AbstractExtension
+class TwigExtension extends \Twig_Extension
 {
     public function getFunction()
     {
         $names = array(
-                'format_cell' => 'format_cell',
+            'format_cell' => 'format_cell',
         );
 
         $funcs = array();
         foreach ($names as $twig => $local) {
-            $funcs[$twig] = new TwigFunction($twig, [$this, $local]);
+            $funcs[$twig] = new \Twig_SimpleFunction($twig, [$this, $local]);
         }
 
         return $funcs;
@@ -25,12 +21,12 @@ class TwigExtension extends AbstractExtension
     public function getFilters()
     {
         $names = array(
-                'format_cell' => 'format_cell',
+            'format_cell' => 'format_cell',
         );
 
         $funcs = array();
         foreach ($names as $twig => $local) {
-            $funcs[$twig] = new TwigFilter($twig, [$this, $local]);
+            $funcs[$twig] = new \Twig_SimpleFilter($twig, [$this, $local]);
         }
 
         return $funcs;

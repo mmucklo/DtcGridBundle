@@ -20,8 +20,8 @@ class DataTablesRenderer extends AbstractJqueryRenderer
 
     protected $dataTablesCss = [];
     protected $dataTablesJs = [];
-    private   $localCss = [];
-    private   $localJs = [];
+    private $localCss = [];
+    private $localJs = [];
 
     const MODE_AJAX = 1;
     const MODE_SERVER = 2;
@@ -58,19 +58,23 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         return $this->dataTablesJs;
     }
 
-    public function setDataTablesLocalCss(array $localCss) {
+    public function setDataTablesLocalCss(array $localCss)
+    {
         $this->localCss = $localCss;
     }
 
-    public function setDataTablesLocalJs(array $localJs) {
+    public function setDataTablesLocalJs(array $localJs)
+    {
         $this->localJs = $localJs;
     }
 
-    public function getDataTablesLocalCss() {
+    public function getDataTablesLocalCss()
+    {
         return $this->localCss;
     }
 
-    public function getDataTablesLocalJs() {
+    public function getDataTablesLocalJs()
+    {
         return $this->localJs;
     }
 
@@ -94,9 +98,10 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         }
         parent::getParams($params);
         $params['dtc_grid_datatables_css'] = $this->dataTablesCss;
-        $params['dtc_grid_datatables_js']  = $this->dataTablesJs;
-        $params['dtc_grid_local_css']      = $this->localCss;
-        $params['dtc_grid_local_js']       = $this->localJs;
+        $params['dtc_grid_datatables_js'] = $this->dataTablesJs;
+        $params['dtc_grid_local_css'] = $this->localCss;
+        $params['dtc_grid_local_js'] = $this->localJs;
+
         return $params;
     }
 

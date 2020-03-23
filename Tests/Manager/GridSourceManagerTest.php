@@ -2,7 +2,6 @@
 
 namespace Dtc\GridBundle\Tests\Manager;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Dtc\GridBundle\Grid\Source\ColumnSource;
 use Dtc\GridBundle\Manager\GridSourceManager;
 use Dtc\GridBundle\Tests\Grid\Source\TestGridSource;
