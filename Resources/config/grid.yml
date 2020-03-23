@@ -14,11 +14,32 @@ services:
                 table.options: '%dtc_grid.table_options%'
                 jq_grid.css: '%dtc_grid.jq_grid.css%'
                 jq_grid.js: '%dtc_grid.jq_grid.js%'
+                jq_grid.local.css: '%dtc_grid.jq_grid.local.css%'
+                jq_grid.local.js: '%dtc_grid.jq_grid.local.js%'
                 jq_grid.options: '%dtc_grid.jq_grid.options%'
                 datatables.css: '%dtc_grid.datatables.css%'
                 datatables.js: '%dtc_grid.datatables.js%'
+                datatables.local.css: '%dtc_grid.datatables.local.css%'
+                datatables.local.js: '%dtc_grid.datatables.local.js%'
                 datatables.class: '%dtc_grid.datatables.class%'
                 datatables.options: '%dtc_grid.datatables.options%'
+    dtc_grid.command.source_list:
+        public: true
+        class: Dtc\GridBundle\Command\SourceListCommand
+        calls:
+            - [ "setGridSourceManager", ['@dtc_grid.manager.source'] ]
+        tags:
+            - { name: console.command }
+    dtc_grid.command.generate_grid_source:
+        public: true
+        class: Dtc\GridBundle\Command\GenerateGridSourceCommand
+        calls:
+            - [ "setRegistry", ['@?doctrine'] ]
+            - [ "setMongoDBRegistry", ['@?doctrine_mongodb'] ]
+            - [ "setEntityManager", ['@?doctrine.orm.default_entity_manager'] ]
+            - [ "setDocumentManager", ['@?doctrine_mongodb.odm.default_document_manager'] ]
+        tags:
+            - { name: console.command }
     dtc_grid.column.source:
         public: true
         class: Dtc\GridBundle\Grid\Source\ColumnSource

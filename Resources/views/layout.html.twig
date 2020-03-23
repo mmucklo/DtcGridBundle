@@ -1,24 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-    {% block head %}
+{% block head %}
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>{% block title %}{% endblock %}</title>
+        {% block dtc_grid_stylesheets %}
+        {% endblock %}
         {% block stylesheets %}
             {% for stylesheet in dtc_grid_theme_css %}
-                <link rel="stylesheet" href="{{ stylesheet }}">
+                {% if stylesheet.url is defined %}
+                    <link rel="stylesheet" href="{{ stylesheet.url }}"
+                        {% if stylesheet.integrity is not empty %} integrity="{{ stylesheet.integrity }}"{% endif %}
+                        {% if stylesheet.crossorigin is not empty %} crossorigin="{{ stylesheet.crossorigin }}"{% endif %}
+                    >
+                {% else %}
+                    <link rel="stylesheet" href="{{ stylesheet }}">
+                {% endif %}
             {% endfor %}
-        {% endblock %}
-        {% block dtc_grid_stylesheets %}
+            {% for stylesheet in dtc_grid_local_css %}
+                <link rel="stylesheet" href="{{ app.request.baseUrl }}{{ stylesheet }}" />
+            {% endfor %}
         {% endblock %}
         {% block dtc_grid_javascripts %}
         {% endblock %}
         {% block javascripts %}
             {% for javascript in dtc_grid_theme_js %}
-                <script src="{{ javascript }}"></script>
+                {% if javascript.url is defined %}
+                    <script src="{{ javascript.url }}"
+                        {% if javascript.integrity is not empty %} integrity="{{ javascript.integrity }}"{% endif %}
+                        {% if javascript.crossorigin is not empty %} crossorigin="{{ javascript.crossorigin }}"{% endif %}
+                    ></script>
+                {% else %}
+                    <script src="{{ javascript }}"></script>
+                {% endif %}
+            {% endfor %}
+            {% for javascript in dtc_grid_local_js %}
+                <script src="{{ app.request.baseUrl }}{{ javascript }}"></script>
             {% endfor %}
         {% endblock javascripts %}
-    {% endblock %}
+{% endblock %}
 </head>
 <body>
 <div style="{{ dtc_grid_page_div_style }}">

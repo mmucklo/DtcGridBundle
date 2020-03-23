@@ -46,6 +46,8 @@ class JQGridRenderer extends AbstractJqueryRenderer
 
     protected $jqGridCss = [];
     protected $jqGridJs = [];
+    private $jqGridLocalCss = [];
+    private $jqGridLocalJs = [];
 
     protected function afterBind()
     {
@@ -124,6 +126,16 @@ class JQGridRenderer extends AbstractJqueryRenderer
         $this->jqGridJs = $js;
     }
 
+    public function setJqGridLocalCss(array $css)
+    {
+        $this->jqGridLocalCss = $css;
+    }
+
+    public function setJqGridLocalJs(array $js)
+    {
+        $this->jqGridLocalJs = $js;
+    }
+
     /**
      * @param array|null $params
      */
@@ -135,6 +147,8 @@ class JQGridRenderer extends AbstractJqueryRenderer
         parent::getParams($params);
         $params['dtc_grid_jq_grid_css'] = $this->jqGridCss;
         $params['dtc_grid_jq_grid_js'] = $this->jqGridJs;
+        $params['dtc_grid_local_css'] = $this->jqGridLocalCss;
+        $params['dtc_grid_local_js'] = $this->jqGridLocalJs;
 
         return $params;
     }

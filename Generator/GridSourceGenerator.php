@@ -18,10 +18,9 @@ class GridSourceGenerator extends Generator
     private $saveCache;
     private $skeletonDir;
 
-    public function __construct($skeletonDir, ContainerInterface $container)
+    public function __construct($skeletonDir)
     {
         $this->skeletonDir = $skeletonDir;
-        $this->container = $container;
     }
 
     protected function generateColumns(BundleInterface $bundle, $entity, $metadata)

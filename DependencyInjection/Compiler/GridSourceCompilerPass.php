@@ -5,6 +5,8 @@ namespace Dtc\GridBundle\DependencyInjection\Compiler;
 use Dtc\GridBundle\Util\ColumnUtil;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -12,6 +14,11 @@ use Symfony\Component\Finder\Finder;
 
 class GridSourceCompilerPass implements CompilerPassInterface
 {
+    /**
+     * @param ContainerBuilder $container
+     * @throws \ReflectionException
+     * @throws \Exception
+     */
     public function process(ContainerBuilder $container)
     {
         self::addDoctrine($container);
@@ -26,6 +33,8 @@ class GridSourceCompilerPass implements CompilerPassInterface
         }
 
         self::addGridFiles($container);
+        self::addLocalCssJs($container, 'css');
+        self::addLocalCssJs($container, 'js');
     }
 
     private static function addDoctrine(ContainerBuilder $container)
@@ -92,6 +101,15 @@ class GridSourceCompilerPass implements CompilerPassInterface
                 $container->addResource(new \Symfony\Component\Config\Resource\GlobResource(str_replace('/', \DIRECTORY_SEPARATOR, $directory),str_replace('/', \DIRECTORY_SEPARATOR, '/**/Resources/config/dtc_grid.yml'), false));
             }
             // TODO: To cover symfony versions that don't support GlobResource, such as 2.x, it would probably be necessary to add a recursive set of FileExistenceResources here.
+        }
+    }
+
+    private static function addLocalCssJs(ContainerBuilder $container, $type) {
+        $parameter = 'dtc_grid.datatables.local.files.'.$type;
+        if ($container->hasParameter($parameter)) {
+            foreach($container->getParameter($parameter) as $filepath) {
+                $container->addResource(new FileResource($filepath));
+            }
         }
     }
 

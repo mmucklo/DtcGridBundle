@@ -1,19 +1,23 @@
 <?php
 
 namespace Dtc\GridBundle\Generator;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 class Generator
 {
     protected function render($skeletonDir, $template, $parameters)
     {
-        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem($skeletonDir), array(
+        if (class_exists('Twig\Environment')) {
+            $environment = new Environment(new FilesystemLoader($skeletonDir), array(
                 'debug' => true,
                 'cache' => false,
                 'strict_variables' => true,
-                'autoescape' => false,
-        ));
-
-        return $twig->render($template, $parameters);
+                'autoescape' => false
+            ));
+            return $environment->render($template, $parameters);
+        }
+        throw new \Exception("Class not found: Twig\Environment");
     }
 
     protected function renderFile($skeletonDir, $template, $target, $parameters)

@@ -1,8 +1,3 @@
-log = function(value) {
-    if (console && console.log) {
-        console.log(value);
-    }
-};
 
 $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         fnCallback, bStandingRedraw) {
@@ -23,15 +18,15 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
         that.oApi._fnAjaxUpdateDraw( oSettings, json );
 
         /* Callback user function - for event handlers etc */
-        if (typeof fnCallback == 'function' && fnCallback != null) {
+        if (typeof fnCallback == 'function') {
             fnCallback(oSettings);
         }
 
         fnCallback = oSettings.oInit.fnInitComplete;
-        if (typeof fnCallback == 'function' && fnCallback != null) {
+        if (typeof fnCallback == 'function') {
             fnCallback(oSettings);
         }
-    }
+    };
 
     // Fetch data from server
     oSettings.fnServerData(oSettings.sAjaxSource, aData, ajaxCallBack, oSettings);
@@ -42,6 +37,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
  */
 (function($) {
     var _fnServerData = function(sUrl, aoData, fnCallback, oSettings) {
+        console.log("_fnServerData", sUrl, aoData, fnCallback, oSettings);
         var data = {
             limit: oSettings._iDisplayLength,
             offset: oSettings._iDisplayStart,
@@ -79,16 +75,17 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
                 oSettings.aaSorting.slice();
 
             for (var index in currentSorting) {
-                var sortedDirection = currentSorting[index][1];
-                var sortedColIndex = currentSorting[index][0];
-                var sortedCol = oSettings.aoColumns[sortedColIndex];
-                var fieldName = $(sortedCol.nTh).data('column-field');
+                if (currentSorting.hasOwnProperty(index)) {
+                    var sortedDirection = currentSorting[index][1];
+                    var sortedColIndex = currentSorting[index][0];
+                    var sortedCol = oSettings.aoColumns[sortedColIndex];
+                    var fieldName = $(sortedCol.nTh).data('column-field');
 
-                params.order[fieldName] = sortedDirection;
+                    params.order[fieldName] = sortedDirection;
+                }
             }
         }
         // Abort any current xhr
-
         if (oSettings.jqXHR) {
             oSettings.jqXHR.abort();
         }
@@ -111,7 +108,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
             error: function (xhr, error, thrown) {
                 //bootbox.alert("Error parsing the results");
 
-                if ( error == "parsererror" ) {
+                if ( error === "parsererror" ) {
                     oSettings.oApi._fnLog( oSettings, 0, "DataTables warning: JSON data from "+
                         "server could not be parsed. This is caused by a JSON formatting error." );
                 }
@@ -130,27 +127,29 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
     methods.init = function(options) {
         return this.each(function() {
             var $table = $(this);
-            var tableOptions = $table.data('jqtable');
 
+            var tableOptions = $table.data('dtc-grid-datatables');
+
+            var myoptions;
             if (!options) {
-                options = tableOptions;
+                myoptions = tableOptions;
             }
             else {
-                options = $.extend(tableOptions, options);
-                options = tableOptions;
+                myoptions = $.extend(tableOptions, options);
+                myoptions = tableOptions;
             }
 
-            if (!options) {
+            if (!myoptions) {
                 return;
             }
 
-            options.sServerMethod = 'POST';
-            options.bServerSide = true;
+            myoptions.sServerMethod = 'POST';
+            myoptions.bServerSide = true;
 
             // Override Server Data, we want to use the format Grids support!
-            options.fnServerData = _fnServerData;
+            myoptions.fnServerData = _fnServerData;
 
-            var dataTable = $table.DataTable(options);
+            var dataTable = $table.DataTable(myoptions);
             $table.data('datatable', dataTable);
         });
     };
@@ -158,13 +157,13 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
     methods.reload = function(keepState) {
         return this.each(function() {
             var $table = $(this);
-            var jqTable = $table.DataTable();
-            jqTable.fnReloadAjax();
+            var dtcGridDatatable = $table.DataTable();
+            dtcGridDatatable.fnReloadAjax();
         });
     };
 
     /**
-     * Filter takes jqTable's settings, then modifies
+     * Filter takes dtcGridDatatable's settings, then modifies
      *  the 'sAjaxSource' with new filter params, if resetPage is
      *  set, then modifies '_iDisplayStart' to 0 to kick the
      *  page back to page 1.
@@ -172,9 +171,9 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
     methods.filter = function(filters, resetPage) {
         return this.each(function() {
             var $table = $(this);
-            var jqTable = $table.DataTable();
+            var dtcGridDatatable = $table.DataTable();
 
-            var settings = jqTable.fnSettings();
+            var settings = dtcGridDatatable.fnSettings();
             var url = settings.sAjaxSource;
 
             if (!url) {
@@ -191,11 +190,11 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
 
             newUrl += '?' + $.param(params);
             settings.sAjaxSource = newUrl;
-            jqTable.fnReloadAjax();
+            dtcGridDatatable.fnReloadAjax();
         });
     };
 
-    $.fn.jqtable = function(method) {
+    $.fn.dtc_grid_datatables = function(method) {
         // Method calling logic
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
@@ -205,7 +204,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
                 return methods.init.apply(this, arguments);
             }
             else {
-                $.error('Method ' + method + ' does not exist on jQuery.jqtable');
+                $.error('Method ' + method + ' does not exist on jQuery.dtc_grid_datatables');
             }
         }
     };

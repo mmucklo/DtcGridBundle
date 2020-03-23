@@ -15,10 +15,14 @@ class RendererFactory
     protected $pageDivStyle;
     protected $jqGridJs;
     protected $jqGridCss;
+    protected $jqGridLocalJs;
+    protected $jqGridLocalCss;
     protected $jqGridOptions;
     protected $tableOptions;
     protected $dataTablesCss;
     protected $dataTablesJs;
+    protected $dataTablesLocalCss;
+    protected $dataTablesLocalJs;
     protected $dataTablesClass;
     protected $dataTablesOptions;
     protected $jQuery;
@@ -38,10 +42,14 @@ class RendererFactory
         $this->purl = $config['purl'];
         $this->dataTablesCss = $config['datatables.css'];
         $this->dataTablesJs = $config['datatables.js'];
+        $this->dataTablesLocalCss = $config['datatables.local.css'];
+        $this->dataTablesLocalJs = $config['datatables.local.js'];
         $this->dataTablesClass = $config['datatables.class'];
         $this->dataTablesOptions = $config['datatables.options'];
         $this->jqGridCss = $config['jq_grid.css'];
         $this->jqGridJs = $config['jq_grid.js'];
+        $this->jqGridLocalCss = $config['jq_grid.local.css'];
+        $this->jqGridLocalJs = $config['jq_grid.local.js'];
         $this->jqGridOptions = $config['jq_grid.options'];
         $this->tableOptions = $config['table.options'];
     }
@@ -113,12 +121,28 @@ class RendererFactory
             $renderer->setJqGridJs($this->jqGridJs);
         }
 
+        if (method_exists($renderer, 'setJqGridLocalCss')) {
+            $renderer->setJqGridLocalCss($this->jqGridLocalCss);
+        }
+
+        if (method_exists($renderer, 'setJqGridLocalJs')) {
+            $renderer->setJqGridLocalJs($this->jqGridLocalJs);
+        }
+
         if (method_exists($renderer, 'setDataTablesCss')) {
             $renderer->setDataTablesCss($this->dataTablesCss);
         }
 
         if (method_exists($renderer, 'setDataTablesJs')) {
             $renderer->setDataTablesJs($this->dataTablesJs);
+        }
+
+        if (method_exists($renderer, 'setDataTablesLocalCss')) {
+            $renderer->setDataTablesLocalCss($this->dataTablesLocalCss);
+        }
+
+        if (method_exists($renderer, 'setDataTablesLocalJs')) {
+            $renderer->setDataTablesLocalJs($this->dataTablesLocalJs);
         }
 
         if (method_exists($renderer, 'setDatatablesClass') && $this->dataTablesClass) {

@@ -1,11 +1,11 @@
-function dtc_grid_tablize(value) {
+function dtc_grid_tableize(value) {
     var table = "<table class=\"table table-bordered\"><thead><th>Column</th><th>Value</th></thead></thead><tbody>";
     var stringifyValue = function (value) {
         if (value === null) {
             return '<div><em>null</em></div>';
         }
         if (typeof(value) === 'object') {
-            return dtc_grid_tablize(value);
+            return dtc_grid_tableize(value);
         }
         return $('<div />').text(value).html();
     };
@@ -64,6 +64,6 @@ function dtc_grid_show(context) {
     }).then(function (result) {
         console.log(result);
         $modalBody.removeClass('dtc-grid-spinner');
-        $modalBody.html(dtc_grid_tablize(result));
+        $modalBody.html(dtc_grid_tableize(result));
     });
 }

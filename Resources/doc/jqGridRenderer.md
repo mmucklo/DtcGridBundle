@@ -46,27 +46,65 @@ Resources/views/your_controller/usersJq.html.twig
     <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         {% block stylesheets %}
-            {% for stylesheet in [
-            'path/to/prettify.css',
-            'path/to/ui.jqgrid-bootstrap.css',
-            ] %}
-                <link rel="stylesheet" href="{{ stylesheet }}" />
+            {% for stylesheet in dtc_grid_theme_css %}
+                {% if stylesheet.url is defined %}
+                    <link rel="stylesheet" href="{{ stylesheet.url }}"
+                        {% if stylesheet.integrity is not empty %} integrity="{{ stylesheet.integrity }}"{% endif %}
+                        {% if stylesheet.crossorigin is not empty %} crossorigin="{{ stylesheet.crossorigin }}"{% endif %}
+                    >
+                {% else %}
+                    <link rel="stylesheet" href="{{ stylesheet }}">
+                {% endif %}
+            {% endfor %}
+            {% for stylesheet in dtc_grid_local_css %}
+                <link rel="stylesheet" href="{{ app.request.baseUrl }}{{ stylesheet }}" />
             {% endfor %}
         {% endblock %}
-        {% block javascripts %}
-            {% for javascript in [
-            path('dtc_grid_jquery'),
-            path('dtc_grid_purl'),
-            'path/to/i18n/grid.locale-en.js',
-            'path/to/jquery.jqGrid.js'
-            ] %}
-                <script type="text/javascript" src="{{ javascript }}"></script>
-            {% endfor %}
-        {% endblock %}
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     
+        {% for stylesheet in dtc_grid_jq_grid_css %}
+            {% if stylesheet.url is defined %}
+                <link rel="stylesheet" href="{{ stylesheet.url }}"
+                        {% if stylesheet.integrity is not empty %} integrity="{{ stylesheet.integrity }}"{% endif %}
+                        {% if stylesheet.crossorigin is not empty %} crossorigin="{{ stylesheet.crossorigin }}"{% endif %}
+                >
+            {% else %}
+                <link rel="stylesheet" href="{{ stylesheet }}">
+            {% endif %}
+        {% endfor %}
+        
+        {% block dtc_grid_javascripts %}
+            <script src="{{ dtc_grid_jquery.url }}"
+                {% if dtc_grid_jquery.integrity is not empty  %} integrity="{{ dtc_grid_jquery.integrity }}"{% endif %}
+                {% if dtc_grid_jquery.crossorigin is not empty  %} crossorigin="{{ dtc_grid_jquery.crossorigin }}"{% endif %}>
+            </script>
+            {% for javascript in dtc_grid_jq_grid_js %}
+                {% if javascript.url is defined %}
+                    <script src="{{ javascript.url }}"
+                            {% if javascript.integrity is not empty %} integrity="{{ javascript.integrity }}"{% endif %}
+                            {% if javascript.crossorigin is not empty %} crossorigin="{{ javascript.crossorigin }}"{% endif %}
+                    ></script>
+                {% else %}
+                    <script src="{{ javascript }}"></script>
+                {% endif %}
+            {% endfor %}
+        {% endblock %}
+
+        {% block javascripts %}
+            {% for javascript in dtc_grid_theme_js %}
+                {% if javascript.url is defined %}
+                    <script src="{{ javascript.url }}"
+                        {% if javascript.integrity is not empty %} integrity="{{ javascript.integrity }}"{% endif %}
+                        {% if javascript.crossorigin is not empty %} crossorigin="{{ javascript.crossorigin }}"{% endif %}
+                    ></script>
+                {% else %}
+                    <script src="{{ javascript }}"></script>
+                {% endif %}
+            {% endfor %}
+            {% for javascript in dtc_grid_local_js %}
+                <script src="{{ app.request.baseUrl }}{{ javascript }}"></script>
+            {% endfor %}
+        {% endblock javascripts %}    
     </head>
     <body>
     {{ dtc_grid.render | raw }}

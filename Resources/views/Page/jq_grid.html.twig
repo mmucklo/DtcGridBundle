@@ -1,14 +1,29 @@
 {% extends '@DtcGrid/layout_base_jquery.html.twig' %}
 
 {% block dtc_grid_stylesheets %}
+    {{ parent() }}
     {% for stylesheet in dtc_grid_jq_grid_css %}
-        <link rel="stylesheet" href="{{ stylesheet }}" />
+        {% if stylesheet.url is defined %}
+            <link rel="stylesheet" href="{{ stylesheet.url }}"
+                    {% if stylesheet.integrity is not empty %} integrity="{{ stylesheet.integrity }}"{% endif %}
+                    {% if stylesheet.crossorigin is not empty %} crossorigin="{{ stylesheet.crossorigin }}"{% endif %}
+            >
+        {% else %}
+            <link rel="stylesheet" href="{{ stylesheet }}">
+        {% endif %}
     {% endfor %}
 {% endblock %}
 
 {% block dtc_grid_javascripts %}
     {{ parent() }}
     {% for javascript in dtc_grid_jq_grid_js %}
-        <script type="text/javascript" src="{{ javascript }}"></script>
+        {% if javascript.url is defined %}
+            <script src="{{ javascript.url }}"
+                    {% if javascript.integrity is not empty %} integrity="{{ javascript.integrity }}"{% endif %}
+                    {% if javascript.crossorigin is not empty %} crossorigin="{{ javascript.crossorigin }}"{% endif %}
+            ></script>
+        {% else %}
+            <script src="{{ javascript }}"></script>
+        {% endif %}
     {% endfor %}
 {% endblock %}

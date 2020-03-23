@@ -28,6 +28,8 @@ abstract class AbstractRenderer
         $params['dtc_grid_theme_css'] = $this->themeCss;
         $params['dtc_grid_theme_js'] = $this->themeJs;
         $params['dtc_grid_page_div_style'] = $this->pageDivStyle;
+        $params['dtc_grid_local_css'] = [];
+        $params['dtc_grid_local_js'] = [];
 
         return $params;
     }

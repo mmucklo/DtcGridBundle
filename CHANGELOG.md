@@ -1,3 +1,11 @@
+6.0.4
+   * Issue #19 - more Symfony 5 fixes around Commands.
+   * Fix documentation around css and js.
+   * Move css/js into more logical directories and rename some variables.
+   * Add the ability to override local css/js via config.
+   * Update css/js default versions.
+   * Refactor jq_grid and datatables startup code into main.js files for each.
+   * Allow for integrity and crossorigin on theme files.
 6.0.3
    * Issue #19 - more fixes for Symfony 5.
 6.0.2

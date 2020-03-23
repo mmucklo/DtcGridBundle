@@ -1,11 +1,15 @@
 <div>
-	<table id="{{ id }}"></table>
+	<table id="{{ id }}" data-dtc-grid-jq-grid="{{ options | json_encode | escape }}"></table>
 	<div id="{{ id }}-pager"></div>
 </div>
 
 <script>
 (function($) {
-	var options = {{ options | json_encode | raw }};
-	$('#{{ id }}').jqGrid(options);
+	$('.dtc-grid-jq-grid').each(
+			function(idx, val) {
+				var options = JSON.parse($(val).data('dtc-grid-jq-grid'));
+				$(val).jqGrid(options);
+			}
+	)
 })(jQuery);
 </script>

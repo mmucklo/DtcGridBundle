@@ -7,7 +7,7 @@
     {% endspaceless %}
 {% endmacro %}
 
-<table id="{{ id }}" {{ selfMacros.attributes(table_attr) }} data-jqtable="{{ options | json_encode }}">
+<table id="{{ id }}" {{ selfMacros.attributes(table_attr) }} data-dtc-grid-datatables="{{ options | json_encode | escape }}">
 	<thead>
 		<tr>
 			{% for column in columns %}
@@ -18,13 +18,6 @@
 		</tr>
 	</thead>
 </table>
-<script>
-	(function ($) {
-        $(document).ready(function () {
-            $('#{{ id }}').jqtable();
-        });
-    })(jQuery);
-</script>
 
 <div>
     <button class="refresh btn btn-primary refresh-{{ id }}" data-id="{{ id }}" onclick="dtc_grid_refresh(this);"><i class="fa fa-circle-o-notch fa-spin dtc-grid-hidden"></i> {{ 'refresh'|trans({}, 'dtc_grid') }}</button>

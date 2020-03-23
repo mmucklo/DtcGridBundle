@@ -471,31 +471,24 @@ jobs.html.twig:
 
 jobs.html.twig (a little complicated as styles and javascript has to be included for both grid types, although this isn't necessary if you use the "table" type renderer as it's CSS and Javascript overlaps with the "datatables" renderer):
 ```twig
-{% extends '@DtcGrid/layout.html.twig' %}
+{% extends '@DtcGrid/layout_base_jquery.html.twig' %}
 
 {% block dtc_grid_stylesheets %}
-    {% for stylesheet in [
-    path('dtc_grid_dataTables_extension_css', { 'type': 'bootstrap' }),
-    ] %}
+    {% for stylesheet in dtc_grid_jq_grid_css %}
         <link rel="stylesheet" href="{{ stylesheet }}" />
     {% endfor %}
-    {% for stylesheet in jq_grid_stylesheets %}
+    {% for stylesheet in dtc_grid_datatables_css %}
         <link rel="stylesheet" href="{{ stylesheet }}" />
     {% endfor %}
 {% endblock %}
 
 {% block dtc_grid_javascripts %}
-    {% for javascript in [
-    path('dtc_grid_jquery'),
-    path('dtc_grid_purl'),
-    path('dtc_grid_dataTables'),
-    path('dtc_grid_dataTables_extension', { 'type': 'bootstrap' }),
-    'js/jquery.datatable/DT_action.js',
-    '/bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
+    {{ parent() }}
+    {% for javascript in dtc_grid_jq_grid_js %}
         <script type="text/javascript" src="{{ javascript }}"></script>
-    {% endfor %}
-    {% for javascript in jq_grid_javascripts %}
-        <script type="text/javascript" src="{{ javascript }}"></script>
+    {% endfor %}    
+    {% for javascript in dtc_grid_datatables_js %}
+        <script src="{{ javascript }}"></script>
     {% endfor %}
 {% endblock %}
 
@@ -539,29 +532,40 @@ public function usersCustomAction(Request $request) {
 ```twig
 <html>
 <head>
-    <!-- Setup all CSS and Javascript manually -->
-    <!-- Any of these below could be modified / customized -->
-    <link rel="stylesheet" href="{{ dtc_grid_bootstrap_css }}">
+    {% block stylesheets %}
+        {% for stylesheet in dtc_grid_theme_css %}
+            <link rel="stylesheet" href="{{ stylesheet }}">
+        {% endfor %}
+    {% endblock %}
+
     {% block dtc_grid_stylesheets %}
-        {% for stylesheet in [
-        path('dtc_grid_dataTables_extension_css', { 'type': 'bootstrap' }),
-        ] %}
+        {% for stylesheet in dtc_grid_datatables_css %}
             <link rel="stylesheet" href="{{ stylesheet }}" />
+        {% endfor %}
+        {% for stylesheet in dtc_grid_local_css %}
+           <link rel="stylesheet" href="{{ app.request.baseUrl }}{{ stylesheet }}" />
         {% endfor %}
     {% endblock %}
     
     {% block dtc_grid_javascripts %}
-        {% for javascript in [
-        path('dtc_grid_jquery'),
-        path('dtc_grid_purl'),
-        path('dtc_grid_dataTables'),
-        path('dtc_grid_dataTables_extension', { 'type': 'bootstrap' }),
-        'js/jquery.datatable/DT_action.js',
-        'bundles/dtcgrid/js/jquery.datatable/jquery.jqtable.js'] %}
-            <script type="text/javascript" src="{{ javascript }}"></script>
+        <script src="{{ dtc_grid_jquery.url }}"
+            {% if dtc_grid_jquery.integrity is not empty  %} integrity="{{ dtc_grid_jquery.integrity }}"{% endif %}
+            {% if dtc_grid_jquery.crossorigin is not empty  %} crossorigin="{{ dtc_grid_jquery.crossorigin }}"{% endif %}>
+        </script>
+        <script src="{{ dtc_grid_purl }}"></script>
+        {% for javascript in dtc_grid_datatables_js %}
+            <script src="{{ javascript }}"></script>
         {% endfor %}
     {% endblock %}
-    <script src="{{ dtc_grid_bootstrap_js }}"></script>
+    
+    {% block javascripts %}
+        {% for javascript in dtc_grid_theme_js %}
+            <script src="{{ javascript }}"></script>
+        {% endfor %}
+        {% for javascript in dtc_grid_local_js %}
+            <script src="{{ app.request.baseUrl }}{{ javascript }}"></script>
+        {% endfor %}
+    {% endblock javascripts %}
 </head>
 <body>
 
@@ -578,28 +582,40 @@ public function usersCustomAction(Request $request) {
 ```twig
 <html>
 <head>
-    <!-- Setup all CSS and Javascript manually -->
-    <!-- Any of these below could be modified / customized -->
-    <link rel="stylesheet" href="{{ dtc_grid_bootstrap_css }}">
+    {% block stylesheets %}
+        {% for stylesheet in dtc_grid_theme_css %}
+            <link rel="stylesheet" href="{{ stylesheet }}">
+        {% endfor %}
+        {% for stylesheet in dtc_grid_local_css %}
+           <link rel="stylesheet" href="{{ app.request.baseUrl }}{{ stylesheet }}" />
+        {% endfor %}
+    {% endblock %}
+
     {% block dtc_grid_stylesheets %}
-        {% for stylesheet in [
-          'path_or_url_to/prettify.css',
-          'path_or_url_to/ui.jqgrid-bootstrap.css'
-        ] %}
+        {% for stylesheet in dtc_grid_jq_grid_css %}
             <link rel="stylesheet" href="{{ stylesheet }}" />
         {% endfor %}
     {% endblock %}
     
     {% block dtc_grid_javascripts %}
-        {% for javascript in [
-        path('dtc_grid_jquery'),
-        path('dtc_grid_purl'),
-        'path_or_url_to/grid.locale-en.js',
-        'path_or_url_to/jquery.jqGrid.js'] %}
+        <script src="{{ dtc_grid_jquery.url }}"
+            {% if dtc_grid_jquery.integrity is not empty  %} integrity="{{ dtc_grid_jquery.integrity }}"{% endif %}
+            {% if dtc_grid_jquery.crossorigin is not empty  %} crossorigin="{{ dtc_grid_jquery.crossorigin }}"{% endif %}>
+        </script>
+        <script src="{{ dtc_grid_purl }}"></script>
+        {% for javascript in dtc_grid_jq_grid_js %}
             <script type="text/javascript" src="{{ javascript }}"></script>
-        {% endfor %}
+        {% endfor %}    
     {% endblock %}
-    <script src="{{ dtc_grid_bootstrap_js }}"></script>
+    
+    {% block javascripts %}
+        {% for javascript in dtc_grid_theme_js %}
+            <script src="{{ javascript }}"></script>
+        {% endfor %}
+        {% for javascript in dtc_grid_local_js %}
+            <script src="{{ app.request.baseUrl }}{{ javascript }}"></script>
+        {% endfor %}
+    {% endblock javascripts %}
 </head>
 <body>
 
@@ -616,10 +632,23 @@ public function usersCustomAction(Request $request) {
 ```twig
 <html>
 <head>
-    <!-- Setup all CSS and Javascript manually -->
-    <!-- Any of these below could be modified / customized -->
-    <link rel="stylesheet" href="{{ dtc_grid_bootstrap_css }}">
-    <script src="{{ dtc_grid_bootstrap_js }}"></script>
+    {% block stylesheets %}
+        {% for stylesheet in dtc_grid_theme_css %}
+            <link rel="stylesheet" href="{{ stylesheet }}">
+        {% endfor %}
+        {% for stylesheet in dtc_grid_local_css %}
+           <link rel="stylesheet" href="{{ app.request.baseUrl }}{{ stylesheet }}" />
+        {% endfor %}
+    {% endblock %}
+
+    {% block javascripts %}
+        {% for javascript in dtc_grid_theme_js %}
+            <script src="{{ javascript }}"></script>
+        {% endfor %}
+        {% for javascript in dtc_grid_local_js %}
+            <script src="{{ app.request.baseUrl }}{{ javascript }}"></script>
+        {% endfor %}
+    {% endblock javascripts %}
 </head>
 <body>
 

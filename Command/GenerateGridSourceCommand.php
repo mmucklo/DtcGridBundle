@@ -2,9 +2,13 @@
 
 namespace Dtc\GridBundle\Command;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Dtc\GridBundle\Generator\GridSourceGenerator;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,8 +19,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * Class GenerateGridSourceCommand
  */
-class GenerateGridSourceCommand extends ContainerAwareCommand
+class GenerateGridSourceCommand extends Command
 {
+    protected $registry;
+    protected $mongodbRegistry;
+    protected $entityManager;
+    protected $documentManager;
+
     protected function configure()
     {
         $this
@@ -30,6 +39,22 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
         ;
     }
 
+    public function setRegistry(Registry $registry) {
+        $this->registry = $registry;
+    }
+
+    public function setEntityManager(EntityManagerInterface $entityManager) {
+        $this->entityManager = $entityManager;
+    }
+
+    public function setDocumentManager(DocumentManager $documentManager) {
+        $this->documentManager = $documentManager;
+    }
+
+    public function setMongoDBRegistry(ManagerRegistry $mongoDBRegistry) {
+        $this->mongoDBRegistry = $mongoDBRegistry;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // Taken from SensioGeneratorBundle: class Command\Validators (see LICENSE)
@@ -39,17 +64,27 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
 
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
-        $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
-        $documentClass = $this->getContainer()->get('doctrine_mongodb')->getAliasNamespace($bundle).'\\'.$entity;
+        if ($this->registry) {
+            $entityClass = $this->registry->getAliasNamespace($bundle).'\\'.$entity;
+        }
+        if ($this->mongodbRegistry) {
+            $documentClass = $this->mongodbRegistry->getAliasNamespace($bundle).'\\'.$entity;
+        }
 
-        try {
-            $metadata = $this->getEntityMetadata($entityClass);
-        } catch (\Exception $exception) {
-            if (preg_match('/does not exist/', $exception->getMessage())) {
-                $metadata = $this->getDocumentMetadata($documentClass);
-            } else {
-                throw $exception;
+        if (isset($entityClass) && $this->entityManager) {
+            try {
+                $metadata = $this->entityManager->getClassMetadata($entityClass);
+            } catch (\Exception $exception) {
+                if (!preg_match('/does not exist/', $exception->getMessage())) {
+                    throw $exception;
+                }
             }
+        }
+        if (!isset($metadata) && $this->documentManager) {
+            if (!isset($documentClass)) {
+                throw new \Exception("Could not get metadata for $entity");
+            }
+            $metadata = $this->documentManager->getClassMetadata($documentClass);
         }
 
         $application = $this->getApplication();
@@ -59,7 +94,7 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
             throw new \Exception("Can't lookup bundle for $bundle");
         }
         $skeletonDir = __DIR__.'/../Resources/skeleton';
-        $columnGenerator = new GridSourceGenerator($skeletonDir, $this->getContainer());
+        $columnGenerator = new GridSourceGenerator($skeletonDir);
 
         $columnGenerator->generate($bundle, $entity, $metadata, $input->getOption('columns'));
     }
@@ -73,15 +108,5 @@ class GenerateGridSourceCommand extends ContainerAwareCommand
         }
 
         return array(substr($entity, 0, $pos), substr($entity, $pos + 1));
-    }
-
-    protected function getEntityMetadata($entity)
-    {
-        return $this->getContainer()->get('doctrine.orm.default_entity_manager')->getClassMetadata($entity);
-    }
-
-    protected function getDocumentMetadata($document)
-    {
-        return $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager')->getClassMetadata($document);
     }
 }

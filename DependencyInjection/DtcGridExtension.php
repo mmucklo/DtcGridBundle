@@ -8,6 +8,7 @@ use Dtc\GridBundle\Grid\Renderer\TableGridRenderer;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
 
@@ -58,6 +59,8 @@ class DtcGridExtension extends Extension
         $container->setParameter('dtc_grid.jq_grid.css', $css);
         $container->setParameter('dtc_grid.jq_grid.js', $js);
         $container->setParameter('dtc_grid.jq_grid.options', $options);
+        $this->setLocal($config, $container, 'jq_grid', 'css');
+        $this->setLocal($config, $container, 'jq_grid', 'js');
     }
 
     public function setDataTables(array $config, ContainerBuilder $container)
@@ -71,6 +74,36 @@ class DtcGridExtension extends Extension
         $container->setParameter('dtc_grid.datatables.css', $css);
         $container->setParameter('dtc_grid.datatables.js', $js);
         $container->setParameter('dtc_grid.datatables.options', $options);
+
+        $this->setLocal($config, $container, 'datatables', 'css');
+        $this->setLocal($config, $container, 'datatables', 'js');
+    }
+
+    public function setLocal(array $config, ContainerBuilder $container, $directory, $type)
+    {
+        if (!empty($config[$directory]['local'][$type])) {
+            $container->setParameter('dtc_grid.'.$directory.'.local.'.$type, $config[$directory]['local'][$type]);
+            return;
+        }
+
+        $path = __DIR__ . \DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'Resources'.\DIRECTORY_SEPARATOR.'public'.\DIRECTORY_SEPARATOR.$type.\DIRECTORY_SEPARATOR.$directory;
+        if (!is_dir($path)) {
+            $container->setParameter('dtc_grid.'.$directory.'.local.'.$type, []);
+            return;
+        }
+        $finder = new Finder();
+        $finder->files()->in(str_replace(\DIRECTORY_SEPARATOR, '/', $path));
+        $localCss = [];
+        $files = [];
+        foreach($finder as $fileInfo) {
+            $fileUrlpath = '/bundles/dtcgrid/'.$type.'/'.$directory.'/'.$fileInfo->getFilename();
+            $filepath = $path.\DIRECTORY_SEPARATOR.$fileInfo->getFilename();
+            $files[] = $filepath;
+            $mtime = filemtime($filepath);
+            $localCss []= $fileUrlpath.'?v='.$mtime;
+        }
+        $container->setParameter('dtc_grid.'.$directory.'.local.'.$type, $localCss);
+        $container->setParameter('dtc_grid.'.$directory.'.local.files.'.$type, $files);
     }
 
     public function setTheme(array $config, ContainerBuilder $container)

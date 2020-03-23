@@ -13,9 +13,6 @@ class DataTablesRenderer extends AbstractJqueryRenderer
                 'class' => 'display table table-striped table-bordered small-font',
             ),
         'serverSide' => true,
-        'columns' => array(array(
-            'width' => '20%',
-        )),
         'language' => array(
             'lengthMenu' => '_MENU_ records per page',
         ),
@@ -23,6 +20,8 @@ class DataTablesRenderer extends AbstractJqueryRenderer
 
     protected $dataTablesCss = [];
     protected $dataTablesJs = [];
+    private   $localCss = [];
+    private   $localJs = [];
 
     const MODE_AJAX = 1;
     const MODE_SERVER = 2;
@@ -59,6 +58,22 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         return $this->dataTablesJs;
     }
 
+    public function setDataTablesLocalCss(array $localCss) {
+        $this->localCss = $localCss;
+    }
+
+    public function setDataTablesLocalJs(array $localJs) {
+        $this->localJs = $localJs;
+    }
+
+    public function getDataTablesLocalCss() {
+        return $this->localCss;
+    }
+
+    public function getDataTablesLocalJs() {
+        return $this->localJs;
+    }
+
     public function setDataTablesClass($class)
     {
         $this->options['table_attr']['class'] = $class;
@@ -79,21 +94,9 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         }
         parent::getParams($params);
         $params['dtc_grid_datatables_css'] = $this->dataTablesCss;
-        $params['dtc_grid_datatables_js'] = $this->dataTablesJs;
-        $cssList = ['css/dtc_grid.css'];
-        $jsList = ['js/jquery.datatable/DT_action.js',
-            'js/jquery.datatable/jquery.jqtable.js', ];
-
-        foreach ($cssList as $css) {
-            $mtime = filemtime(__DIR__.'/../../Resources/public/'.$css);
-            $params['dtc_grid_local_css'][] = $css.'?v='.$mtime;
-        }
-
-        foreach ($jsList as $js) {
-            $mtime = filemtime(__DIR__.'/../../Resources/public/'.$js);
-            $params['dtc_grid_local_js'][] = $js.'?v='.$mtime;
-        }
-
+        $params['dtc_grid_datatables_js']  = $this->dataTablesJs;
+        $params['dtc_grid_local_css']      = $this->localCss;
+        $params['dtc_grid_local_js']       = $this->localJs;
         return $params;
     }
 
