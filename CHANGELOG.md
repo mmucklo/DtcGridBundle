@@ -1,3 +1,5 @@
+6.0.5
+   * Issue #19 - twig 3.
 6.0.4
    * Issue #19 - more Symfony 5 fixes around Commands.
    * Fix documentation around css and js.

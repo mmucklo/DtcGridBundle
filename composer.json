@@ -20,7 +20,7 @@
         "symfony/templating": "2.*|3.*|4.*|5.*",
         "symfony/translation": "2.*|3.*|4.*|5.*",
         "symfony/twig-bundle": "2.*|3.*|4.*|5.*",
-        "twig/twig": "^1.0||^2.0"
+        "twig/twig": "^1.0||^2.0|^3.0"
     },
     "require-dev": {
         "doctrine/orm": "^2.4",
