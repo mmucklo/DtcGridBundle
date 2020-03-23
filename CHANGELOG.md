@@ -1,3 +1,5 @@
+6.0.6
+   * Issue #19 - fix TreeBuilder instantiation.
 6.0.5
    * Issue #19 - twig 3.
 6.0.4

@@ -14,8 +14,13 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('dtc_grid');
+        if (method_exists('Symfony\Component\Config\Definition\Builder\TreeBuilder', 'root')) {
+            $treeBuilder = new TreeBuilder();
+            $rootNode = $treeBuilder->root('dtc_grid');
+        } else {
+            $treeBuilder = new TreeBuilder('dtc_grid');
+            $rootNode = $treeBuilder->getRootNode();
+        }
 
         $rootNode
             ->children()
