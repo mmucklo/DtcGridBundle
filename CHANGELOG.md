@@ -1,3 +1,6 @@
+6.0.9
+   * Issue #19 - fix spaceless block for twig 3.
+   * Fix issues with table_attr possibly not being an array.
 6.0.8
    * Issue #19 - fix typo.
 6.0.7

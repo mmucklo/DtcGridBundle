@@ -1,13 +1,11 @@
 {% import _self as selfMacros %}
 {% macro attributes(attributes) %}
-    {% spaceless %}
-        {% for attb, value in attributes %}
-            {{ attb }}="{{ value }}"
-        {% endfor %}
-    {% endspaceless %}
+    {% for attb, value in attributes %}
+        {{ attb }}="{{ value }}"
+    {% endfor %}
 {% endmacro %}
 
-<table id="{{ id }}" {{ selfMacros.attributes(table_attr) }} data-dtc-grid-datatables="{{ options | json_encode | escape }}">
+<table id="{{ id }}" {% if table_attr is defined and table_attr is iterable %}{{ selfMacros.attributes(table_attr) | spaceless }} {% endif %}data-dtc-grid-datatables="{{ options | json_encode | escape }}">
 	<thead>
 		<tr>
 			{% for column in columns %}

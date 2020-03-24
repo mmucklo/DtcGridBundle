@@ -1,6 +1,6 @@
 {% import _self as selfMacros %}
 
-<table {{ selfMacros.render_attb(options['table_attr']) }}>
+<table{% if options['table_attr'] is defined and options['table_attr'] is iterable %} {{ selfMacros.render_attb(options['table_attr']) | spaceless }}{% endif %}>
 	<thead>
 		<tr>
 			{% for column in columns %}
@@ -24,9 +24,7 @@
 </table>
 
 {% macro render_attb(attributes) %}
-{% spaceless %}
 {% for attb, value in attributes %}
     {{ attb }}="{{ value }}"
 {% endfor %}
-{% endspaceless %}
 {% endmacro %}

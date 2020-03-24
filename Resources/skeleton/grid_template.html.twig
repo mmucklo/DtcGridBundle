@@ -1,8 +1,6 @@
 {% for field, title in fields %}
 {{ '{% block ' ~ field ~ ' %}' }}
-{{ '{% spaceless %}' }}
-{{ '{{- obj. ' ~ field ~' | format_cell -}}' }}
-{{ '{% endspaceless %}' }}
+{{ '{{- obj. ' ~ field ~' | format_cell | spaceless -}}' }}
 {{ '{% endblock %}'}}
 
 {% endfor %}

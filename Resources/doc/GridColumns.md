@@ -58,33 +58,23 @@ Twig file for GridColumn
    * Example: AppBundle/Resources/views/User/_grid.html.twig
 
             {% block firstName %}
-            {% spaceless %}
-            {{- obj. firstName | format_cell -}}
-            {% endspaceless %}
+            {{- obj. firstName | format_cell | spaceless -}}
             {% endblock %}
             
             {% block lastName %}
-            {% spaceless %}
-            {{- obj. lastName | format_cell -}}
-            {% endspaceless %}
+            {{- obj. lastName | format_cell | spaceless -}}
             {% endblock %}
             
             {% block username %}
-            {% spaceless %}
-            {{- obj. username | format_cell -}}
-            {% endspaceless %}
+            {{- obj. username | format_cell | spaceless -}}
             {% endblock %}
             
             {% block createdAt %}
-            {% spaceless %}
-            {{- obj. createdAt | format_cell -}}
-            {% endspaceless %}
+            {{- obj. createdAt | format_cell | spaceless -}}
             {% endblock %}
             
             {% block updatedAt %}
-            {% spaceless %}
-            {{- obj. updatedAt | format_cell -}}
-            {% endspaceless %}
+            {{- obj. updatedAt | format_cell | spaceless -}}
             {% endblock %}
 
 Setting Columns for GridSource
