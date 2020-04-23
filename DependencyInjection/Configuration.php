@@ -14,12 +14,14 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        if (method_exists('Symfony\Component\Config\Definition\Builder\TreeBuilder', 'root')) {
-            $treeBuilder = new TreeBuilder();
-            $rootNode = $treeBuilder->root('dtc_grid');
-        } else {
-            $treeBuilder = new TreeBuilder('dtc_grid');
+
+        $treeBuilder = new TreeBuilder('dtc_grid');
+
+        if (method_exists($treeBuilder, 'getRootNode')) {
             $rootNode = $treeBuilder->getRootNode();
+        } else {
+            // BC layer for symfony/config 4.1 and older
+            $rootNode = $treeBuilder->root('dtc_grid');
         }
 
         $rootNode
