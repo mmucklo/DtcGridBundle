@@ -4,3 +4,10 @@ filter:
 tools:
     external_code_coverage:
         timeout: 900
+
+build:
+    nodes:
+        node-with-auto-setup:
+            tests:
+                override:
+                    - true
