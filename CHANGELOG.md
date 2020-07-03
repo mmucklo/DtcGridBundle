@@ -1,3 +1,6 @@
+7.0.0
+   * Issue #19 - fix deprecation notice.
+   * Issue #24 - fix class load issue.
 6.0.9
    * Issue #19 - fix spaceless block for twig 3.
    * Fix issues with table_attr possibly not being an array.
