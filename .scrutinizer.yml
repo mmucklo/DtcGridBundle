@@ -7,6 +7,9 @@ tools:
 
 
 build:
+    dependencies:
+        override:
+            - true
     nodes:
         analysis:
             tests:
