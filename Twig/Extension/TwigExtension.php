@@ -2,57 +2,55 @@
 
 namespace Dtc\GridBundle\Twig\Extension;
 
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
-use Twig\TwigFunction;
-
-class TwigExtension extends AbstractExtension
-{
-    public function getFunction()
+if (class_exists('\Twig\Extension\AbstractExtension')) {
+    class TwigExtension extends \Twig\Extension\AbstractExtension
     {
-        $names = array(
+        public function getFunction()
+        {
+            $names = array(
                 'format_cell' => 'format_cell',
-        );
+            );
 
-        $funcs = array();
-        foreach ($names as $twig => $local) {
-            $funcs[$twig] = new TwigFunction($twig, [$this, $local]);
-        }
-
-        return $funcs;
-    }
-
-    public function getFilters()
-    {
-        $names = array(
-                'format_cell' => 'format_cell',
-        );
-
-        $funcs = array();
-        foreach ($names as $twig => $local) {
-            $funcs[$twig] = new TwigFilter($twig, [$this, $local]);
-        }
-
-        return $funcs;
-    }
-
-    public function getName()
-    {
-        return 'dtc_grid';
-    }
-
-    public function format_cell($value)
-    {
-        if (is_object($value)) {
-            if ($value instanceof \DateTime) {
-                return $value->format(\DateTime::ISO8601);
+            $funcs = array();
+            foreach ($names as $twig => $local) {
+                $funcs[$twig] = new \Twig\TwigFunction($twig, [$this, $local]);
             }
 
-            return 'object: '.get_class($value);
-        } elseif (is_scalar($value)) {
-            return $value;
-        } elseif (is_array($value)) {
-            return 'array';
+            return $funcs;
+        }
+
+        public function getFilters()
+        {
+            $names = array(
+                'format_cell' => 'format_cell',
+            );
+
+            $funcs = array();
+            foreach ($names as $twig => $local) {
+                $funcs[$twig] = new \Twig\TwigFilter($twig, [$this, $local]);
+            }
+
+            return $funcs;
+        }
+
+        public function getName()
+        {
+            return 'dtc_grid';
+        }
+
+        public function format_cell($value)
+        {
+            if (is_object($value)) {
+                if ($value instanceof \DateTime) {
+                    return $value->format(\DateTime::ISO8601);
+                }
+
+                return 'object: ' . get_class($value);
+            } elseif (is_scalar($value)) {
+                return $value;
+            } elseif (is_array($value)) {
+                return 'array';
+            }
         }
     }
 }

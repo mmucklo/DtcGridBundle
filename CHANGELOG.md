@@ -1,3 +1,5 @@
+7.0.1
+   * Issue #24 - fix class conflict issue.
 7.0.0
    * Issue #19 - fix deprecation notice.
    * Issue #24 - fix class load issue.

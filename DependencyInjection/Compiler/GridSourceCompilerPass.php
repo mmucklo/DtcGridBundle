@@ -39,7 +39,7 @@ class GridSourceCompilerPass implements CompilerPassInterface
     }
 
     private static function legacyTwigExtension(ContainerBuilder $container) {
-        if (!class_exists('Twig\Extension\AbstractExtension')) {
+        if (!class_exists('\Twig\Extension\AbstractExtension')) {
             $container->getDefinition('dtc_grid.twig.extension')->setClass('Dtc\GridBundle\Twig\Extension\TwigExtensionLegacy');
         }
     }

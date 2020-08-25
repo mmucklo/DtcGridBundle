@@ -2,7 +2,7 @@
 
 namespace Dtc\GridBundle\Twig\Extension;
 
-if (!class_exists('Twig\Extension\AbstractExtension')) {
+if (!class_exists('\Twig\Extension\AbstractExtension')) {
     class TwigExtension extends \Twig_Extension
     {
         public function getFunction()
