@@ -17,4 +17,14 @@ class Action implements Annotation
      * @var string
      */
     public $route;
+
+    /**
+     * @var string
+     */
+    public $buttonClass;
+
+    /**
+     * @var string
+     */
+    public $onclick;
 }

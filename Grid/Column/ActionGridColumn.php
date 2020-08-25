@@ -7,6 +7,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ActionGridColumn extends AbstractGridColumn
 {
+    static protected $spinnerHtml = '<i class="fa fa-circle-o-notch fa-spin dtc-grid-hidden"></i> ';
+
     protected $actions;
     protected $idField;
 
@@ -33,19 +35,38 @@ class ActionGridColumn extends AbstractGridColumn
             if ($content) {
                 $content .= ' ';
             }
+            $route = isset($options['route']) ? $options['route'] : '';
             switch ($options['action']) {
                 case 'show':
-                    $route = $this->router->generate('dtc_grid_show', ['identifier' => $id, 'id' => $this->gridSourceId]);
-                    $route = htmlspecialchars($route);
-                    $content .= "<button class=\"btn btn-primary grid-show\" data-route=\"$route\" data-id=\"$idHtml\"";
+                    if (!$route) {
+                        $route = 'dtc_grid_show';
+                    }
+                    $uri = $this->router->generate($route, ['identifier' => $id, 'id' => $this->gridSourceId]);
+                    $uri = htmlspecialchars($uri);
+                    $content .= "<button class=\"btn btn-primary grid-show\" data-route=\"$uri\" data-id=\"$idHtml\"";
                     $content .= "onclick=\"dtc_grid_show(this)\">$label</button>";
                     break;
                 case 'delete':
-                    $route = $this->router->generate('dtc_grid_delete', ['identifier' => $id, 'id' => $this->gridSourceId]);
-                    $route = htmlspecialchars($route);
-                    $content .= "<button class=\"btn btn-primary grid-delete\" data-route=\"$route\" data-id=\"$idHtml\"";
-                    $content .= "onclick=\"dtc_grid_delete(this)\"><i class=\"fa fa-circle-o-notch fa-spin dtc-grid-hidden\"></i> $label</button>";
+                    if (!$route) {
+                        $route = 'dtc_grid_delete';
+                    }
+                    $uri = $this->router->generate($route, ['identifier' => $id, 'id' => $this->gridSourceId]);
+                    $uri = htmlspecialchars($uri);
+                    $content .= "<button class=\"btn btn-primary grid-delete\" data-route=\"$uri\" data-id=\"$idHtml\"";
+                    $content .= "onclick=\"dtc_grid_delete(this)\">" . static::$spinnerHtml . "$label</button>";
                     break;
+                default:
+                    $uri = $this->router->generate($route, ['identifier' => $id, 'id' => $this->gridSourceId]);
+                    $uri = htmlspecialchars($uri);
+                    $content .= "<button class \"";
+                    if (isset($options['button_class'])) {
+                        $content .= " " . $options['button_class'];
+                    }
+                    $content .= " data-route=\"$uri\" data-id=\"$idHtml\"";
+                    if (isset($options['onclick'])) {
+                        $content .= " onclick=\"" . htmlspecialchars($options['onclick']) . "\"";
+                    }
+                    $content .= ">$label</button>";
             }
         }
 

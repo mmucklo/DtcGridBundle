@@ -154,10 +154,14 @@ class ColumnUtil
                     if (!isset($action['route'])) {
                         throw new Exception("$class - action definition missing 'route' ".print_r($action, true));
                     }
-                    if (!isset($action['type'])) {
-                        throw new Exception("$class - action definition missing 'type' ".print_r($action, true));
-                    }
                     $actionDef = ['label' => $action['label'], 'route' => $action['route']];
+                    if (isset($action['onclick'])) {
+                        $actionDef['onclick'] = $action['onclick'];
+                    }
+                    if (isset($action['button_class'])) {
+                        $actionDef['button_class'] = $action['button_class'];
+                    }
+
                     switch ($action['type']) {
                         case 'show':
                             $actionDef['action'] = 'show';
@@ -166,7 +170,7 @@ class ColumnUtil
                             $actionDef['action'] = 'delete';
                             break;
                         default:
-                            throw new Exception("$class - action definition unknown 'type' {$action['type']} ".print_r($action, true));
+
                     }
                     $actionDefs[] = $actionDef;
                 }

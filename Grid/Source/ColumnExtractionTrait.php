@@ -304,7 +304,7 @@ trait ColumnExtractionTrait
             $actionDefs = [];
             /* @var Action $action */
             foreach ($actions as $action) {
-                $actionDef = ['label' => $action->label, 'route' => $action->route];
+                $actionDef = ['label' => $action->label, 'route' => $action->route, 'button_class' => $action->buttonClass, 'onclick' => $action->onclick];
                 if ($action instanceof ShowAction) {
                     $actionDef['action'] = 'show';
                 }

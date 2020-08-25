@@ -2,55 +2,53 @@
 
 namespace Dtc\GridBundle\Twig\Extension;
 
-if (class_exists('\Twig\Extension\AbstractExtension')) {
-    class TwigExtension extends \Twig\Extension\AbstractExtension
+class TwigExtension extends \Twig\Extension\AbstractExtension
+{
+    public function getFunction()
     {
-        public function getFunction()
-        {
-            $names = array(
-                'format_cell' => 'format_cell',
-            );
+        $names = array(
+            'format_cell' => 'format_cell',
+        );
 
-            $funcs = array();
-            foreach ($names as $twig => $local) {
-                $funcs[$twig] = new \Twig\TwigFunction($twig, [$this, $local]);
-            }
-
-            return $funcs;
+        $funcs = array();
+        foreach ($names as $twig => $local) {
+            $funcs[$twig] = new \Twig\TwigFunction($twig, [$this, $local]);
         }
 
-        public function getFilters()
-        {
-            $names = array(
-                'format_cell' => 'format_cell',
-            );
+        return $funcs;
+    }
 
-            $funcs = array();
-            foreach ($names as $twig => $local) {
-                $funcs[$twig] = new \Twig\TwigFilter($twig, [$this, $local]);
-            }
+    public function getFilters()
+    {
+        $names = array(
+            'format_cell' => 'format_cell',
+        );
 
-            return $funcs;
+        $funcs = array();
+        foreach ($names as $twig => $local) {
+            $funcs[$twig] = new \Twig\TwigFilter($twig, [$this, $local]);
         }
 
-        public function getName()
-        {
-            return 'dtc_grid';
-        }
+        return $funcs;
+    }
 
-        public function format_cell($value)
-        {
-            if (is_object($value)) {
-                if ($value instanceof \DateTime) {
-                    return $value->format(\DateTime::ISO8601);
-                }
+    public function getName()
+    {
+        return 'dtc_grid';
+    }
 
-                return 'object: ' . get_class($value);
-            } elseif (is_scalar($value)) {
-                return $value;
-            } elseif (is_array($value)) {
-                return 'array';
+    public function format_cell($value)
+    {
+        if (is_object($value)) {
+            if ($value instanceof \DateTime) {
+                return $value->format(\DateTime::ISO8601);
             }
+
+            return 'object: ' . get_class($value);
+        } elseif (is_scalar($value)) {
+            return $value;
+        } elseif (is_array($value)) {
+            return 'array';
         }
     }
 }

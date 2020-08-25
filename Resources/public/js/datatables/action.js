@@ -26,7 +26,8 @@ function dtc_grid_delete(context) {
     $(context).find('i').removeClass('dtc-grid-hidden');
     $table.find('button').attr('disabled','disabled');
     $.ajax({
-        url: route
+        url: route,
+        method: "POST"
     }).then(function () {
         $table.data('datatable').ajax.reload();
     })
