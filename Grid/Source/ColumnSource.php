@@ -58,8 +58,6 @@ class ColumnSource
 
     /**
      * @param $cacheFilename
-     * @param ClassMetadata $classMetadata
-     * @param Reader|null   $reader
      *
      * @return array|null
      *
@@ -155,7 +153,6 @@ class ColumnSource
      * Check timestamps of the file pointed to by the class metadata, and the columnCacheFilename and see if any
      * are newer (meaning we .
      *
-     * @param ClassMetadata $metadata
      * @param $columnCacheFilename
      *
      * @return bool
@@ -238,9 +235,10 @@ class ColumnSource
                 $actionDef = ['label' => $action->label, 'route' => $action->route, 'button_class' => $action->buttonClass, 'onclick' => $action->onclick];
                 if ($action instanceof ShowAction) {
                     $actionDef['action'] = 'show';
-                }
-                if ($action instanceof DeleteAction) {
+                } elseif ($action instanceof DeleteAction) {
                     $actionDef['action'] = 'delete';
+                } else {
+                    $actionDef['action'] = 'custom';
                 }
                 $actionDefs[] = $actionDef;
             }
@@ -260,18 +258,19 @@ class ColumnSource
         }
 
         $sortList = [];
-        try {
-            foreach ($sortMulti as $sortDef) {
-                $sortInfo = self::extractSortInfo($sortDef);
-                self::validateSortInfo($sortInfo, $gridColumns);
-                if (isset($sortInfo['column'])) {
-                    $sortList[$sortInfo['column']] = $sortInfo['direction'];
+        if ($sortMulti) {
+            try {
+                foreach ($sortMulti as $sortDef) {
+                    $sortInfo = self::extractSortInfo($sortDef);
+                    self::validateSortInfo($sortInfo, $gridColumns);
+                    if (isset($sortInfo['column'])) {
+                        $sortList[$sortInfo['column']] = $sortInfo['direction'];
+                    }
                 }
+            } catch (InvalidArgumentException $exception) {
+                throw new InvalidArgumentException($reflectionClass->getName().' - '.$exception->getMessage(), $exception->getCode(), $exception);
             }
-        } catch (InvalidArgumentException $exception) {
-            throw new InvalidArgumentException($reflectionClass->getName().' - '.$exception->getMessage(), $exception->getCode(), $exception);
         }
-
         $columnInfo = ['columns' => $gridColumns, 'sort' => $sortList];
 
         ColumnUtil::populateCacheFile($cacheFilename, $columnInfo);
@@ -280,9 +279,6 @@ class ColumnSource
     }
 
     /**
-     * @param array $sortInfo
-     * @param array $gridColumns
-     *
      * @throws InvalidArgumentException
      */
     private static function validateSortInfo(array $sortInfo, array $gridColumns)
@@ -372,10 +368,10 @@ class ColumnSource
         $identifier = isset($identifier[0]) ? $identifier[0] : null;
 
         if (!method_exists($metadata, 'getFieldMapping')) {
-            return array();
+            return [];
         }
 
-        $columns = array();
+        $columns = [];
         foreach ($fields as $field) {
             $mapping = $metadata->getFieldMapping($field);
             if (isset($mapping['options']) && isset($mapping['options']['label'])) {

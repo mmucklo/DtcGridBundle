@@ -2,8 +2,8 @@
 
 namespace Dtc\GridBundle\Mapper;
 
-use Exception;
 use ArrayObject;
+use Exception;
 
 class ArrayValueObject extends ArrayObject
 {

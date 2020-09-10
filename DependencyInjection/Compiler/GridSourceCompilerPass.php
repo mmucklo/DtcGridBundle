@@ -6,16 +6,14 @@ use Dtc\GridBundle\Util\ColumnUtil;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 
 class GridSourceCompilerPass implements CompilerPassInterface
 {
     /**
-     * @param ContainerBuilder $container
      * @throws \ReflectionException
      * @throws \Exception
      */
@@ -38,7 +36,8 @@ class GridSourceCompilerPass implements CompilerPassInterface
         self::legacyTwigExtension($container);
     }
 
-    private static function legacyTwigExtension(ContainerBuilder $container) {
+    private static function legacyTwigExtension(ContainerBuilder $container)
+    {
         if (!class_exists('\Twig\Extension\AbstractExtension')) {
             $container->getDefinition('dtc_grid.twig.extension')->setClass('Dtc\GridBundle\Twig\Extension\TwigExtensionLegacy');
         }
@@ -58,7 +57,6 @@ class GridSourceCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param ContainerBuilder $container
      * @param $id
      *
      * @throws \ReflectionException
@@ -76,20 +74,18 @@ class GridSourceCompilerPass implements CompilerPassInterface
             throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
         }
 
-        $gridSourceDefinition->addMethodCall('setId', array($id));
+        $gridSourceDefinition->addMethodCall('setId', [$id]);
         $sourceManager->addMethodCall('add', [$id, new Reference($id)]);
     }
 
     /**
-     * @param ContainerBuilder $container
-     *
      * @throws \Exception
      */
     private static function addGridFiles(ContainerBuilder $container)
     {
         $cacheDir = $container->getParameter('kernel.cache_dir');
         if ($container->hasParameter('kernel.project_dir')) {
-            $directory = $container->getParameter('kernel.project_dir') . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR . 'dtc_grid';
+            $directory = $container->getParameter('kernel.project_dir').\DIRECTORY_SEPARATOR.'config'.\DIRECTORY_SEPARATOR.'dtc_grid';
             if (is_dir($directory)) {
                 $finder = new Finder();
                 $finder->files()->in(str_replace(\DIRECTORY_SEPARATOR, '/', $directory));
@@ -97,6 +93,7 @@ class GridSourceCompilerPass implements CompilerPassInterface
                 $container->addResource(new DirectoryResource($directory));
             }
             $container->addResource(new FileExistenceResource($directory));
+            $container->addResource(new DirectoryResource(dirname(dirname(__DIR__))));
         } elseif ($container->hasParameter('kernel.root_dir')) {
             // Typically Symfony versions < 4 using the older directory layout.
             $directory = str_replace(\DIRECTORY_SEPARATOR, '/', $container->getParameter('kernel.root_dir')).'/../src';
@@ -104,17 +101,18 @@ class GridSourceCompilerPass implements CompilerPassInterface
             $finder->files()->in($directory)->name('dtc_grid.yaml')->name('dtc_grid.yml')->path('Resources/config');
             self::cacheAllFiles($cacheDir, $finder);
             if (class_exists('Symfony\Component\Config\Resource\GlobResource')) {
-                $container->addResource(new \Symfony\Component\Config\Resource\GlobResource(str_replace('/', \DIRECTORY_SEPARATOR, $directory),str_replace('/', \DIRECTORY_SEPARATOR, '/**/Resources/config/dtc_grid.yaml'), false));
-                $container->addResource(new \Symfony\Component\Config\Resource\GlobResource(str_replace('/', \DIRECTORY_SEPARATOR, $directory),str_replace('/', \DIRECTORY_SEPARATOR, '/**/Resources/config/dtc_grid.yml'), false));
+                $container->addResource(new \Symfony\Component\Config\Resource\GlobResource(str_replace('/', \DIRECTORY_SEPARATOR, $directory), str_replace('/', \DIRECTORY_SEPARATOR, '/**/Resources/config/dtc_grid.yaml'), false));
+                $container->addResource(new \Symfony\Component\Config\Resource\GlobResource(str_replace('/', \DIRECTORY_SEPARATOR, $directory), str_replace('/', \DIRECTORY_SEPARATOR, '/**/Resources/config/dtc_grid.yml'), false));
             }
             // TODO: To cover symfony versions that don't support GlobResource, such as 2.x, it would probably be necessary to add a recursive set of FileExistenceResources here.
         }
     }
 
-    private static function addLocalCssJs(ContainerBuilder $container, $type) {
+    private static function addLocalCssJs(ContainerBuilder $container, $type)
+    {
         $parameter = 'dtc_grid.datatables.local.files.'.$type;
         if ($container->hasParameter($parameter)) {
-            foreach($container->getParameter($parameter) as $filepath) {
+            foreach ($container->getParameter($parameter) as $filepath) {
                 $container->addResource(new FileResource($filepath));
             }
         }
@@ -122,10 +120,11 @@ class GridSourceCompilerPass implements CompilerPassInterface
 
     /**
      * @param $cacheDir
-     * @param Finder $finder
+     *
      * @throws \Exception
      */
-    private static function cacheAllFiles($cacheDir, Finder $finder) {
+    private static function cacheAllFiles($cacheDir, Finder $finder)
+    {
         foreach ($finder as $file) {
             ColumnUtil::cacheClassesFromFile($cacheDir, $file->getRealPath());
         }

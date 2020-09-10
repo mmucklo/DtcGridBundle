@@ -10,9 +10,9 @@ abstract class AbstractGridSource implements GridSourceInterface
 {
     protected $limit = 25;
     protected $offset = 0;
-    protected $filter = array();
-    protected $orderBy = array();
-    protected $pager = array();
+    protected $filter = [];
+    protected $orderBy = [];
+    protected $pager = [];
     protected $id = 'grid';
     protected $columns;
     protected $parameters;
@@ -100,7 +100,7 @@ abstract class AbstractGridSource implements GridSourceInterface
 
     public function selectColumns(array $fields)
     {
-        $selectedCols = array();
+        $selectedCols = [];
         foreach ($fields as $field) {
             if (isset($this->columns[$field])) {
                 $selectedCols[$field] = $this->columns[$field];
@@ -166,9 +166,6 @@ abstract class AbstractGridSource implements GridSourceInterface
         return $this->filter;
     }
 
-    /**
-     * @param array $filter
-     */
     public function setFilter(array $filter)
     {
         $this->filter = $filter;
@@ -182,9 +179,6 @@ abstract class AbstractGridSource implements GridSourceInterface
         return $this->orderBy;
     }
 
-    /**
-     * @param array $orderBy
-     */
     public function setOrderBy(array $orderBy)
     {
         $this->orderBy = $orderBy;
@@ -213,9 +207,6 @@ abstract class AbstractGridSource implements GridSourceInterface
         return $this->parameters;
     }
 
-    /**
-     * @param array $parameters
-     */
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;

@@ -18,7 +18,6 @@ class GridColumn extends AbstractGridColumn
      * @param $field
      * @param string|null $label
      * @param mixed       $formatter
-     * @param array|null  $options
      * @param bool        $searchable
      * @param int|null    $order      If there are columns that have an order mixed with columns of 'null' order, the null ones will appear last
      */
@@ -73,11 +72,11 @@ class GridColumn extends AbstractGridColumn
                 $value = $object[$this->field];
             }
         } elseif (is_object($object)) {
-            $funcPrefix = array(
+            $funcPrefix = [
                     'get',
                     'is',
                     'has',
-            );
+            ];
             foreach ($funcPrefix as $prefix) {
                 $methodName = $prefix.$this->field;
                 if (method_exists($object, $methodName)) {

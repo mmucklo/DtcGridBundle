@@ -7,7 +7,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ActionGridColumn extends AbstractGridColumn
 {
-    static protected $spinnerHtml = '<i class="fa fa-circle-o-notch fa-spin dtc-grid-hidden"></i> ';
+    protected static $spinnerHtml = '<i class="fa fa-circle-o-notch fa-spin dtc-grid-hidden"></i> ';
 
     protected $actions;
     protected $idField;
@@ -53,18 +53,21 @@ class ActionGridColumn extends AbstractGridColumn
                     $uri = $this->router->generate($route, ['identifier' => $id, 'id' => $this->gridSourceId]);
                     $uri = htmlspecialchars($uri);
                     $content .= "<button class=\"btn btn-primary grid-delete\" data-route=\"$uri\" data-id=\"$idHtml\"";
-                    $content .= "onclick=\"dtc_grid_delete(this)\">" . static::$spinnerHtml . "$label</button>";
+                    $content .= 'onclick="dtc_grid_delete(this)">'.static::$spinnerHtml."$label</button>";
                     break;
                 default:
-                    $uri = $this->router->generate($route, ['identifier' => $id, 'id' => $this->gridSourceId]);
-                    $uri = htmlspecialchars($uri);
-                    $content .= "<button class \"";
-                    if (isset($options['button_class'])) {
-                        $content .= " " . $options['button_class'];
+                    $uri = '';
+                    if ($route) {
+                        $uri = $this->router->generate($route, ['identifier' => $id, 'id' => $this->gridSourceId]);
+                        $uri = htmlspecialchars($uri);
                     }
-                    $content .= " data-route=\"$uri\" data-id=\"$idHtml\"";
+                    $content .= '<button class="btn';
+                    if (isset($options['button_class'])) {
+                        $content .= ' '.htmlspecialchars($options['button_class']);
+                    }
+                    $content .= "\" data-route=\"$uri\" data-id=\"$idHtml\"";
                     if (isset($options['onclick'])) {
-                        $content .= " onclick=\"" . htmlspecialchars($options['onclick']) . "\"";
+                        $content .= ' onclick="'.htmlspecialchars($options['onclick']).'"';
                     }
                     $content .= ">$label</button>";
             }

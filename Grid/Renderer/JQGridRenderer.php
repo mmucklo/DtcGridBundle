@@ -6,15 +6,15 @@ use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 
 class JQGridRenderer extends AbstractJqueryRenderer
 {
-    public static $defaultOptions = array(
+    public static $defaultOptions = [
             'datatype' => 'json',
-            'jsonReader' => array(
+            'jsonReader' => [
                     'root' => 'rows',
                     'total' => 'total',
                     'records' => 'records',
                     'page' => 'page',
                     'repeatitems' => false,
-            ),
+            ],
 
             'url' => null,
             'cell' => '',
@@ -27,22 +27,22 @@ class JQGridRenderer extends AbstractJqueryRenderer
             'styleUI' => 'Bootstrap4',
             'iconSet' => 'Octicons',
             // Paging params
-            'prmNames' => array(
+            'prmNames' => [
                     'page' => 'page',
                     'rows' => 'limit',
                     'sort' => 'sort_column',
                     'order' => 'sort_order',
                     'nd' => null,
-            ),
+            ],
 
-            'ajaxGridOptions' => array(
+            'ajaxGridOptions' => [
                     'cache' => false,
                     'ifModified' => false,
-            ),
+            ],
 
             // Pager Config
             'pager' => 'grid-pager',
-    );
+    ];
 
     protected $jqGridCss = [];
     protected $jqGridJs = [];
@@ -54,17 +54,17 @@ class JQGridRenderer extends AbstractJqueryRenderer
         $id = $this->gridSource->getDivId();
         $this->options['pager'] = "{$id}-pager";
 
-        $params = array(
+        $params = [
                 'id' => $this->gridSource->getId(),
                 'renderer' => 'jq_grid',
-        );
+        ];
 
         $url = $this->router->generate('dtc_grid_data', $params);
         $this->options['url'] = $url;
 
         /** @var AbstractGridColumn $column */
         foreach ($this->gridSource->getColumns() as $column) {
-            $info = array();
+            $info = [];
             $info['label'] = $column->getLabel();
             $info['name'] = $column->getField();
             $info['index'] = $column->getField();
@@ -88,17 +88,17 @@ class JQGridRenderer extends AbstractJqueryRenderer
         $gridSource = $this->gridSource;
         $records = $gridSource->getRecords();
 
-        $retVal = array(
+        $retVal = [
                 'page' => $gridSource->getPager()
                     ->getCurrentPage(),
                 'total' => $gridSource->getPager()
                     ->getTotalPages(),
                 'records' => $gridSource->getCount(),
                 'id' => $gridSource->getId(), // unique id
-        );
+        ];
 
         foreach ($records as $record) {
-            $info = array();
+            $info = [];
             /** @var AbstractGridColumn $column */
             foreach ($columns as $column) {
                 if (method_exists($column, 'setRouter')) {
@@ -136,9 +136,6 @@ class JQGridRenderer extends AbstractJqueryRenderer
         $this->jqGridLocalJs = $js;
     }
 
-    /**
-     * @param array|null $params
-     */
     public function getParams(array &$params = null)
     {
         if (null === $params) {
@@ -157,10 +154,10 @@ class JQGridRenderer extends AbstractJqueryRenderer
     {
         $id = $this->gridSource->getDivId();
 
-        $params = array(
+        $params = [
                 'options' => $this->options,
                 'id' => $id,
-        );
+        ];
 
         $template = '@DtcGrid/Grid/jq_grid.html.twig';
 

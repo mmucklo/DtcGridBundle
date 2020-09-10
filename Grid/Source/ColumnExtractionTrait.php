@@ -44,9 +44,6 @@ trait ColumnExtractionTrait
         $this->debug = $flag;
     }
 
-    /**
-     * @param Reader $reader
-     */
     public function setAnnotationReader(Reader $reader)
     {
         $this->reader = $reader;
@@ -307,9 +304,10 @@ trait ColumnExtractionTrait
                 $actionDef = ['label' => $action->label, 'route' => $action->route, 'button_class' => $action->buttonClass, 'onclick' => $action->onclick];
                 if ($action instanceof ShowAction) {
                     $actionDef['action'] = 'show';
-                }
-                if ($action instanceof DeleteAction) {
+                } elseif ($action instanceof DeleteAction) {
                     $actionDef['action'] = 'delete';
+                } else {
+                    $actionDef['action'] = 'custom';
                 }
                 $actionDefs[] = $actionDef;
             }
@@ -331,9 +329,6 @@ trait ColumnExtractionTrait
     }
 
     /**
-     * @param array $sortInfo
-     * @param array $gridColumns
-     *
      * @throws \InvalidArgumentException
      */
     protected function validateSortInfo(array $sortInfo, array $gridColumns)
@@ -425,7 +420,7 @@ trait ColumnExtractionTrait
         $identifier = $metadata->getIdentifier();
         $identifier = isset($identifier[0]) ? $identifier[0] : null;
 
-        $columns = array();
+        $columns = [];
         foreach ($fields as $field) {
             $mapping = $metadata->getFieldMapping($field);
             if (isset($mapping['options']) && isset($mapping['options']['label'])) {

@@ -104,8 +104,6 @@ class GridController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse|Response
      */
     public function show(Request $request)
@@ -137,8 +135,6 @@ class GridController
     }
 
     /**
-     * @param Request $request
-     *
      * @return Response
      */
     public function delete(Request $request)

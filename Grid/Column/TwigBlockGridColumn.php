@@ -9,15 +9,14 @@ class TwigBlockGridColumn extends AbstractGridColumn
 {
     protected $template;
     protected $blockName;
-    protected $env = array();
+    protected $env = [];
 
     /**
      * Block name.
      *
-     * @param string        $field
-     * @param string        $label
-     * @param Twig_Template $template
-     * @param string        $blockName
+     * @param string $field
+     * @param string $label
+     * @param string $blockName
      */
     public function __construct($field, $label, Twig_Template $template, array $env, $blockName = null)
     {

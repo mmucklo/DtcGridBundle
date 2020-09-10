@@ -14,7 +14,6 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-
         $treeBuilder = new TreeBuilder('dtc_grid');
 
         if (method_exists($treeBuilder, 'getRootNode')) {

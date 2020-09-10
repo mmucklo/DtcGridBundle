@@ -6,17 +6,17 @@ use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 
 class DataTablesRenderer extends AbstractJqueryRenderer
 {
-    public static $defaultOptions = array(
+    public static $defaultOptions = [
         'processing' => true,
         'searchDelay' => 350,
-        'table_attr' => array(
+        'table_attr' => [
                 'class' => 'display table table-striped table-bordered small-font',
-            ),
+            ],
         'serverSide' => true,
-        'language' => array(
+        'language' => [
             'lengthMenu' => '_MENU_ records per page',
-        ),
-    );
+        ],
+    ];
 
     protected $dataTablesCss = [];
     protected $dataTablesJs = [];
@@ -88,9 +88,6 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         return isset($this->options['table_attr']['class']) ? $this->options['table_attr']['class'] : null;
     }
 
-    /**
-     * @param array|null $params
-     */
     public function getParams(array &$params = null)
     {
         if (null === $params) {
@@ -113,14 +110,14 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         $fields = array_keys($this->gridSource->getColumns());
 
         // We need to pass filter information here.
-        $params = array(
+        $params = [
                'id' => $this->gridSource->getId(),
                'renderer' => 'datatables',
                'filter' => $this->gridSource->getFilter(),
                'parameters' => $this->gridSource->getParameters(),
                'order' => $this->gridSource->getOrderBy(),
                'fields' => $fields,
-        );
+        ];
 
         $sortInfo = $this->gridSource->getDefaultSort();
         $defaultSortColumn = isset($sortInfo['column']) ? $sortInfo['column'] : null;
@@ -131,11 +128,11 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         $url = $this->router->generate('dtc_grid_data', $params);
         $this->options['sAjaxSource'] = $url;
 
-        $columnsDef = array();
+        $columnsDef = [];
         /** @var AbstractGridColumn $column */
         $idx = 0;
         foreach ($this->gridSource->getColumns() as $index => $column) {
-            $info = array();
+            $info = [];
             $name = $column->getField();
             $info['bSortable'] = $column->getOption('sortable') ? true : false;
             $info['sName'] = $name;
@@ -144,7 +141,7 @@ class DataTablesRenderer extends AbstractJqueryRenderer
                 $info['sWidth'] = $width;
             }
 
-            $info['aTargets'] = array($index);
+            $info['aTargets'] = [$index];
             $info = array_merge($info, $column->getOptions());
             $columnsDef[] = $info;
             if ($index === $defaultSortColumn) {
@@ -164,7 +161,7 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         $records = $gridSource->getRecords();
         $count = $gridSource->getCount();
 
-        $retVal = array(
+        $retVal = [
                 'page' => $gridSource->getPager()
                     ->getCurrentPage(),
                 'total_pages' => $gridSource->getPager()
@@ -172,11 +169,11 @@ class DataTablesRenderer extends AbstractJqueryRenderer
                 'iTotalRecords' => (int) $count,
                 'iTotalDisplayRecords' => $count,
                 'id' => $gridSource->getId(), // unique id
-        );
+        ];
 
-        $data = array();
+        $data = [];
         foreach ($records as $record) {
-            $info = array();
+            $info = [];
             /** @var AbstractGridColumn $column */
             foreach ($columns as $column) {
                 if (method_exists($column, 'setRouter')) {
@@ -203,12 +200,12 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         $options = $this->options;
         unset($options['table_attr']);
 
-        $params = array(
+        $params = [
                 'options' => $options,
                 'table_attr' => $this->options['table_attr'],
                 'columns' => $this->gridSource->getColumns(),
                 'id' => $id,
-        );
+        ];
 
         $template = '@DtcGrid/Grid/datatables.html.twig';
 

@@ -10,12 +10,12 @@ class Generator
     protected function render($skeletonDir, $template, $parameters)
     {
         if (class_exists('Twig\Environment')) {
-            $environment = new Environment(new FilesystemLoader($skeletonDir), array(
+            $environment = new Environment(new FilesystemLoader($skeletonDir), [
                 'debug' => true,
                 'cache' => false,
                 'strict_variables' => true,
                 'autoescape' => false,
-            ));
+            ]);
 
             return $environment->render($template, $parameters);
         }

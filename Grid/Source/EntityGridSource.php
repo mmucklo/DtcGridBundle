@@ -28,7 +28,7 @@ class EntityGridSource extends AbstractDoctrineGridSource
         }
 
         $qb = $this->objectManager->createQueryBuilder();
-        $orderBy = array();
+        $orderBy = [];
         foreach ($this->orderBy as $key => $value) {
             $orderBy[] = "u.{$key} {$value}";
         }
@@ -50,7 +50,7 @@ class EntityGridSource extends AbstractDoctrineGridSource
 
             $validFilters = array_intersect_key($this->filter, $classFields);
 
-            $query = array();
+            $query = [];
             foreach ($validFilters as $key => $value) {
                 if (isset($fieldList[$key])) {
                     if (is_array($value)) {

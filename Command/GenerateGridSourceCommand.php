@@ -4,8 +4,8 @@ namespace Dtc\GridBundle\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Dtc\GridBundle\Generator\GridSourceGenerator;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -30,11 +30,11 @@ class GenerateGridSourceCommand extends Command
     {
         $this
         ->setName('dtc:grid:source:generate')
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('entity_or_document', InputArgument::REQUIRED, 'The entity or document class name to initialize (shortcut notation)'),
                 new InputArgument('class_name', InputArgument::OPTIONAL, 'Name of GridSource - camel case, no space.'),
                 new InputOption('columns', null, InputOption::VALUE_NONE, 'Generate column files.'),
-            ))
+            ])
         ->setDescription('Generate a class for GridSource, GridColumn and template file')
         ;
     }
@@ -111,6 +111,6 @@ class GenerateGridSourceCommand extends Command
             throw new \InvalidArgumentException(sprintf('The entity name must contain a : ("%s" given, expecting something like AcmeBlogBundle:Blog/Post)', $entity));
         }
 
-        return array(substr($entity, 0, $pos), substr($entity, $pos + 1));
+        return [substr($entity, 0, $pos), substr($entity, $pos + 1)];
     }
 }

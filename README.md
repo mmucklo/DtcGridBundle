@@ -151,6 +151,10 @@ App\Article:
       label: Show
       type: show
       route: dtc_grid_show
+    -
+      label: Custom
+      onclick: "alert('custom action')"
+      button_class: btn-info
   sort:
     createdAt: DESC
 ```
@@ -247,7 +251,7 @@ use Dtc\GridBundle\Annotation as Grid;
 
 /**
  * Class User
- * @Grid\Grid(actions={@Grid\ShowAction(), @Grid\DeleteAction()})
+ * @Grid\Grid(actions={@Grid\ShowAction(), @Grid\DeleteAction(), @Grid\Action(label="Custom",buttonClass="btn-info",onclick="alert('custom-action')")})
  * @ORM\Entity
  * @package App\Entity
  */

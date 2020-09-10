@@ -11,7 +11,7 @@ abstract class AbstractGridColumn
 {
     protected $field;
     protected $label;
-    protected $options = array();
+    protected $options = [];
     protected $order;
 
     abstract public function format($object, GridSourceInterface $gridsource);

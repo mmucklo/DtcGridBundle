@@ -6,11 +6,11 @@ class TwigExtension extends \Twig\Extension\AbstractExtension
 {
     public function getFunction()
     {
-        $names = array(
+        $names = [
             'format_cell' => 'format_cell',
-        );
+        ];
 
-        $funcs = array();
+        $funcs = [];
         foreach ($names as $twig => $local) {
             $funcs[$twig] = new \Twig\TwigFunction($twig, [$this, $local]);
         }
@@ -20,11 +20,11 @@ class TwigExtension extends \Twig\Extension\AbstractExtension
 
     public function getFilters()
     {
-        $names = array(
+        $names = [
             'format_cell' => 'format_cell',
-        );
+        ];
 
-        $funcs = array();
+        $funcs = [];
         foreach ($names as $twig => $local) {
             $funcs[$twig] = new \Twig\TwigFilter($twig, [$this, $local]);
         }
@@ -44,7 +44,7 @@ class TwigExtension extends \Twig\Extension\AbstractExtension
                 return $value->format(\DateTime::ISO8601);
             }
 
-            return 'object: ' . get_class($value);
+            return 'object: '.get_class($value);
         } elseif (is_scalar($value)) {
             return $value;
         } elseif (is_array($value)) {

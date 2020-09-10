@@ -2,8 +2,8 @@
 
 namespace Dtc\GridBundle\Grid\Source;
 
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 
 class DocumentGridSource extends AbstractDoctrineGridSource
@@ -43,7 +43,7 @@ class DocumentGridSource extends AbstractDoctrineGridSource
         if ($this->filter) {
             $validFilters = array_intersect_key($this->filter, $classFields);
 
-            $query = array();
+            $query = [];
             foreach ($validFilters as $key => $value) {
                 if (isset($fieldList[$key])) {
                     if (is_array($value)) {

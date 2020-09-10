@@ -44,7 +44,7 @@ class GridSourceManager
     {
         $this->columnSource = $columnSource;
         $this->reflectionAllowedEntities = [];
-        $this->sources = array();
+        $this->sources = [];
     }
 
     public function setReader(Reader $reader)
@@ -108,7 +108,6 @@ class GridSourceManager
      * @param $manager
      * @param $className
      * @param $name
-     * @param ColumnSourceInfo $columnSourceInfo
      *
      * @return DocumentGridSource|EntityGridSource
      *

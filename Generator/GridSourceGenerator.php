@@ -3,10 +3,10 @@
 namespace Dtc\GridBundle\Generator;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Dtc\GridBundle\Util\CamelCase;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
  * @deprecated
@@ -36,22 +36,22 @@ class GridSourceGenerator extends Generator
         $gridColumnPath = $dirPath.'/'.str_replace('\\', '/', $entity).'GridColumn.php';
         $templatePath = $bundle->getPath().'/Resources/views/'.str_replace('\\', '/', $entity).'/_grid.html.twig';
 
-        $fields = array();
+        $fields = [];
         foreach ($this->getFieldsFromMetadata($metadata) as $field) {
             $fields[$field] = CamelCase::fromCamelCase($field);
         }
 
-        $params = array(
+        $params = [
                 'fields' => $fields,
                 'namespace' => $gridColumnsNamespace,
                 'class' => $gridColumnClass,
                 'template_name' => "{$bundle->getName()}:{$entity}:_grid.html.twig",
-        );
+        ];
 
         $this->saveCache[$templatePath] = $this->render($this->skeletonDir, 'grid_template.html.twig', $params);
         $this->saveCache[$gridColumnPath] = $this->render($this->skeletonDir, 'GridColumns.php.twig', $params);
 
-        return array($gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath);
+        return [$gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath];
     }
 
     public function generate(BundleInterface $bundle, $entityDocument, $metadata, $columns = false)
@@ -75,10 +75,10 @@ class GridSourceGenerator extends Generator
             list($gridColumnClass, $gridColumnsNamespace, $gridColumnPath, $templatePath) =
                 $this->generateColumns($bundle, $entityDocument, $metadata);
 
-            $files = array(
+            $files = [
                 'grid_columns' => $gridColumnPath,
                 'grid_template' => $templatePath,
-            );
+            ];
         }
 
         // Check to see if the files exists
@@ -88,32 +88,32 @@ class GridSourceGenerator extends Generator
             }
         }
 
-        $config = array();
+        $config = [];
         $serviceName = 'grid.source.'.strtolower($entityDocumentClass);
-        $config[$serviceName] = array(
+        $config[$serviceName] = [
                 'class' => $class,
-                'arguments' => array($manager, $entityDocumentClassPath),
-                'tags' => array(array('name' => 'dtc_grid.source')),
-                'calls' => array(
-                    array('autoDiscoverColumns'),
-        ), );
+                'arguments' => [$manager, $entityDocumentClassPath],
+                'tags' => [['name' => 'dtc_grid.source']],
+                'calls' => [
+                    ['autoDiscoverColumns'],
+        ], ];
 
         if ($columns && isset($gridColumnsNamespace) && isset($gridColumnClass)) {
-            $config[$serviceName]['calls'] = array(
-                array('setColumns', array(
+            $config[$serviceName]['calls'] = [
+                ['setColumns', [
                     '@'.$serviceName.'.columns',
-                ),
-                ),
-            );
+                ],
+                ],
+            ];
 
-            $config[$serviceName.'.columns'] = array(
+            $config[$serviceName.'.columns'] = [
                 'class' => $gridColumnsNamespace.'\\'.$gridColumnClass,
-                'arguments' => array('@twig'),
-            );
+                'arguments' => ['@twig'],
+            ];
         }
 
         $configFile = $bundle->getPath().'/Resources/config/grid.yml';
-        $services = array();
+        $services = [];
         if (file_exists($configFile)) {
             $services = Yaml::parse($contents = file_get_contents($configFile));
             if (isset($services['services'])) {
@@ -127,10 +127,10 @@ class GridSourceGenerator extends Generator
 
         $this->saveFile($configFile, Yaml::dump($services, 3));
 
-        $params = array(
+        $params = [
             'gridsource_id' => $serviceName,
             'files' => $files,
-        );
+        ];
 
         $output = $this->render($this->skeletonDir, 'controller.php.twig', $params);
         echo $output;
