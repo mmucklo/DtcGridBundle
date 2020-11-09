@@ -1,3 +1,5 @@
+7.2.1
+   * Remove reference to AbstractManagerRegistry type hint for now to aid differing Doctrine Versions, per [DtcQueueBundle issue #134](https://github.com/mmucklo/DtcQueueBundle/issues/134).
 7.2.0
    * Remove reference to ObjectManager type hint for now to aid differing Doctrine Versions, per [DtcQueueBundle issue #134](https://github.com/mmucklo/DtcQueueBundle/issues/134).
 7.1.0

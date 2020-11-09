@@ -3,8 +3,6 @@
 namespace Dtc\GridBundle\Manager;
 
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Persistence\AbstractManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,10 +19,8 @@ class GridSourceManager
 
     protected $reader;
 
-    /** @var AbstractManagerRegistry */
     protected $registry;
 
-    /** @var AbstractManagerRegistry */
     protected $mongodbRegistry;
 
     protected $customManagerMappings;
@@ -60,12 +56,12 @@ class GridSourceManager
         $this->reflectionAllowedEntities = is_array($allowedEntities) ? array_flip($allowedEntities) : ('*' === $allowedEntities ? null : []);
     }
 
-    public function setRegistry(AbstractManagerRegistry $registry)
+    public function setRegistry($registry)
     {
         $this->registry = $registry;
     }
 
-    public function setMongodbRegistry(AbstractManagerRegistry $registry)
+    public function setMongodbRegistry($registry)
     {
         $this->mongodbRegistry = $registry;
     }
@@ -76,7 +72,6 @@ class GridSourceManager
     }
 
     /**
-     * @param ObjectManager $manager
      * @param $entityOrDocument
      *z
      *
