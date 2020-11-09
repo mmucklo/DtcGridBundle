@@ -2,15 +2,13 @@
 
 namespace Dtc\GridBundle\Grid\Source;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
 abstract class AbstractDoctrineGridSource extends AbstractGridSource
 {
     protected $objectManager;
     protected $idColumn;
     protected $objectName;
 
-    public function __construct(ObjectManager $objectManager, $objectName)
+    public function __construct($objectManager, $objectName)
     {
         $this->objectManager = $objectManager;
         $this->objectName = $objectName;

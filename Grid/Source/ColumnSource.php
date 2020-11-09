@@ -4,7 +4,6 @@ namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
 use Dtc\GridBundle\Annotation\Action;
 use Dtc\GridBundle\Annotation\Column;
 use Dtc\GridBundle\Annotation\DeleteAction;
@@ -92,7 +91,7 @@ class ColumnSource
      *
      * @throws Exception
      */
-    public function getColumnSourceInfo(ObjectManager $objectManager, $objectName, $allowReflection, Reader $reader = null)
+    public function getColumnSourceInfo($objectManager, $objectName, $allowReflection, Reader $reader = null)
     {
         $metadataFactory = $objectManager->getMetadataFactory();
         $classMetadata = $metadataFactory->getMetadataFor($objectName);
