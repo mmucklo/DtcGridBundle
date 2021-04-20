@@ -3,7 +3,7 @@
 namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Dtc\GridBundle\Annotation\Action;
 use Dtc\GridBundle\Annotation\Column;
 use Dtc\GridBundle\Annotation\DeleteAction;
