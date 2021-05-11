@@ -3,7 +3,6 @@
 namespace Dtc\GridBundle\Grid\Source;
 
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Dtc\GridBundle\Annotation\Action;
 use Dtc\GridBundle\Annotation\Column;
 use Dtc\GridBundle\Annotation\DeleteAction;
@@ -48,7 +47,12 @@ class ColumnSource
         $this->cacheDir = $cacheDir;
     }
 
-    public static function getIdColumn(ClassMetadata $classMetadata)
+    /**
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $classMetadata
+     *
+     * @return mixed|null
+     */
+    public static function getIdColumn($classMetadata)
     {
         $identifier = $classMetadata->getIdentifier();
 
@@ -56,13 +60,14 @@ class ColumnSource
     }
 
     /**
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $classMetadata
      * @param $cacheFilename
      *
      * @return array|null
      *
      * @throws \Exception
      */
-    private function getCachedColumnInfo($cacheFilename, ClassMetadata $classMetadata, Reader $reader = null)
+    private function getCachedColumnInfo($cacheFilename, $classMetadata, Reader $reader = null)
     {
         $params = [$classMetadata, $cacheFilename];
         if ($reader) {
@@ -130,11 +135,13 @@ class ColumnSource
     /**
      * Cached annotation info from the file, if the mtime of the file has not changed (or if not in debug).
      *
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
+     *
      * @return bool
      *
      * @throws Exception
      */
-    private function shouldIncludeColumnCache(ClassMetadata $metadata, $columnCacheFilename, Reader $reader = null)
+    private function shouldIncludeColumnCache($metadata, $columnCacheFilename, Reader $reader = null)
     {
         // In production, or if we're sure there's no annotaitons, just include the cache.
         if (!$this->debug || !isset($reader)) {
@@ -152,11 +159,12 @@ class ColumnSource
      * Check timestamps of the file pointed to by the class metadata, and the columnCacheFilename and see if any
      * are newer (meaning we .
      *
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
      * @param $columnCacheFilename
      *
      * @return bool
      */
-    public static function checkTimestamps(ClassMetadata $metadata, $columnCacheFilename)
+    public static function checkTimestamps($metadata, $columnCacheFilename)
     {
         $reflectionClass = $metadata->getReflectionClass();
         $filename = $reflectionClass->getFileName();
@@ -177,11 +185,13 @@ class ColumnSource
     /**
      * Generates a list of property name and labels based on finding the GridColumn annotation.
      *
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
+     *
      * @throws \Exception
      *
      * @return array|null Hash of grid annotation results: ['columns' => array, 'sort' => string]
      */
-    private function readAndCacheGridAnnotations($cacheFilename, Reader $reader, ClassMetadata $metadata, $allowReflection)
+    private function readAndCacheGridAnnotations($cacheFilename, Reader $reader, $metadata, $allowReflection)
     {
         $reflectionClass = $metadata->getReflectionClass();
         $properties = $reflectionClass->getProperties();
@@ -359,8 +369,10 @@ class ColumnSource
 
     /**
      * Generate Columns based on document's Metadata.
+     *
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
      */
-    private static function getReflectionColumns(ClassMetadata $metadata)
+    private static function getReflectionColumns($metadata)
     {
         $fields = $metadata->getFieldNames();
         $identifier = $metadata->getIdentifier();
