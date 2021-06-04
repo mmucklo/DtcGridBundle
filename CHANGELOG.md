@@ -1,3 +1,5 @@
+7.3.0
+   * Support older symfony yaml libraries that don't have parseFile.
 7.2.2
    * Remove ClassMetadata type hint for now to aid differing Doctrine Versions.
 7.2.1
