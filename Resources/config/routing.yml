@@ -1,15 +1,15 @@
 dtc_grid:
     path: /dtc_grid/grid
-    defaults: { _controller: dtc_grid.controller.grid::grid }
+    defaults: { _controller: dtc_grid.controller.grid:grid }
 
 dtc_grid_data:
     path: /dtc_grid/data
-    defaults: { _controller: dtc_grid.controller.grid::data }
+    defaults: { _controller: dtc_grid.controller.grid:data }
 
 dtc_grid_show:
     path: /dtc_grid/show
-    defaults: { _controller: dtc_grid.controller.grid::show }
+    defaults: { _controller: dtc_grid.controller.grid:show }
 
 dtc_grid_delete:
     path: /dtc_grid/delete
-    defaults: { _controller: dtc_grid.controller.grid::delete }
+    defaults: { _controller: dtc_grid.controller.grid:delete }
