@@ -1,3 +1,7 @@
+7.3.0
+   * Support older symfony yaml libraries that don't have parseFile.
+7.2.2
+   * Remove ClassMetadata type hint for now to aid differing Doctrine Versions.
 7.2.1
    * Remove reference to AbstractManagerRegistry type hint for now to aid differing Doctrine Versions, per [DtcQueueBundle issue #134](https://github.com/mmucklo/DtcQueueBundle/issues/134).
 7.2.0

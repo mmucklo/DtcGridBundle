@@ -111,7 +111,7 @@ class ColumnUtil
             throw new Exception("Can't read {$filename}");
         }
         $stat = stat($filename);
-        $result = Yaml::parseFile($filename);
+        $result = method_exists('Symfony\Component\Yaml\Yaml', 'parseFile') ? Yaml::parseFile($filename) : Yaml::parse(file_get_contents($filename));
         if (!$result && $stat['size'] > 0) {
             throw new Exception("Can't parse data from {$filename}");
         }
