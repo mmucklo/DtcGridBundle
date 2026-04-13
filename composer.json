@@ -15,11 +15,10 @@
     ],
     "require": {
         "php": ">=7.2.0",
-        "symfony/framework-bundle": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0",
-        "sensio/framework-extra-bundle": "^5.6 || ^6.2",
-        "symfony/templating": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0",
-        "symfony/translation": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0",
-        "symfony/twig-bundle": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0",
+        "symfony/framework-bundle": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "symfony/templating": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "symfony/translation": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "symfony/twig-bundle": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0",
         "twig/twig": "^2.0 || ^3.0"
     },
     "require-dev": {
