@@ -16,7 +16,7 @@ class GridSourceManagerTest extends TestCase
         $container->setParameter('dtc_grid.custom_managers', []);
         $gridSourceManager = new GridSourceManager(new ColumnSource('/tmp', true));
         self::assertNotNull($gridSourceManager->all());
-        self::assertInternalType('array', $gridSourceManager->all());
+        self::assertIsArray($gridSourceManager->all());
         self::assertEmpty($gridSourceManager->all());
     }
 
@@ -41,26 +41,32 @@ class GridSourceManagerTest extends TestCase
         $container->setParameter('dtc_grid.custom_managers', []);
         $gridSourceManager = new GridSourceManager(new ColumnSource('/tmp', true));
         $gridSource = new TestGridSource();
+        $caught = 0;
         try {
             $gridSourceManager->get('test_grirce');
             $this->fail('should not get a gridsource here');
         } catch (\Exception $exception) {
+            ++$caught;
         }
         $gridSourceManager->add('test_grid_source', $gridSource);
         try {
             $gridSourceManager->get('test_grirce');
             $this->fail('should not get a gridsource here');
         } catch (\Exception $exception) {
+            ++$caught;
         }
         try {
             $gridSourceManager->get('');
             $this->fail('should not get a gridsource here');
         } catch (\Exception $exception) {
+            ++$caught;
         }
         try {
             $gridSourceManager->get(null);
             $this->fail('should not get a gridsource here');
         } catch (\Exception $exception) {
+            ++$caught;
         }
+        self::assertSame(4, $caught);
     }
 }
