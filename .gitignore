@@ -18,6 +18,9 @@ bin/php-cs-fixer
 # PHP CS Fixer
 .php_cs.cache
 
+# PHPUnit
+.phpunit.result.cache
+
 # Jetbrains
 .idea
 
