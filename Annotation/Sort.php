@@ -6,6 +6,7 @@ namespace Dtc\GridBundle\Annotation;
  * @Annotation
  * @Target("ANNOTATION")
  */
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class Sort implements Annotation
 {
     /**
