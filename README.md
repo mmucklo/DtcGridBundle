@@ -1,7 +1,7 @@
 DtcGridBundle
 ==============
 
-[![Build Status](https://travis-ci.org/mmucklo/DtcGridBundle.svg?branch=master)](https://travis-ci.org/mmucklo/DtcGridBundle)
+[![CI](https://github.com/mmucklo/DtcGridBundle/actions/workflows/ci.yml/badge.svg)](https://github.com/mmucklo/DtcGridBundle/actions/workflows/ci.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mmucklo/DtcGridBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mmucklo/DtcGridBundle/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/mmucklo/DtcGridBundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/mmucklo/DtcGridBundle/?branch=master)
 
@@ -17,6 +17,23 @@ Generate a searchable Grid from a Doctrine ORM Entity or Doctrine MongoDB Docume
 Render customizable tables using jqGrid, or jQuery DataTables, or in a Styled HTML Table.
 
 Supports both Doctrine ORM and Doctrine MongoDB ODM
+
+Requirements
+------------
+
+| PHP   | Symfony (tested) |
+|-------|------------------|
+| 7.2   | 3.4 - 4.4 LTS    |
+| 7.3   | 3.4 - 5.4 LTS    |
+| 7.4   | 3.4 - 5.4 LTS    |
+| 8.0   | 5.4 - 6.4 LTS    |
+| 8.1   | 5.4 - 6.4 LTS    |
+| 8.2   | 5.4 - 6.4 LTS    |
+| 8.3   | 5.4 - 7.4 LTS    |
+| 8.4   | 5.4 - 8.0        |
+
+The bundle declares support for Symfony `^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0`.
+Composer will pick the highest Symfony version your PHP supports.
 
 ![Screenshot](/Resources/doc/img/screenshot.png?raw=true "Screenshot")
 
