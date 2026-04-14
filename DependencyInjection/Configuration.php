@@ -9,10 +9,8 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * Generates the configuration tree.
-     *
-     * @return TreeBuilder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('dtc_grid');
 
@@ -74,7 +72,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->variableNode('js')
                             ->defaultValue(['//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js',
-                                            '//cdn.datatables.net/1.10.20/js/dataTables.bootstrap.min.js', ])
+                                '//cdn.datatables.net/1.10.20/js/dataTables.bootstrap.min.js', ])
                         ->end()
                         ->arrayNode('local')
                             ->children()

@@ -7,41 +7,41 @@ use Dtc\GridBundle\Grid\Column\AbstractGridColumn;
 class JQGridRenderer extends AbstractJqueryRenderer
 {
     public static $defaultOptions = [
-            'datatype' => 'json',
-            'jsonReader' => [
-                    'root' => 'rows',
-                    'total' => 'total',
-                    'records' => 'records',
-                    'page' => 'page',
-                    'repeatitems' => false,
-            ],
+        'datatype' => 'json',
+        'jsonReader' => [
+            'root' => 'rows',
+            'total' => 'total',
+            'records' => 'records',
+            'page' => 'page',
+            'repeatitems' => false,
+        ],
 
-            'url' => null,
-            'cell' => '',
-            'width' => 840,
-            'height' => 400,
-            'loadui' => 'disable',
-            'altRows' => true,
-            'viewrecords' => true,
-            'multiselect' => true,
-            'styleUI' => 'Bootstrap4',
-            'iconSet' => 'Octicons',
-            // Paging params
-            'prmNames' => [
-                    'page' => 'page',
-                    'rows' => 'limit',
-                    'sort' => 'sort_column',
-                    'order' => 'sort_order',
-                    'nd' => null,
-            ],
+        'url' => null,
+        'cell' => '',
+        'width' => 840,
+        'height' => 400,
+        'loadui' => 'disable',
+        'altRows' => true,
+        'viewrecords' => true,
+        'multiselect' => true,
+        'styleUI' => 'Bootstrap4',
+        'iconSet' => 'Octicons',
+        // Paging params
+        'prmNames' => [
+            'page' => 'page',
+            'rows' => 'limit',
+            'sort' => 'sort_column',
+            'order' => 'sort_order',
+            'nd' => null,
+        ],
 
-            'ajaxGridOptions' => [
-                    'cache' => false,
-                    'ifModified' => false,
-            ],
+        'ajaxGridOptions' => [
+            'cache' => false,
+            'ifModified' => false,
+        ],
 
-            // Pager Config
-            'pager' => 'grid-pager',
+        // Pager Config
+        'pager' => 'grid-pager',
     ];
 
     protected $jqGridCss = [];
@@ -55,8 +55,8 @@ class JQGridRenderer extends AbstractJqueryRenderer
         $this->options['pager'] = "{$id}-pager";
 
         $params = [
-                'id' => $this->gridSource->getId(),
-                'renderer' => 'jq_grid',
+            'id' => $this->gridSource->getId(),
+            'renderer' => 'jq_grid',
         ];
 
         $url = $this->router->generate('dtc_grid_data', $params);
@@ -89,12 +89,12 @@ class JQGridRenderer extends AbstractJqueryRenderer
         $records = $gridSource->getRecords();
 
         $retVal = [
-                'page' => $gridSource->getPager()
-                    ->getCurrentPage(),
-                'total' => $gridSource->getPager()
-                    ->getTotalPages(),
-                'records' => $gridSource->getCount(),
-                'id' => $gridSource->getId(), // unique id
+            'page' => $gridSource->getPager()
+                ->getCurrentPage(),
+            'total' => $gridSource->getPager()
+                ->getTotalPages(),
+            'records' => $gridSource->getCount(),
+            'id' => $gridSource->getId(), // unique id
         ];
 
         foreach ($records as $record) {
@@ -136,7 +136,7 @@ class JQGridRenderer extends AbstractJqueryRenderer
         $this->jqGridLocalJs = $js;
     }
 
-    public function getParams(array &$params = null)
+    public function getParams(?array &$params = null)
     {
         if (null === $params) {
             $params = [];
@@ -155,8 +155,8 @@ class JQGridRenderer extends AbstractJqueryRenderer
         $id = $this->gridSource->getDivId();
 
         $params = [
-                'options' => $this->options,
-                'id' => $id,
+            'options' => $this->options,
+            'id' => $id,
         ];
 
         $template = '@DtcGrid/Grid/jq_grid.html.twig';

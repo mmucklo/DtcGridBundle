@@ -64,7 +64,7 @@ abstract class AbstractGridSource implements GridSourceInterface
         return $this->id;
     }
 
-    private $divId = null;
+    private $divId;
 
     public function getDivId()
     {
@@ -221,8 +221,6 @@ abstract class AbstractGridSource implements GridSourceInterface
     }
 
     /**
-     * @param $id
-     *
      * @return mixed|null returns the row identified by Id if found
      */
     public function find($id)

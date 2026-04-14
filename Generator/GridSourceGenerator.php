@@ -42,10 +42,10 @@ class GridSourceGenerator extends Generator
         }
 
         $params = [
-                'fields' => $fields,
-                'namespace' => $gridColumnsNamespace,
-                'class' => $gridColumnClass,
-                'template_name' => "{$bundle->getName()}:{$entity}:_grid.html.twig",
+            'fields' => $fields,
+            'namespace' => $gridColumnsNamespace,
+            'class' => $gridColumnClass,
+            'template_name' => "{$bundle->getName()}:{$entity}:_grid.html.twig",
         ];
 
         $this->saveCache[$templatePath] = $this->render($this->skeletonDir, 'grid_template.html.twig', $params);
@@ -91,12 +91,12 @@ class GridSourceGenerator extends Generator
         $config = [];
         $serviceName = 'grid.source.'.strtolower($entityDocumentClass);
         $config[$serviceName] = [
-                'class' => $class,
-                'arguments' => [$manager, $entityDocumentClassPath],
-                'tags' => [['name' => 'dtc_grid.source']],
-                'calls' => [
-                    ['autoDiscoverColumns'],
-        ], ];
+            'class' => $class,
+            'arguments' => [$manager, $entityDocumentClassPath],
+            'tags' => [['name' => 'dtc_grid.source']],
+            'calls' => [
+                ['autoDiscoverColumns'],
+            ], ];
 
         if ($columns && isset($gridColumnsNamespace) && isset($gridColumnClass)) {
             $config[$serviceName]['calls'] = [
@@ -134,7 +134,7 @@ class GridSourceGenerator extends Generator
 
         $output = $this->render($this->skeletonDir, 'controller.php.twig', $params);
         echo $output;
-        exit();
+        exit;
     }
 
     private function getFieldsFromMetadata($metadata)

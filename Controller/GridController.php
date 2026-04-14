@@ -90,15 +90,14 @@ class GridController
         $response->setPublic();
         if ($response->isNotModified($request)) {
             return $response;
-        } else {
-            if (!$content) {
-                $data = $renderer->getData();
-                $content = json_encode($data);
-            }
-
-            $response->headers->set('Content-type', 'application/json');
-            $response->setContent($content);
         }
+        if (!$content) {
+            $data = $renderer->getData();
+            $content = json_encode($data);
+        }
+
+        $response->headers->set('Content-type', 'application/json');
+        $response->setContent($content);
 
         return $response;
     }

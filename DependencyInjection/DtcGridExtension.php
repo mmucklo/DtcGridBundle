@@ -117,7 +117,7 @@ class DtcGridExtension extends Extension
         $container->setParameter('dtc_grid.theme.js', $js);
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'dtc_grid';
     }

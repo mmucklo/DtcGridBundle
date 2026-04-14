@@ -57,8 +57,6 @@ class GridSourceCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param $id
-     *
      * @throws \ReflectionException
      */
     public static function addGridSource(ContainerBuilder $container, $id)
@@ -119,8 +117,6 @@ class GridSourceCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param $cacheDir
-     *
      * @throws \Exception
      */
     private static function cacheAllFiles($cacheDir, Finder $finder)

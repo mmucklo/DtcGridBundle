@@ -29,10 +29,10 @@ class TableGridRenderer extends AbstractRenderer
     public function render()
     {
         $params = [
-                'records' => $this->gridSource->getRecords(),
-                'columns' => $this->gridSource->getColumns(),
-                'options' => $this->options,
-                'source' => $this->gridSource,
+            'records' => $this->gridSource->getRecords(),
+            'columns' => $this->gridSource->getColumns(),
+            'options' => $this->options,
+            'source' => $this->gridSource,
         ];
 
         $template = '@DtcGrid/Grid/table.html.twig';
@@ -40,7 +40,7 @@ class TableGridRenderer extends AbstractRenderer
         return $this->twig->render($template, $params);
     }
 
-    public function getParams(array &$params = null)
+    public function getParams(?array &$params = null)
     {
         if (null === $params) {
             $params = [];

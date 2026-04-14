@@ -3,18 +3,14 @@
 namespace Dtc\GridBundle\Util;
 
 use Dtc\GridBundle\Annotation\Action;
-use Exception;
 use Symfony\Component\Yaml\Yaml;
 
 class ColumnUtil
 {
     /**
-     * @param $cacheDir
-     * @param $fqn
-     *
      * @return string
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function createCacheFilename($cacheDir, $fqn)
     {
@@ -33,10 +29,10 @@ class ColumnUtil
         $filename = $directory.DIRECTORY_SEPARATOR.$name.'.php';
 
         if (($dir = dirname($filename)) && !is_dir($dir) && !mkdir($dir, octdec($permissions), true)) {
-            throw new Exception("Can't create: ".$dir);
+            throw new \Exception("Can't create: ".$dir);
         }
         if (!is_writable($dir)) {
-            throw new Exception("Can't write to: $dir");
+            throw new \Exception("Can't write to: $dir");
         }
 
         return $filename;
@@ -86,7 +82,7 @@ class ColumnUtil
      * @param string $cacheDir
      * @param string $filename
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function cacheClassesFromFile($cacheDir, $filename)
     {
@@ -102,18 +98,18 @@ class ColumnUtil
      *
      * @return array
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function extractClassesFromFile($filename)
     {
         // @TODO probably break this into multiple functions
         if (!is_readable($filename)) {
-            throw new Exception("Can't read {$filename}");
+            throw new \Exception("Can't read {$filename}");
         }
         $stat = stat($filename);
         $result = method_exists('Symfony\Component\Yaml\Yaml', 'parseFile') ? Yaml::parseFile($filename) : Yaml::parse(file_get_contents($filename));
         if (!$result && $stat['size'] > 0) {
-            throw new Exception("Can't parse data from {$filename}");
+            throw new \Exception("Can't parse data from {$filename}");
         }
 
         $classes = [];
@@ -124,7 +120,7 @@ class ColumnUtil
             }
             $class = ltrim($class, '\\');
             if (!class_exists($class)) {
-                throw new Exception("$class - class does not exist");
+                throw new \Exception("$class - class does not exist");
             }
             $classes[$class]['columns'] = [];
             foreach ($info['columns'] as $name => $columnDef) {
@@ -148,7 +144,7 @@ class ColumnUtil
                 /* @var Action $action */
                 foreach ($info['actions'] as $action) {
                     if (!isset($action['label'])) {
-                        throw new Exception("$class - action definition missing 'label' ".print_r($action, true));
+                        throw new \Exception("$class - action definition missing 'label' ".print_r($action, true));
                     }
                     $actionDef = ['label' => $action['label']];
                     if (isset($action['route'])) {
@@ -182,7 +178,7 @@ class ColumnUtil
             if (isset($info['sort'])) {
                 foreach ($info['sort'] as $key => $value) {
                     if (!isset($info['columns'][$key])) {
-                        throw new Exception("$class - can't find sort column $key in list of columns.");
+                        throw new \Exception("$class - can't find sort column $key in list of columns.");
                     }
                     switch ($value) {
                         case 'ASC':
@@ -190,7 +186,7 @@ class ColumnUtil
                         case 'DESC':
                             break;
                         default:
-                            throw new Exception("$class - sort type should be ASC or DESC instead of $value.");
+                            throw new \Exception("$class - sort type should be ASC or DESC instead of $value.");
                     }
                 }
                 $classes[$class]['sort'] = $info['sort'];

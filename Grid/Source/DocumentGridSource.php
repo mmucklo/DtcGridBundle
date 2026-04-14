@@ -87,8 +87,6 @@ class DocumentGridSource extends AbstractDoctrineGridSource
     }
 
     /**
-     * @return mixed
-     *
      * @throws \Exception
      */
     public function getClassMetadata()
@@ -100,8 +98,6 @@ class DocumentGridSource extends AbstractDoctrineGridSource
     }
 
     /**
-     * @return mixed
-     *
      * @throws \Doctrine\ODM\MongoDB\MongoDBException
      * @throws \Exception
      */
@@ -113,8 +109,6 @@ class DocumentGridSource extends AbstractDoctrineGridSource
     }
 
     /**
-     * @return mixed
-     *
      * @throws \Doctrine\ODM\MongoDB\MongoDBException
      * @throws \Exception
      */
@@ -124,8 +118,6 @@ class DocumentGridSource extends AbstractDoctrineGridSource
     }
 
     /**
-     * @param $id
-     *
      * @return mixed|null
      *
      * @throws \Exception
@@ -147,7 +139,6 @@ class DocumentGridSource extends AbstractDoctrineGridSource
     }
 
     /**
-     * @param $id
      * @param bool   $soft
      * @param string $softColumn
      * @param string $softColumnType

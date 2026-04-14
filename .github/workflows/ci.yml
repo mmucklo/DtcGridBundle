@@ -57,3 +57,30 @@ jobs:
 
       - name: Run PHPUnit
         run: bin/phpunit
+
+  lint:
+    name: Lint & static analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, json, mongodb
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      - name: PHP CS Fixer
+        env:
+          PHP_CS_FIXER_IGNORE_ENV: 1
+        run: bin/php-cs-fixer fix --dry-run --diff
+
+      - name: PHPStan
+        run: bin/phpstan analyse --no-progress --memory-limit=512M
