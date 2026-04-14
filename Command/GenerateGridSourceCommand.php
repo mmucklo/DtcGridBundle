@@ -59,7 +59,7 @@ class GenerateGridSourceCommand extends Command
         $this->mongoDBRegistry = $mongoDBRegistry;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Taken from SensioGeneratorBundle: class Command\Validators (see LICENSE)
         if (!preg_match('{^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*:[a-zA-Z0-9_\x7f-\xff\\\/]+$}', $entity = $input->getArgument('entity_or_document'))) {
@@ -101,6 +101,8 @@ class GenerateGridSourceCommand extends Command
         $columnGenerator = new GridSourceGenerator($skeletonDir);
 
         $columnGenerator->generate($bundle, $entity, $metadata, $input->getOption('columns'));
+
+        return 0;
     }
 
     protected function parseShortcutNotation($shortcut)

@@ -12,8 +12,6 @@ use Dtc\GridBundle\Annotation\Sort;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 use Dtc\GridBundle\Util\CamelCase;
 use Dtc\GridBundle\Util\ColumnUtil;
-use Exception;
-use InvalidArgumentException;
 
 class ColumnSource
 {
@@ -61,13 +59,12 @@ class ColumnSource
 
     /**
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $classMetadata
-     * @param $cacheFilename
      *
      * @return array|null
      *
      * @throws \Exception
      */
-    private function getCachedColumnInfo($cacheFilename, $classMetadata, Reader $reader = null)
+    private function getCachedColumnInfo($cacheFilename, $classMetadata, ?Reader $reader = null)
     {
         $params = [$classMetadata, $cacheFilename];
         if ($reader) {
@@ -94,9 +91,9 @@ class ColumnSource
     /**
      * @return ColumnSourceInfo|null
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getColumnSourceInfo($objectManager, $objectName, $allowReflection, Reader $reader = null)
+    public function getColumnSourceInfo($objectManager, $objectName, $allowReflection, ?Reader $reader = null)
     {
         $metadataFactory = $objectManager->getMetadataFactory();
         $classMetadata = $metadataFactory->getMetadataFor($objectName);
@@ -139,9 +136,9 @@ class ColumnSource
      *
      * @return bool
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    private function shouldIncludeColumnCache($metadata, $columnCacheFilename, Reader $reader = null)
+    private function shouldIncludeColumnCache($metadata, $columnCacheFilename, ?Reader $reader = null)
     {
         // In production, or if we're sure there's no annotaitons, just include the cache.
         if (!$this->debug || !isset($reader)) {
@@ -160,7 +157,6 @@ class ColumnSource
      * are newer (meaning we .
      *
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
-     * @param $columnCacheFilename
      *
      * @return bool
      */
@@ -187,9 +183,9 @@ class ColumnSource
      *
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
      *
-     * @throws \Exception
-     *
      * @return array|null Hash of grid annotation results: ['columns' => array, 'sort' => string]
+     *
+     * @throws \Exception
      */
     private function readAndCacheGridAnnotations($cacheFilename, Reader $reader, $metadata, $allowReflection)
     {
@@ -261,7 +257,7 @@ class ColumnSource
 
         if ($sort) {
             if ($sortMulti) {
-                throw new InvalidArgumentException($reflectionClass->getName().' - '."Can't have sort and sortMulti defined on Grid annotation");
+                throw new \InvalidArgumentException($reflectionClass->getName().' - '."Can't have sort and sortMulti defined on Grid annotation");
             }
             $sortMulti = [$sort];
         }
@@ -276,8 +272,8 @@ class ColumnSource
                         $sortList[$sortInfo['column']] = $sortInfo['direction'];
                     }
                 }
-            } catch (InvalidArgumentException $exception) {
-                throw new InvalidArgumentException($reflectionClass->getName().' - '.$exception->getMessage(), $exception->getCode(), $exception);
+            } catch (\InvalidArgumentException $exception) {
+                throw new \InvalidArgumentException($reflectionClass->getName().' - '.$exception->getMessage(), $exception->getCode(), $exception);
             }
         }
         $columnInfo = ['columns' => $gridColumns, 'sort' => $sortList];
@@ -288,7 +284,7 @@ class ColumnSource
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     private static function validateSortInfo(array $sortInfo, array $gridColumns)
     {
@@ -298,7 +294,7 @@ class ColumnSource
                 case 'DESC':
                     break;
                 default:
-                    throw new InvalidArgumentException("Grid's sort annotation direction '{$sortInfo['direction']}' is invalid");
+                    throw new \InvalidArgumentException("Grid's sort annotation direction '{$sortInfo['direction']}' is invalid");
             }
         }
 
@@ -306,12 +302,12 @@ class ColumnSource
             $column = $sortInfo['column'];
 
             if (!isset($sortInfo['direction'])) {
-                throw new InvalidArgumentException("Grid's sort annotation column '$column' specified but a sort direction was not");
+                throw new \InvalidArgumentException("Grid's sort annotation column '$column' specified but a sort direction was not");
             }
             if (isset($gridColumns[$column])) {
                 return;
             }
-            throw new InvalidArgumentException("Grid's sort annotation column '$column' not in list of columns (".implode(', ', array_keys($gridColumns)).')');
+            throw new \InvalidArgumentException("Grid's sort annotation column '$column' not in list of columns (".implode(', ', array_keys($gridColumns)).')');
         }
     }
 

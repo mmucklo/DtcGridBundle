@@ -2,10 +2,7 @@
 
 namespace Dtc\GridBundle\Mapper;
 
-use ArrayObject;
-use Exception;
-
-class ArrayValueObject extends ArrayObject
+class ArrayValueObject extends \ArrayObject
 {
     public function getValueByArray(array $params)
     {
@@ -14,14 +11,14 @@ class ArrayValueObject extends ArrayObject
         $key = current($params);
 
         if (0 === $total) {
-            throw new Exception('requires at least 1 arg');
+            throw new \Exception('requires at least 1 arg');
         }
 
         if (null === $key) {
-            throw new Exception('requires non NULL args');
+            throw new \Exception('requires non NULL args');
         }
         if (!is_scalar($key)) {
-            throw new Exception('requires scalar args');
+            throw new \Exception('requires scalar args');
         }
         if (!isset($data[$key])) {
             return null;
@@ -37,15 +34,14 @@ class ArrayValueObject extends ArrayObject
         $count = 0;
         foreach ($args as $key) {
             if ($count++ > 100) {
-                exit();
+                exit;
             }
 
             if (is_array($data)) {
                 if (!isset($data[$key])) {
                     return null;
-                } else {
-                    $data = &$data[$key];
                 }
+                $data = &$data[$key];
             } else {
                 return null;
             }

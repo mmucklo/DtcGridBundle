@@ -100,10 +100,6 @@ class GridSourceManager
     }
 
     /**
-     * @param $manager
-     * @param $className
-     * @param $name
-     *
      * @return DocumentGridSource|EntityGridSource
      *
      * @throws \Exception
@@ -131,9 +127,6 @@ class GridSourceManager
     /**
      * Get a gridsource.
      *
-     * @param string                             $id      Entity or Document
-     * @param EntityManager|DocumentManager|null $manager (optional) Entity or Document manager to use (overrides default)
-     *
      * @return GridSourceInterface|null
      *
      * @throws \Exception
@@ -154,15 +147,15 @@ class GridSourceManager
         }
 
         try {
-            if ($this->registry && ($manager = $this->registry->getManagerForClass($entityOrDocumentNameOrId)) &&
-                $gridSource = $this->getGridSource($manager, $entityOrDocumentNameOrId)) {
+            if ($this->registry && ($manager = $this->registry->getManagerForClass($entityOrDocumentNameOrId))
+                && $gridSource = $this->getGridSource($manager, $entityOrDocumentNameOrId)) {
                 return $gridSource;
             }
         } catch (\ReflectionException $exception) {
         }
 
-        if ($this->mongodbRegistry && ($manager = $this->mongodbRegistry->getManagerForClass($entityOrDocumentNameOrId)) &&
-            $gridSource = $this->getGridSource($manager, $entityOrDocumentNameOrId)) {
+        if ($this->mongodbRegistry && ($manager = $this->mongodbRegistry->getManagerForClass($entityOrDocumentNameOrId))
+            && $gridSource = $this->getGridSource($manager, $entityOrDocumentNameOrId)) {
             return $gridSource;
         }
         throw new \Exception("Can't find grid source for $entityOrDocumentNameOrId");
