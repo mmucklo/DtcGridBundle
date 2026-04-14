@@ -3,25 +3,24 @@
 namespace Dtc\GridBundle\Annotation;
 
 /**
- * Class GridColumn.
- *
  * @Annotation
  * @Target("CLASS")
  */
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class Grid implements Annotation
 {
     /**
-     * @var array<\Dtc\GridBundle\Annotation\Action>
+     * @var array<Action>
      */
     public $actions;
 
     /**
-     * @var \Dtc\GridBundle\Annotation\Sort
+     * @var Sort
      */
     public $sort;
 
     /**
-     * @var array<\Dtc\GridBundle\Annotation\Sort>
+     * @var array<Sort>
      */
     public $sortMulti;
 }
