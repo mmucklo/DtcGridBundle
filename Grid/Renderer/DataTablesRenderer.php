@@ -10,8 +10,8 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         'processing' => true,
         'searchDelay' => 350,
         'table_attr' => [
-                'class' => 'display table table-striped table-bordered small-font',
-            ],
+            'class' => 'display table table-striped table-bordered small-font',
+        ],
         'serverSide' => true,
         'language' => [
             'lengthMenu' => '_MENU_ records per page',
@@ -23,8 +23,8 @@ class DataTablesRenderer extends AbstractJqueryRenderer
     private $localCss = [];
     private $localJs = [];
 
-    const MODE_AJAX = 1;
-    const MODE_SERVER = 2;
+    public const MODE_AJAX = 1;
+    public const MODE_SERVER = 2;
 
     protected $mode = 1;
 
@@ -35,8 +35,6 @@ class DataTablesRenderer extends AbstractJqueryRenderer
 
     /**
      * Set the type (bootstrap, bootstrap4, foundation, etc.).
-     *
-     * @param $type
      */
     public function setDataTablesCss($css)
     {
@@ -88,7 +86,7 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         return isset($this->options['table_attr']['class']) ? $this->options['table_attr']['class'] : null;
     }
 
-    public function getParams(array &$params = null)
+    public function getParams(?array &$params = null)
     {
         if (null === $params) {
             $params = [];
@@ -111,12 +109,12 @@ class DataTablesRenderer extends AbstractJqueryRenderer
 
         // We need to pass filter information here.
         $params = [
-               'id' => $this->gridSource->getId(),
-               'renderer' => 'datatables',
-               'filter' => $this->gridSource->getFilter(),
-               'parameters' => $this->gridSource->getParameters(),
-               'order' => $this->gridSource->getOrderBy(),
-               'fields' => $fields,
+            'id' => $this->gridSource->getId(),
+            'renderer' => 'datatables',
+            'filter' => $this->gridSource->getFilter(),
+            'parameters' => $this->gridSource->getParameters(),
+            'order' => $this->gridSource->getOrderBy(),
+            'fields' => $fields,
         ];
 
         $sortInfo = $this->gridSource->getDefaultSort();
@@ -162,13 +160,13 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         $count = $gridSource->getCount();
 
         $retVal = [
-                'page' => $gridSource->getPager()
-                    ->getCurrentPage(),
-                'total_pages' => $gridSource->getPager()
-                    ->getTotalPages(),
-                'iTotalRecords' => (int) $count,
-                'iTotalDisplayRecords' => $count,
-                'id' => $gridSource->getId(), // unique id
+            'page' => $gridSource->getPager()
+                ->getCurrentPage(),
+            'total_pages' => $gridSource->getPager()
+                ->getTotalPages(),
+            'iTotalRecords' => (int) $count,
+            'iTotalDisplayRecords' => $count,
+            'id' => $gridSource->getId(), // unique id
         ];
 
         $data = [];
@@ -201,10 +199,10 @@ class DataTablesRenderer extends AbstractJqueryRenderer
         unset($options['table_attr']);
 
         $params = [
-                'options' => $options,
-                'table_attr' => $this->options['table_attr'],
-                'columns' => $this->gridSource->getColumns(),
-                'id' => $id,
+            'options' => $options,
+            'table_attr' => $this->options['table_attr'],
+            'columns' => $this->gridSource->getColumns(),
+            'id' => $id,
         ];
 
         $template = '@DtcGrid/Grid/datatables.html.twig';

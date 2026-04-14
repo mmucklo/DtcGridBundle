@@ -31,7 +31,7 @@ class RendererFactory
     public function __construct(
         RouterInterface $router,
         $translator,
-        array $config
+        array $config,
     ) {
         $this->router = $router;
         $this->translator = $translator;
@@ -66,8 +66,6 @@ class RendererFactory
 
     /**
      * Creates a new renderer of type $type, throws an exception if it's not known how to create a renderer of type $type.
-     *
-     * @param $type
      *
      * @return AbstractRenderer
      *

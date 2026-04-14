@@ -15,9 +15,7 @@ class GridColumn extends AbstractGridColumn
     /**
      * GridColumn constructor.
      *
-     * @param $field
      * @param string|null $label
-     * @param mixed       $formatter
      * @param bool        $searchable
      * @param int|null    $order      If there are columns that have an order mixed with columns of 'null' order, the null ones will appear last
      */
@@ -25,7 +23,7 @@ class GridColumn extends AbstractGridColumn
         $field,
         $label = null,
         $formatter = null,
-        array $options = null,
+        ?array $options = null,
         $searchable = true,
         $order = null
     ) {
@@ -59,9 +57,9 @@ class GridColumn extends AbstractGridColumn
     {
         if ($this->formatter) {
             return call_user_func($this->formatter, $object, $this);
-        } else {
-            return $this->_format($object);
         }
+
+        return $this->_format($object);
     }
 
     protected function _format($object)
@@ -73,9 +71,9 @@ class GridColumn extends AbstractGridColumn
             }
         } elseif (is_object($object)) {
             $funcPrefix = [
-                    'get',
-                    'is',
-                    'has',
+                'get',
+                'is',
+                'has',
             ];
             foreach ($funcPrefix as $prefix) {
                 $methodName = $prefix.$this->field;
@@ -108,9 +106,6 @@ class GridColumn extends AbstractGridColumn
         return $this->formatter;
     }
 
-    /**
-     * @param $formatter
-     */
     public function setFormatter($formatter)
     {
         $this->formatter = $formatter;

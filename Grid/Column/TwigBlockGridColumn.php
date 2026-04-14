@@ -3,7 +3,6 @@
 namespace Dtc\GridBundle\Grid\Column;
 
 use Dtc\GridBundle\Grid\Source\GridSourceInterface;
-use Twig_Template;
 
 class TwigBlockGridColumn extends AbstractGridColumn
 {
@@ -18,7 +17,7 @@ class TwigBlockGridColumn extends AbstractGridColumn
      * @param string $label
      * @param string $blockName
      */
-    public function __construct($field, $label, Twig_Template $template, array $env, $blockName = null)
+    public function __construct($field, $label, \Twig_Template $template, array $env, $blockName = null)
     {
         $this->field = $field;
         $this->label = $label;
@@ -54,8 +53,8 @@ class TwigBlockGridColumn extends AbstractGridColumn
             $this->env['source'] = $gridSource;
 
             return $this->template->renderBlock($this->blockName, $this->env);
-        } else {
-            return 'No Template';
         }
+
+        return 'No Template';
     }
 }

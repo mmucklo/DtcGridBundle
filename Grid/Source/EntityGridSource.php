@@ -105,8 +105,6 @@ class EntityGridSource extends AbstractDoctrineGridSource
     }
 
     /**
-     * @return mixed
-     *
      * @throws \Exception
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
@@ -138,8 +136,6 @@ class EntityGridSource extends AbstractDoctrineGridSource
     }
 
     /**
-     * @param $id
-     *
      * @return mixed|null
      *
      * @throws \Exception
@@ -164,8 +160,6 @@ class EntityGridSource extends AbstractDoctrineGridSource
     }
 
     /**
-     * @param $id
-     *
      * @return bool
      *
      * @throws \Exception|\Doctrine\ORM\OptimisticLockException

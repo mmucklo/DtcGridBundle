@@ -27,7 +27,7 @@ abstract class AbstractJqueryRenderer extends TableGridRenderer
         $this->jQuery = $jQuery;
     }
 
-    public function getParams(array &$params = null)
+    public function getParams(?array &$params = null)
     {
         parent::getParams($params);
         $params['dtc_grid_jquery'] = $this->jQuery;

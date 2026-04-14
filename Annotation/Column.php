@@ -3,11 +3,10 @@
 namespace Dtc\GridBundle\Annotation;
 
 /**
- * Class GridColumn.
- *
  * @Annotation
  * @Target("PROPERTY")
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
 class Column implements Annotation
 {
     /**

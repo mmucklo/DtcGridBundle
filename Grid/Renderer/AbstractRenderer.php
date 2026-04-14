@@ -18,7 +18,7 @@ abstract class AbstractRenderer
     /**
      * @param array|null $params Will be populated if passed in
      */
-    public function getParams(array &$params = null)
+    public function getParams(?array &$params = null)
     {
         if (null === $params) {
             $params = [];
@@ -61,49 +61,31 @@ abstract class AbstractRenderer
     {
     }
 
-    /**
-     * @return mixed
-     */
     public function getThemeCss()
     {
         return $this->themeCss;
     }
 
-    /**
-     * @param mixed $bootstrapCss
-     */
     public function setThemeCss(array $themeCss)
     {
         $this->themeCss = $themeCss;
     }
 
-    /**
-     * @return mixed
-     */
     public function getThemeJs()
     {
         return $this->themeJs;
     }
 
-    /**
-     * @param mixed $bootstrapJs
-     */
     public function setThemeJs(array $themeJs)
     {
         $this->themeJs = $themeJs;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPageDivStyle()
     {
         return $this->pageDivStyle;
     }
 
-    /**
-     * @param mixed $pageDivStyle
-     */
     public function setPageDivStyle($pageDivStyle)
     {
         $this->pageDivStyle = $pageDivStyle;

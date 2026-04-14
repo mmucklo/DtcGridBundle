@@ -29,7 +29,7 @@ class SourceListCommand extends Command
         $this->gridSourceManager = $gridSourceManager;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $gridSources = $this->gridSourceManager->all();
 
@@ -37,5 +37,7 @@ class SourceListCommand extends Command
         foreach ($gridSources as $id => $source) {
             $output->writeln("{$id} => ".get_class($source));
         }
+
+        return 0;
     }
 }
