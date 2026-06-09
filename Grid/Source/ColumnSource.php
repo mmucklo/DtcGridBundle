@@ -47,7 +47,7 @@ class ColumnSource
     }
 
     /**
-     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $classMetadata
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $classMetadata
      *
      * @return mixed|null
      */
@@ -59,7 +59,7 @@ class ColumnSource
     }
 
     /**
-     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $classMetadata
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $classMetadata
      *
      * @return array|null
      *
@@ -109,6 +109,10 @@ class ColumnSource
         }
         $columnInfo = call_user_func_array([$this, 'getCachedColumnInfo'], $params);
 
+        if (!$columnInfo) {
+            $columnInfo = $this->readAndCacheGridAttributes($cacheFilename, $classMetadata, $allowReflection);
+        }
+
         if (!$columnInfo && $reader) {
             $columnInfo = $this->readAndCacheGridAnnotations($cacheFilename, $reader, $classMetadata, $allowReflection);
         }
@@ -133,7 +137,7 @@ class ColumnSource
     /**
      * Cached annotation info from the file, if the mtime of the file has not changed (or if not in debug).
      *
-     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $metadata
      *
      * @return bool
      *
@@ -157,7 +161,7 @@ class ColumnSource
      * Check timestamps of the file pointed to by the class metadata, and the columnCacheFilename and see if any
      * are newer (meaning we .
      *
-     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $metadata
      *
      * @return bool
      */
@@ -182,7 +186,7 @@ class ColumnSource
     /**
      * Generates a list of property name and labels based on finding the GridColumn annotation.
      *
-     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $metadata
      *
      * @return array|null Hash of grid annotation results: ['columns' => array, 'sort' => string]
      *
@@ -194,36 +198,111 @@ class ColumnSource
         $properties = $reflectionClass->getProperties();
 
         /** @var Grid $gridAnnotation */
-        $sort = null;
-        $sortMulti = null;
         if (!($gridAnnotation = $reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid'))) {
             return null;
         }
 
+        $columnAnnotations = [];
+        foreach ($properties as $property) {
+            $annotation = $reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
+            if ($annotation) {
+                $columnAnnotations[$property->getName()] = $annotation;
+            }
+        }
+
+        $columnInfo = $this->buildColumnInfoFromGrid($reflectionClass, $gridAnnotation, $columnAnnotations, $metadata, $allowReflection);
+
+        ColumnUtil::populateCacheFile($cacheFilename, $columnInfo);
+
+        return $this->getCachedColumnInfo($cacheFilename, $metadata, $reader);
+    }
+
+    /**
+     * Read grid configuration from PHP 8 attributes (ReflectionAttribute).
+     *
+     * @return array|null
+     *
+     * @throws \Exception
+     */
+    private function readAndCacheGridAttributes($cacheFilename, $metadata, $allowReflection)
+    {
+        if (\PHP_VERSION_ID < 80000) {
+            return null;
+        }
+
+        $reflectionClass = $metadata->getReflectionClass();
+        $gridAttrs = $reflectionClass->getAttributes(Grid::class);
+        if (empty($gridAttrs)) {
+            return null;
+        }
+
+        $gridAnnotation = $gridAttrs[0]->newInstance();
+
+        // Actions and sort can't be nested inside #[Grid] — PHP attribute
+        // arguments must be constant expressions, so `new ShowAction()` /
+        // `new Sort()` aren't allowed there. Read them as separate
+        // class-level attributes instead.
+        if (null === $gridAnnotation->actions) {
+            $actionAttrs = $reflectionClass->getAttributes(Action::class, \ReflectionAttribute::IS_INSTANCEOF);
+            if ($actionAttrs) {
+                $gridAnnotation->actions = array_map(function ($attr) {
+                    return $attr->newInstance();
+                }, $actionAttrs);
+            }
+        }
+        if (null === $gridAnnotation->sort && null === $gridAnnotation->sortMulti) {
+            $sortAttrs = $reflectionClass->getAttributes(Sort::class);
+            if (1 === count($sortAttrs)) {
+                $gridAnnotation->sort = $sortAttrs[0]->newInstance();
+            } elseif (count($sortAttrs) > 1) {
+                $gridAnnotation->sortMulti = array_map(function ($attr) {
+                    return $attr->newInstance();
+                }, $sortAttrs);
+            }
+        }
+
+        $columnAnnotations = [];
+        foreach ($reflectionClass->getProperties() as $property) {
+            $colAttrs = $property->getAttributes(Column::class);
+            if (!empty($colAttrs)) {
+                $columnAnnotations[$property->getName()] = $colAttrs[0]->newInstance();
+            }
+        }
+
+        $columnInfo = $this->buildColumnInfoFromGrid($reflectionClass, $gridAnnotation, $columnAnnotations, $metadata, $allowReflection);
+
+        ColumnUtil::populateCacheFile($cacheFilename, $columnInfo);
+
+        return $this->getCachedColumnInfo($cacheFilename, $metadata);
+    }
+
+    /**
+     * Shared logic: convert Grid + Column annotations/attributes into the column info array.
+     *
+     * @param array<string, Column> $columnAnnotations keyed by property name
+     *
+     * @return array ['columns' => array, 'sort' => array]
+     */
+    private function buildColumnInfoFromGrid(\ReflectionClass $reflectionClass, Grid $gridAnnotation, array $columnAnnotations, $metadata, $allowReflection)
+    {
         $actions = $gridAnnotation->actions;
         $sort = $gridAnnotation->sort;
         $sortMulti = $gridAnnotation->sortMulti;
 
         $gridColumns = [];
-        foreach ($properties as $property) {
-            /** @var Column $annotation */
-            $annotation = $reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
-            if ($annotation) {
-                $name = $property->getName();
-                $label = $annotation->label ?: CamelCase::fromCamelCase($name);
-                $gridColumns[$name] = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$name, $label]];
-                $gridColumns[$name]['arguments'][] = isset($annotation->formatter) ? $annotation->formatter : null;
-                if ($annotation->sortable) {
-                    $gridColumns[$name]['arguments'][] = ['sortable' => true];
-                } else {
-                    $gridColumns[$name]['arguments'][] = [];
-                }
-                $gridColumns[$name]['arguments'][] = $annotation->searchable;
-                $gridColumns[$name]['arguments'][] = $annotation->order;
+        foreach ($columnAnnotations as $name => $annotation) {
+            $label = $annotation->label ?: CamelCase::fromCamelCase($name);
+            $gridColumns[$name] = ['class' => '\Dtc\GridBundle\Grid\Column\GridColumn', 'arguments' => [$name, $label]];
+            $gridColumns[$name]['arguments'][] = isset($annotation->formatter) ? $annotation->formatter : null;
+            if ($annotation->sortable) {
+                $gridColumns[$name]['arguments'][] = ['sortable' => true];
+            } else {
+                $gridColumns[$name]['arguments'][] = [];
             }
+            $gridColumns[$name]['arguments'][] = $annotation->searchable;
+            $gridColumns[$name]['arguments'][] = $annotation->order;
         }
 
-        // Fall back to default column list if list is not specified
         if (!$gridColumns && $allowReflection) {
             $gridColumnList = self::getReflectionColumns($metadata);
             /** @var GridColumn $gridColumn */
@@ -277,11 +356,8 @@ class ColumnSource
                 throw new \InvalidArgumentException($reflectionClass->getName().' - '.$exception->getMessage(), $exception->getCode(), $exception);
             }
         }
-        $columnInfo = ['columns' => $gridColumns, 'sort' => $sortList];
 
-        ColumnUtil::populateCacheFile($cacheFilename, $columnInfo);
-
-        return $this->getCachedColumnInfo($cacheFilename, $metadata, $reader);
+        return ['columns' => $gridColumns, 'sort' => $sortList];
     }
 
     /**
@@ -367,7 +443,7 @@ class ColumnSource
     /**
      * Generate Columns based on document's Metadata.
      *
-     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|\Doctrine\ORM\Mapping\ClassMetadata $metadata
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $metadata
      */
     private static function getReflectionColumns($metadata)
     {

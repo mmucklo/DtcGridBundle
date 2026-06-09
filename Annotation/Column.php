@@ -33,4 +33,37 @@ class Column implements Annotation
      * @var int
      */
     public $order;
+
+    /**
+     * @param array $data Doctrine annotation values (BC)
+     */
+    public function __construct(
+        array $data = [],
+        $label = null,
+        $sortable = null,
+        $searchable = null,
+        $formatter = null,
+        $order = null
+    ) {
+        foreach ($data as $key => $value) {
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
+            }
+        }
+        if (null !== $label) {
+            $this->label = $label;
+        }
+        if (null !== $sortable) {
+            $this->sortable = $sortable;
+        }
+        if (null !== $searchable) {
+            $this->searchable = $searchable;
+        }
+        if (null !== $formatter) {
+            $this->formatter = $formatter;
+        }
+        if (null !== $order) {
+            $this->order = $order;
+        }
+    }
 }

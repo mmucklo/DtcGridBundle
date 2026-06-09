@@ -23,4 +23,29 @@ class Grid implements Annotation
      * @var array<Sort>
      */
     public $sortMulti;
+
+    /**
+     * @param array $data Doctrine annotation values (BC)
+     */
+    public function __construct(
+        array $data = [],
+        $actions = null,
+        $sort = null,
+        $sortMulti = null
+    ) {
+        foreach ($data as $key => $value) {
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
+            }
+        }
+        if (null !== $actions) {
+            $this->actions = $actions;
+        }
+        if (null !== $sort) {
+            $this->sort = $sort;
+        }
+        if (null !== $sortMulti) {
+            $this->sortMulti = $sortMulti;
+        }
+    }
 }
