@@ -17,9 +17,11 @@ jobs:
         php: ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
         dependencies: ['highest']
         include:
+          # Lowest-deps is tested on the minimum PHP only: the dependency floor
+          # (PHPUnit 8.5, kept for PHP 7.2) cannot run on PHP 8.1+, so a
+          # "lowest on newest PHP" cell is an impossible combination. Newest
+          # PHP is covered by 8.4/highest.
           - php: '7.2'
-            dependencies: 'lowest'
-          - php: '8.4'
             dependencies: 'lowest'
 
     steps:
