@@ -32,7 +32,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: mbstring, intl, json, mongodb
           coverage: none
-          tools: composer:v2
+          tools: composer:2.9
 
       - name: Get composer cache directory
         id: composer-cache
@@ -76,7 +76,7 @@ jobs:
           php-version: '8.3'
           extensions: mbstring, intl, json, mongodb
           coverage: none
-          tools: composer:v2
+          tools: composer:2.9
 
       - name: Install dependencies
         run: composer update --no-interaction --no-progress --prefer-dist
@@ -108,7 +108,7 @@ jobs:
           php-version: '8.4'
           extensions: mbstring, intl, json
           coverage: none
-          tools: composer:v2
+          tools: composer:2.9
 
       - name: Install dependencies
         run: composer update --no-interaction --no-progress --prefer-dist
