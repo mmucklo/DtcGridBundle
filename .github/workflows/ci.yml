@@ -95,6 +95,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      PUPPETEER_VERSION: 24.0.0
 
     steps:
       - name: Checkout
@@ -118,8 +120,14 @@ jobs:
           ln -s "$(pwd)/Resources/public/css" Tests/App/public/bundles/dtcgrid/css
           ln -s "$(pwd)/Resources/public/js" Tests/App/public/bundles/dtcgrid/js
 
+      - name: Cache Puppeteer browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/puppeteer
+          key: ${{ runner.os }}-puppeteer-${{ env.PUPPETEER_VERSION }}
+
       - name: Install Puppeteer
-        run: npm install puppeteer
+        run: npm install "puppeteer@${PUPPETEER_VERSION}"
 
       - name: Take screenshots
         run: |
