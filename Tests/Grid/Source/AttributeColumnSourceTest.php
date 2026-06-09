@@ -72,7 +72,18 @@ class AttributeColumnSourceTest extends TestCase
         self::assertSame(['name' => 'ASC'], $info->sort);
     }
 
-    private function buildColumnSourceInfo()
+    public function testDebugModeResolvesAttributesWithoutReader()
+    {
+        // In debug mode with no annotation reader, the cache timestamp check
+        // must still round-trip the freshly written attribute cache.
+        $info = $this->buildColumnSourceInfo(true);
+
+        self::assertArrayHasKey('name', $info->columns);
+        self::assertSame('Full Name', $info->columns['name']->getLabel());
+        self::assertSame(['name' => 'ASC'], $info->sort);
+    }
+
+    private function buildColumnSourceInfo($debug = false)
     {
         $reflectionClass = new \ReflectionClass(AttributeGridEntity::class);
 
@@ -86,7 +97,7 @@ class AttributeColumnSourceTest extends TestCase
         $objectManager = $this->createMock(ObjectManager::class);
         $objectManager->method('getMetadataFactory')->willReturn($factory);
 
-        $columnSource = new ColumnSource($this->cacheDir, false);
+        $columnSource = new ColumnSource($this->cacheDir, $debug);
 
         return $columnSource->getColumnSourceInfo($objectManager, AttributeGridEntity::class, true);
     }

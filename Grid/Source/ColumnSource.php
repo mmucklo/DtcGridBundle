@@ -145,15 +145,20 @@ class ColumnSource
      */
     private function shouldIncludeColumnCache($metadata, $columnCacheFilename, ?Reader $reader = null)
     {
-        // In production, or if we're sure there's no annotaitons, just include the cache.
-        if (!$this->debug || !isset($reader)) {
-            if (!is_file($columnCacheFilename) || !is_readable($columnCacheFilename)) {
-                return false;
-            }
+        if (!is_file($columnCacheFilename) || !is_readable($columnCacheFilename)) {
+            return false;
+        }
 
+        // In production, just trust the cache.
+        if (!$this->debug) {
             return true;
         }
 
+        // In debug, re-check timestamps so edits to the entity invalidate the
+        // cache regardless of how the grid is configured. Previously this was
+        // skipped whenever no annotation reader was present, which left PHP 8
+        // attribute-only entities serving stale columns until a manual cache
+        // clear (attributes can be read with no annotation_reader injected).
         return self::checkTimestamps($metadata, $columnCacheFilename);
     }
 
