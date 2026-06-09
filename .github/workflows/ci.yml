@@ -56,7 +56,11 @@ jobs:
         run: composer update --no-interaction --no-progress --prefer-dist --prefer-lowest --prefer-stable
 
       - name: Run PHPUnit
-        run: bin/phpunit
+        run: bin/phpunit --testsuite=default
+
+      - name: Run PHP 8+ tests
+        if: ${{ !startsWith(matrix.php, '7.') }}
+        run: bin/phpunit --testsuite=php8
 
   lint:
     name: Lint & static analysis
@@ -84,3 +88,95 @@ jobs:
 
       - name: PHPStan
         run: bin/phpstan analyse --no-progress --memory-limit=512M
+
+  screenshots:
+    name: Grid screenshots
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, json
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      - name: Setup test app (DB + fixtures + assets)
+        run: |
+          php Tests/App/setup.php
+          mkdir -p Tests/App/public/bundles/dtcgrid
+          ln -s "$(pwd)/Resources/public/css" Tests/App/public/bundles/dtcgrid/css
+          ln -s "$(pwd)/Resources/public/js" Tests/App/public/bundles/dtcgrid/js
+
+      - name: Install Puppeteer
+        run: npm install puppeteer
+
+      - name: Take screenshots
+        run: |
+          # Start PHP server in background
+          php -S 127.0.0.1:8199 -t Tests/App/public Tests/App/public/index.php &
+          SERVER_PID=$!
+          sleep 2
+
+          node Tests/Screenshots/screenshot.mjs http://127.0.0.1:8199 Tests/Screenshots/output
+
+          kill $SERVER_PID 2>/dev/null || true
+
+      - name: Upload screenshots as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: grid-screenshots
+          path: Tests/Screenshots/output/*.png
+
+      - name: Push screenshots to separate ref
+        # Fork PRs get a read-only token with no secret access, so the push
+        # and PR comment below can't run. Skip them for forks.
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          SCREENSHOTS_REF="refs/screenshots/${{ github.head_ref || github.ref_name }}"
+          cp Tests/Screenshots/output/*.png /tmp/
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan screenshots-tmp
+          git rm -rf . > /dev/null 2>&1
+          cp /tmp/*.png .
+          git add *.png
+          git commit -m "Grid screenshots for ${{ github.head_ref || github.ref_name }}"
+          git push origin HEAD:${SCREENSHOTS_REF} --force
+
+      - name: Comment on PR with screenshots
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO="${{ github.repository }}"
+          SCREENSHOTS_REF="refs/screenshots/${{ github.head_ref }}"
+          REF_SHA=$(git rev-parse HEAD)
+          BODY="## Grid Screenshots
+
+          **Table renderer:**
+          ![table](https://raw.githubusercontent.com/${REPO}/${REF_SHA}/table.png)
+
+          **DataTables renderer:**
+          ![datatables](https://raw.githubusercontent.com/${REPO}/${REF_SHA}/datatables.png)
+
+          _Auto-generated from [CI run](https://github.com/${REPO}/actions/runs/${{ github.run_id }})_"
+
+          # Update existing comment or create new one
+          COMMENT_ID=$(gh api repos/${REPO}/issues/${{ github.event.pull_request.number }}/comments \
+            --jq '.[] | select(.body | startswith("## Grid Screenshots")) | .id' | tail -1)
+          if [ -n "$COMMENT_ID" ]; then
+            gh api repos/${REPO}/issues/comments/${COMMENT_ID} -X PATCH -f body="$BODY"
+          else
+            gh pr comment ${{ github.event.pull_request.number }} --body "$BODY"
+          fi

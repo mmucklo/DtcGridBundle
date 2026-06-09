@@ -13,12 +13,6 @@ parameters:
 			path: Command/GenerateGridSourceCommand.php
 
 		-
-			message: '#^Parameter \$registry of method Dtc\\GridBundle\\Command\\GenerateGridSourceCommand\:\:setRegistry\(\) has invalid type Doctrine\\Bundle\\DoctrineBundle\\Registry\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Command/GenerateGridSourceCommand.php
-
-		-
 			message: '#^Variable \$metadata might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
@@ -35,18 +29,6 @@ parameters:
 			identifier: variable.undefined
 			count: 3
 			path: Controller/GridController.php
-
-		-
-			message: '#^Call to static method dump\(\) on an unknown class Symfony\\Component\\Yaml\\Yaml\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Generator/GridSourceGenerator.php
-
-		-
-			message: '#^Call to static method parse\(\) on an unknown class Symfony\\Component\\Yaml\\Yaml\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Generator/GridSourceGenerator.php
 
 		-
 			message: '#^Class Doctrine\\ODM\\MongoDB\\Mapping\\ClassMetadataInfo not found\.$#'
@@ -89,15 +71,3 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: Manager/GridSourceManager.php
-
-		-
-			message: '#^Call to static method parse\(\) on an unknown class Symfony\\Component\\Yaml\\Yaml\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Util/ColumnUtil.php
-
-		-
-			message: '#^Call to static method parseFile\(\) on an unknown class Symfony\\Component\\Yaml\\Yaml\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Util/ColumnUtil.php
