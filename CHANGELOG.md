@@ -1,3 +1,12 @@
+8.0.0
+   * Add PHP 8 native attribute support for grid configuration (`#[Grid]`, `#[Column]`). Annotations remain fully supported.
+   * Support actions and sort as class-level attributes (`#[ShowAction]`, `#[DeleteAction]`, `#[Action]`, `#[Sort]`) — they cannot be nested inside `#[Grid]` because PHP attribute arguments must be constant expressions.
+   * Drop PHP 5.6/7.0/7.1 support; minimum is now PHP 7.2. Tested on PHP 7.2 - 8.4.
+   * Add support for Symfony 7 and Symfony 8; declared range is `^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0`.
+   * Remove the abandoned, unused `sensio/framework-extra-bundle` dependency.
+   * **BC break:** DataTables default integration assets switched from Bootstrap 3 (`dataTables.bootstrap.min.*`) to Bootstrap 4 (`dataTables.bootstrap4.min.*`) to match the default Bootstrap 4 theme. Override `dtc_grid.datatables.css`/`js` if you rely on the old behavior.
+   * Replace Travis CI with GitHub Actions; add PHPStan + PHP CS Fixer linting and an end-to-end grid screenshot job.
+   * Expand test coverage.
 7.3.0
    * Support older symfony yaml libraries that don't have parseFile.
 7.2.2
