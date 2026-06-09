@@ -1,0 +1,24 @@
+name: Cleanup screenshots ref
+
+# When a PR closes (merged or not), delete the throwaway
+# refs/screenshots/<branch> ref that the screenshot job pushed, so these
+# refs don't accumulate over time.
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    name: Delete screenshots ref
+    runs-on: ubuntu-latest
+    # Fork PRs never created a ref (read-only token), so only run for same-repo branches.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Delete refs/screenshots/${{ github.head_ref }}
+        run: |
+          git push origin ":refs/screenshots/${{ github.head_ref }}" || echo "No screenshots ref to delete"
