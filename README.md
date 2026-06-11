@@ -383,10 +383,19 @@ class User
 
 #### Actions and sort with attributes
 
-Unlike annotations, actions and sort **cannot** be nested inside `#[Grid]` — PHP
-requires attribute arguments to be constant expressions, so `new ShowAction()`
-isn't valid there. Instead, add them as separate class-level attributes
-alongside `#[Grid]`:
+On PHP 8.1+ actions and sort can be nested directly inside `#[Grid]`:
+
+```php
+#[Grid(actions: [new ShowAction(), new DeleteAction()], sort: new Sort(column: 'lastName', direction: 'ASC'))]
+class User
+{
+    // ...
+}
+```
+
+On PHP 8.0, `new` is not allowed in attribute arguments, so add them as
+separate class-level attributes alongside `#[Grid]` instead (this form works
+on every PHP 8 version):
 
 ```php
 use Dtc\GridBundle\Annotation\DeleteAction;

@@ -29,24 +29,6 @@ class ColumnSource
     }
 
     /**
-     * @var array|null
-     */
-    private $cachedSort;
-
-    public function setDebug($flag)
-    {
-        $this->debug = $flag;
-    }
-
-    /**
-     * @param string|null $cacheDir
-     */
-    public function setCacheDir($cacheDir)
-    {
-        $this->cacheDir = $cacheDir;
-    }
-
-    /**
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $classMetadata
      *
      * @return mixed|null
@@ -56,33 +38,6 @@ class ColumnSource
         $identifier = $classMetadata->getIdentifier();
 
         return isset($identifier[0]) ? $identifier[0] : null;
-    }
-
-    /**
-     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $classMetadata
-     *
-     * @return array|null
-     *
-     * @throws \Exception
-     */
-    private function getCachedColumnInfo($cacheFilename, $classMetadata)
-    {
-        if ($this->shouldIncludeColumnCache($classMetadata, $cacheFilename)) {
-            $columnInfo = include $cacheFilename;
-            if (!isset($columnInfo['columns'])) {
-                throw new \Exception("Bad column cache, missing columns: {$cacheFilename}");
-            }
-            if (!isset($columnInfo['sort'])) {
-                throw new \Exception("Bad column cache, missing sort: {$cacheFilename}");
-            }
-            if ($columnInfo['sort']) {
-                self::validateSortInfo($columnInfo['sort'], $columnInfo['columns']);
-            }
-
-            return $columnInfo;
-        }
-
-        return null;
     }
 
     /**
@@ -98,23 +53,47 @@ class ColumnSource
         $name = $reflectionClass->getName();
         $cacheFilename = ColumnUtil::createCacheFilename($this->cacheDir, $name);
 
-        // Try to include them from the cached file if exists.
         $columnInfo = $this->getCachedColumnInfo($cacheFilename, $classMetadata);
 
+        // Attributes are consulted before annotations: when a class carries
+        // both, the attributes win. Either reader falls back to the other
+        // source's column definitions when it finds a Grid marker but no
+        // columns of its own kind, so a half-migrated class keeps working.
+        $gridConfigured = false;
         if (!$columnInfo) {
-            $columnInfo = $this->readAndCacheGridAttributes($cacheFilename, $classMetadata, $allowReflection);
+            $built = $this->readGridAttributes($classMetadata, $allowReflection, $reader);
+            if (null === $built && $reader) {
+                $built = $this->readGridAnnotations($reader, $classMetadata, $allowReflection);
+            }
+            if (null !== $built) {
+                $gridConfigured = true;
+                if ($built['columns']) {
+                    ColumnUtil::populateCacheFile($cacheFilename, $built);
+                    $columnInfo = self::instantiateColumnInfo($built);
+                }
+            }
         }
 
-        if (!$columnInfo && $reader) {
-            $columnInfo = $this->readAndCacheGridAnnotations($cacheFilename, $reader, $classMetadata, $allowReflection);
+        // A stale-but-valid cache beats nothing: column caches written at
+        // container compile time from dtc_grid YAML files have no
+        // request-time regeneration path, so when the entity file is newer
+        // than the cache but carries no Grid marker, serve the cached config
+        // rather than degrading to reflection columns (it refreshes on the
+        // next container rebuild).
+        if (!$columnInfo && !$gridConfigured) {
+            $columnInfo = $this->getCachedColumnInfo($cacheFilename, $classMetadata, true);
         }
 
-        if (!$columnInfo && $allowReflection) {
+        if (!$columnInfo && !$gridConfigured && $allowReflection) {
             $columns = self::getReflectionColumns($classMetadata);
             $columnInfo = ['columns' => $columns, 'sort' => []];
         }
 
         if (!$columnInfo) {
+            if ($gridConfigured) {
+                throw new \InvalidArgumentException($name.' has a Grid annotation or attribute but no Column definitions, and reflection-based columns are not available for it');
+            }
+
             return null;
         }
 
@@ -127,30 +106,52 @@ class ColumnSource
     }
 
     /**
-     * Cached annotation info from the file, if the mtime of the file has not changed (or if not in debug).
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $classMetadata
+     * @param bool                                                             $ignoreTimestamps Serve the cache even if the entity file is newer
+     *
+     * @return array|null
+     *
+     * @throws \Exception
+     */
+    private function getCachedColumnInfo($cacheFilename, $classMetadata, $ignoreTimestamps = false)
+    {
+        if (!is_file($cacheFilename) || !is_readable($cacheFilename)) {
+            return null;
+        }
+        if (!$ignoreTimestamps && !$this->shouldIncludeColumnCache($classMetadata, $cacheFilename)) {
+            return null;
+        }
+
+        $columnInfo = include $cacheFilename;
+        if (!isset($columnInfo['columns'])) {
+            throw new \Exception("Bad column cache, missing columns: {$cacheFilename}");
+        }
+        if (!isset($columnInfo['sort'])) {
+            throw new \Exception("Bad column cache, missing sort: {$cacheFilename}");
+        }
+        if ($columnInfo['sort']) {
+            self::validateSortList($columnInfo['sort'], $columnInfo['columns']);
+        }
+
+        return $columnInfo;
+    }
+
+    /**
+     * Whether the cached column info is still current. In production any
+     * readable cache is trusted; in debug the entity file timestamp is
+     * re-checked so edits invalidate the cache regardless of how the grid
+     * is configured.
      *
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $metadata
      *
      * @return bool
-     *
-     * @throws \Exception
      */
     private function shouldIncludeColumnCache($metadata, $columnCacheFilename)
     {
-        if (!is_file($columnCacheFilename) || !is_readable($columnCacheFilename)) {
-            return false;
-        }
-
-        // In production, just trust the cache.
         if (!$this->debug) {
             return true;
         }
 
-        // In debug, re-check timestamps so edits to the entity invalidate the
-        // cache regardless of how the grid is configured. Previously this was
-        // skipped whenever no annotation reader was present, which left PHP 8
-        // attribute-only entities serving stale columns until a manual cache
-        // clear (attributes can be read with no annotation_reader injected).
         return self::checkTimestamps($metadata, $columnCacheFilename);
     }
 
@@ -181,47 +182,15 @@ class ColumnSource
     }
 
     /**
-     * Generates a list of property name and labels based on finding the GridColumn annotation.
+     * Read grid configuration from PHP 8 attributes (ReflectionAttribute).
      *
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $metadata
      *
-     * @return array|null Hash of grid annotation results: ['columns' => array, 'sort' => string]
+     * @return array|null column info, or null when the class has no #[Grid]
      *
      * @throws \Exception
      */
-    private function readAndCacheGridAnnotations($cacheFilename, Reader $reader, $metadata, $allowReflection)
-    {
-        $reflectionClass = $metadata->getReflectionClass();
-        $properties = $reflectionClass->getProperties();
-
-        /** @var Grid $gridAnnotation */
-        if (!($gridAnnotation = $reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid'))) {
-            return null;
-        }
-
-        $columnAnnotations = [];
-        foreach ($properties as $property) {
-            $annotation = $reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
-            if ($annotation) {
-                $columnAnnotations[$property->getName()] = $annotation;
-            }
-        }
-
-        $columnInfo = $this->buildColumnInfoFromGrid($reflectionClass, $gridAnnotation, $columnAnnotations, $metadata, $allowReflection);
-
-        ColumnUtil::populateCacheFile($cacheFilename, $columnInfo);
-
-        return $this->getCachedColumnInfo($cacheFilename, $metadata);
-    }
-
-    /**
-     * Read grid configuration from PHP 8 attributes (ReflectionAttribute).
-     *
-     * @return array|null
-     *
-     * @throws \Exception
-     */
-    private function readAndCacheGridAttributes($cacheFilename, $metadata, $allowReflection)
+    private function readGridAttributes($metadata, $allowReflection, ?Reader $reader = null)
     {
         if (\PHP_VERSION_ID < 80000) {
             return null;
@@ -235,10 +204,9 @@ class ColumnSource
 
         $gridAnnotation = $gridAttrs[0]->newInstance();
 
-        // Actions and sort can't be nested inside #[Grid] — PHP attribute
-        // arguments must be constant expressions, so `new ShowAction()` /
-        // `new Sort()` aren't allowed there. Read them as separate
-        // class-level attributes instead.
+        // On PHP 8.0 attribute arguments cannot contain `new`, so actions
+        // and sort can also be declared as separate class-level attributes.
+        // (On PHP 8.1+ nesting them inside #[Grid] works directly.)
         if (null === $gridAnnotation->actions) {
             $actionAttrs = $reflectionClass->getAttributes(Action::class, \ReflectionAttribute::IS_INSTANCEOF);
             if ($actionAttrs) {
@@ -258,19 +226,91 @@ class ColumnSource
             }
         }
 
-        $columnAnnotations = [];
+        $columnAnnotations = self::collectAttributeColumns($reflectionClass);
+        if (!$columnAnnotations && $reader) {
+            // Half-migrated class: #[Grid] at class level but columns still
+            // declared as @Column docblock annotations — honor them rather
+            // than silently dropping the column configuration.
+            $columnAnnotations = self::collectAnnotationColumns($reader, $reflectionClass);
+        }
+
+        return $this->buildColumnInfoFromGrid($reflectionClass, $gridAnnotation, $columnAnnotations, $metadata, $allowReflection);
+    }
+
+    /**
+     * Read grid configuration from Doctrine annotations.
+     *
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata|ClassMetadata $metadata
+     *
+     * @return array|null column info, or null when the class has no @Grid
+     *
+     * @throws \Exception
+     */
+    private function readGridAnnotations(Reader $reader, $metadata, $allowReflection)
+    {
+        $reflectionClass = $metadata->getReflectionClass();
+
+        /** @var Grid $gridAnnotation */
+        if (!($gridAnnotation = $reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid'))) {
+            return null;
+        }
+
+        $columnAnnotations = self::collectAnnotationColumns($reader, $reflectionClass);
+        if (!$columnAnnotations && \PHP_VERSION_ID >= 80000) {
+            // Half-migrated class, the other direction: @Grid kept at class
+            // level while the properties already use #[Column] attributes.
+            $columnAnnotations = self::collectAttributeColumns($reflectionClass);
+        }
+
+        return $this->buildColumnInfoFromGrid($reflectionClass, $gridAnnotation, $columnAnnotations, $metadata, $allowReflection);
+    }
+
+    /**
+     * @return array<string, Column> keyed by property name
+     */
+    private static function collectAttributeColumns(\ReflectionClass $reflectionClass)
+    {
+        $columns = [];
         foreach ($reflectionClass->getProperties() as $property) {
             $colAttrs = $property->getAttributes(Column::class);
             if (!empty($colAttrs)) {
-                $columnAnnotations[$property->getName()] = $colAttrs[0]->newInstance();
+                $columns[$property->getName()] = $colAttrs[0]->newInstance();
             }
         }
 
-        $columnInfo = $this->buildColumnInfoFromGrid($reflectionClass, $gridAnnotation, $columnAnnotations, $metadata, $allowReflection);
+        return $columns;
+    }
 
-        ColumnUtil::populateCacheFile($cacheFilename, $columnInfo);
+    /**
+     * @return array<string, Column> keyed by property name
+     */
+    private static function collectAnnotationColumns(Reader $reader, \ReflectionClass $reflectionClass)
+    {
+        $columns = [];
+        foreach ($reflectionClass->getProperties() as $property) {
+            $annotation = $reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
+            if ($annotation) {
+                $columns[$property->getName()] = $annotation;
+            }
+        }
 
-        return $this->getCachedColumnInfo($cacheFilename, $metadata);
+        return $columns;
+    }
+
+    /**
+     * Materialize the cache-file column specs into GridColumn objects.
+     *
+     * @return array ['columns' => array<GridColumn>, 'sort' => array]
+     */
+    private static function instantiateColumnInfo(array $columnInfo)
+    {
+        $columns = [];
+        foreach ($columnInfo['columns'] as $field => $info) {
+            $class = $info['class'];
+            $columns[$field] = new $class(...$info['arguments']);
+        }
+
+        return ['columns' => $columns, 'sort' => $columnInfo['sort']];
     }
 
     /**
@@ -330,10 +370,6 @@ class ColumnSource
                 'arguments' => $actionArgs, ];
         }
 
-        if (!$gridColumns) {
-            throw new \InvalidArgumentException($reflectionClass->getName().' has a Grid annotation or attribute but no Column definitions, and reflection-based columns are not available for it');
-        }
-
         $this->sortGridColumns($gridColumns);
 
         if ($sort) {
@@ -344,7 +380,7 @@ class ColumnSource
         }
 
         $sortList = [];
-        if ($sortMulti) {
+        if ($sortMulti && $gridColumns) {
             try {
                 foreach ($sortMulti as $sortDef) {
                     $sortInfo = self::extractSortInfo($sortDef);
@@ -362,6 +398,27 @@ class ColumnSource
     }
 
     /**
+     * Validate the cached sort list (column => direction map) against the
+     * cached columns.
+     *
+     * @throws \InvalidArgumentException
+     */
+    private static function validateSortList(array $sortList, array $gridColumns)
+    {
+        foreach ($sortList as $column => $direction) {
+            if ('ASC' !== $direction && 'DESC' !== $direction) {
+                throw new \InvalidArgumentException("Grid sort direction '{$direction}' for column '{$column}' is invalid");
+            }
+            if (!isset($gridColumns[$column])) {
+                throw new \InvalidArgumentException("Grid sort column '{$column}' not in list of columns (".implode(', ', array_keys($gridColumns)).')');
+            }
+        }
+    }
+
+    /**
+     * Validate a single sort definition (['column' => ..., 'direction' => ...])
+     * against the column specs at build time.
+     *
      * @throws \InvalidArgumentException
      */
     private static function validateSortInfo(array $sortInfo, array $gridColumns)

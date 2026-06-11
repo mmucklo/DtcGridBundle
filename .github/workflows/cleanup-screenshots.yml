@@ -1,8 +1,10 @@
-name: Cleanup screenshots ref
+name: Archive screenshots ref
 
-# When a PR closes (merged or not), delete the throwaway
-# refs/screenshots/<branch> ref that the screenshot job pushed, so these
-# refs don't accumulate over time.
+# When a PR closes (merged or not), move refs/screenshots/<branch> to an
+# archive ref keyed by PR number. Deleting it outright would let GitHub
+# garbage-collect the orphan screenshot commits, breaking every image in the
+# merged PR's comment — the visual record matters most after the merge.
+# Archiving keeps the commits reachable while freeing the branch namespace.
 on:
   pull_request:
     types: [closed]
@@ -11,14 +13,21 @@ permissions:
   contents: write
 
 jobs:
-  cleanup:
-    name: Delete screenshots ref
+  archive:
+    name: Archive screenshots ref
     runs-on: ubuntu-latest
     # Fork PRs never created a ref (read-only token), so only run for same-repo branches.
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v4
 
-      - name: Delete refs/screenshots/${{ github.head_ref }}
+      - name: Move refs/screenshots/${{ github.head_ref }} to archive
         run: |
-          git push origin ":refs/screenshots/${{ github.head_ref }}" || echo "No screenshots ref to delete"
+          SRC="refs/screenshots/${{ github.head_ref }}"
+          DST="refs/screenshots/closed/pr-${{ github.event.pull_request.number }}"
+          if git fetch origin "${SRC}:refs/tmp-screenshots"; then
+            git push origin "refs/tmp-screenshots:${DST}" --force
+            git push origin ":${SRC}"
+          else
+            echo "No screenshots ref to archive"
+          fi

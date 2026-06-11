@@ -4,38 +4,79 @@ namespace Dtc\GridBundle\Tests\Grid\Source;
 
 use Dtc\GridBundle\Annotation\Column;
 use Dtc\GridBundle\Annotation\Grid;
+use Dtc\GridBundle\Annotation\ShowAction;
 use Dtc\GridBundle\Annotation\Sort;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests annotation class constructors with Doctrine-style $data array (PHP 7.2+).
+ * Tests the annotation/attribute constructor contract (PHP 7.2+ positional
+ * syntax): natural parameters, normalization, and argument validation.
  */
 class AttributeReaderTest extends TestCase
 {
-    public function testColumnDoctrineCompatArray()
+    public function testColumnPositional()
     {
-        $col = new Column(['label' => 'Email', 'sortable' => true]);
+        $col = new Column('Email', true);
         self::assertSame('Email', $col->label);
         self::assertTrue($col->sortable);
         self::assertFalse($col->searchable);
     }
 
-    public function testGridDoctrineCompatArray()
+    public function testColumnRejectsStringSortable()
     {
-        $sort = new Sort(['column' => 'id', 'direction' => 'DESC']);
-        $grid = new Grid(['sort' => $sort]);
-        self::assertSame($sort, $grid->sort);
-        self::assertNull($grid->actions);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"sortable" must be a bool');
+        new Column('Email', 'false');
     }
 
-    public function testSortDoctrineCompatArray()
+    public function testColumnRejectsNonIntOrder()
     {
-        $sort = new Sort(['column' => 'name', 'direction' => 'ASC']);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"order" must be an int');
+        new Column('Email', false, false, null, 'first');
+    }
+
+    public function testGridNormalizesSingleActionToArray()
+    {
+        $grid = new Grid(new ShowAction());
+        self::assertIsArray($grid->actions);
+        self::assertCount(1, $grid->actions);
+        self::assertInstanceOf(ShowAction::class, $grid->actions[0]);
+    }
+
+    public function testGridRejectsNonActionElements()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"actions" elements must be Action instances');
+        new Grid(['show']);
+    }
+
+    public function testGridRejectsNonSort()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"sort" must be a Sort instance');
+        new Grid(null, 'name');
+    }
+
+    public function testGridSortAndSortMulti()
+    {
+        $sort = new Sort('DESC', 'id');
+        $grid = new Grid(null, $sort);
+        self::assertSame($sort, $grid->sort);
+        self::assertNull($grid->actions);
+
+        $gridMulti = new Grid(null, null, [$sort, new Sort('ASC', 'name')]);
+        self::assertCount(2, $gridMulti->sortMulti);
+    }
+
+    public function testSortPositional()
+    {
+        $sort = new Sort('ASC', 'name');
         self::assertSame('name', $sort->column);
         self::assertSame('ASC', $sort->direction);
     }
 
-    public function testColumnPositionalDefaults()
+    public function testColumnDefaults()
     {
         $col = new Column();
         self::assertNull($col->label);
@@ -51,5 +92,16 @@ class AttributeReaderTest extends TestCase
         self::assertNull($grid->actions);
         self::assertNull($grid->sort);
         self::assertNull($grid->sortMulti);
+    }
+
+    public function testShowActionDefaultsSurviveConstruction()
+    {
+        $action = new ShowAction();
+        self::assertSame('Show', $action->label);
+        self::assertSame('dtc_grid_show', $action->route);
+
+        $custom = new ShowAction('View');
+        self::assertSame('View', $custom->label);
+        self::assertSame('dtc_grid_show', $custom->route);
     }
 }

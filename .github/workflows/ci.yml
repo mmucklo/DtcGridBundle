@@ -115,6 +115,19 @@ jobs:
           coverage: none
           tools: composer:v2
 
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-8.4-highest-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-php-8.4-highest-
+            ${{ runner.os }}-php-8.4-
+
       - name: Install dependencies
         run: composer update --no-interaction --no-progress --prefer-dist
 
@@ -125,14 +138,30 @@ jobs:
           ln -s "$(pwd)/Resources/public/css" Tests/App/public/bundles/dtcgrid/css
           ln -s "$(pwd)/Resources/public/js" Tests/App/public/bundles/dtcgrid/js
 
-      - name: Cache Puppeteer browser
-        uses: actions/cache@v4
+      # restore/save are split so the ~170MB browser download is persisted
+      # even when a later step (screenshot capture, push, comment) fails —
+      # plain actions/cache skips its save on job failure, which forfeits
+      # the download exactly when the job is flaky and retrying.
+      - name: Restore Puppeteer cache
+        id: puppeteer-cache
+        uses: actions/cache/restore@v4
         with:
-          path: ~/.cache/puppeteer
+          path: |
+            ~/.cache/puppeteer
+            ~/.npm
           key: ${{ runner.os }}-puppeteer-${{ env.PUPPETEER_VERSION }}
 
       - name: Install Puppeteer
         run: npm install "puppeteer@${PUPPETEER_VERSION}"
+
+      - name: Save Puppeteer cache
+        if: always() && steps.puppeteer-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cache/puppeteer
+            ~/.npm
+          key: ${{ runner.os }}-puppeteer-${{ env.PUPPETEER_VERSION }}
 
       - name: Take screenshots
         run: |
@@ -152,6 +181,7 @@ jobs:
           path: Tests/Screenshots/output/*.png
 
       - name: Push screenshots to separate ref
+        id: push-screenshots
         # Fork PRs get a read-only token with no secret access, so the push
         # and PR comment below can't run. Skip them for forks.
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
@@ -166,6 +196,9 @@ jobs:
           git add *.png
           git commit -m "Grid screenshots for ${{ github.head_ref || github.ref_name }}"
           git push origin HEAD:${SCREENSHOTS_REF} --force
+          # Pass the screenshot commit to the comment step explicitly rather
+          # than relying on HEAD still pointing at the orphan branch there.
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Comment on PR with screenshots
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
@@ -173,8 +206,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           REPO="${{ github.repository }}"
-          SCREENSHOTS_REF="refs/screenshots/${{ github.head_ref }}"
-          REF_SHA=$(git rev-parse HEAD)
+          REF_SHA="${{ steps.push-screenshots.outputs.sha }}"
           BODY="## Grid Screenshots
 
           **Table renderer:**
@@ -185,8 +217,9 @@ jobs:
 
           _Auto-generated from [CI run](https://github.com/${REPO}/actions/runs/${{ github.run_id }})_"
 
-          # Update existing comment or create new one
-          COMMENT_ID=$(gh api repos/${REPO}/issues/${{ github.event.pull_request.number }}/comments \
+          # Update existing comment or create new one (--paginate: the
+          # comment may sit beyond the first 30 on a busy PR)
+          COMMENT_ID=$(gh api --paginate repos/${REPO}/issues/${{ github.event.pull_request.number }}/comments \
             --jq '.[] | select(.body | startswith("## Grid Screenshots")) | .id' | tail -1)
           if [ -n "$COMMENT_ID" ]; then
             gh api repos/${REPO}/issues/comments/${COMMENT_ID} -X PATCH -f body="$BODY"

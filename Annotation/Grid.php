@@ -2,8 +2,11 @@
 
 namespace Dtc\GridBundle\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
+
 /**
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target("CLASS")
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
@@ -25,20 +28,52 @@ class Grid implements Annotation
     public $sortMulti;
 
     /**
-     * Actions and sort cannot be passed as attribute arguments (PHP attribute
-     * arguments must be constant expressions) — use the class-level
-     * #[ShowAction]/#[DeleteAction]/#[Action]/#[Sort] attributes instead.
-     * The array form exists for the Doctrine annotation reader, which passes
-     * the parsed @Grid values as a single array.
+     * On PHP 8.0, attribute arguments cannot contain `new`, so actions and
+     * sort must be declared as separate class-level attributes
+     * (#[ShowAction], #[DeleteAction], #[Action], #[Sort]). On PHP 8.1+,
+     * nesting works directly: #[Grid(actions: [new ShowAction()])].
+     * The Doctrine annotation reader maps @Grid(actions={...}, sort=@Sort(...))
+     * onto these parameters via @NamedArgumentConstructor.
      *
-     * @param array $data Doctrine annotation values
+     * @param Action|array<Action>|null $actions
+     * @param Sort|null                 $sort
+     * @param Sort|array<Sort>|null     $sortMulti
      */
-    public function __construct(array $data = [])
+    public function __construct($actions = null, $sort = null, $sortMulti = null)
     {
-        foreach ($data as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->$key = $value;
+        if (null !== $actions) {
+            if ($actions instanceof Action) {
+                $actions = [$actions];
             }
+            if (!is_array($actions)) {
+                throw new \InvalidArgumentException('Grid "actions" must be an Action or an array of Action instances, got '.gettype($actions));
+            }
+            foreach ($actions as $action) {
+                if (!$action instanceof Action) {
+                    throw new \InvalidArgumentException('Grid "actions" elements must be Action instances, got '.(is_object($action) ? get_class($action) : gettype($action)));
+                }
+            }
+            $this->actions = $actions;
+        }
+        if (null !== $sort) {
+            if (!$sort instanceof Sort) {
+                throw new \InvalidArgumentException('Grid "sort" must be a Sort instance, got '.(is_object($sort) ? get_class($sort) : gettype($sort)));
+            }
+            $this->sort = $sort;
+        }
+        if (null !== $sortMulti) {
+            if ($sortMulti instanceof Sort) {
+                $sortMulti = [$sortMulti];
+            }
+            if (!is_array($sortMulti)) {
+                throw new \InvalidArgumentException('Grid "sortMulti" must be a Sort or an array of Sort instances, got '.gettype($sortMulti));
+            }
+            foreach ($sortMulti as $sortItem) {
+                if (!$sortItem instanceof Sort) {
+                    throw new \InvalidArgumentException('Grid "sortMulti" elements must be Sort instances, got '.(is_object($sortItem) ? get_class($sortItem) : gettype($sortItem)));
+                }
+            }
+            $this->sortMulti = $sortMulti;
         }
     }
 }

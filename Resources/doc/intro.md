@@ -66,4 +66,3 @@ YAML:
             class: Path\To\Your\NewGridSource
             arguments: ['@your_services', 'etc']
             tags: [{ name: dtc_grid.source }]
-            calls: [[autoDiscoverColumns]]

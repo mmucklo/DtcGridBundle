@@ -7,7 +7,6 @@
             <argument type="service" id="doctrine_mongodb.odm.default_document_manager"></argument>
             <argument>Odl\ShadowBundle\Documents\Character</argument>
             <argument>grid.source.character</argument>
-            <call method="autoDiscoverColumns"></call>
         </service>
     
     YAML:
@@ -15,7 +14,6 @@
             class: Dtc\GridBundle\Grid\Source\DocumentGridSource
             arguments: ['@doctrine_mongodb.odm.default_document_manager', AppBundle\Document\User]
             tags: [{ name: dtc_grid.source }]
-            calls: [[autoDiscoverColumns]]
 
  * For ORMs, use
     * Dtc\GridBundle\Grid\Source\EntityGridSource

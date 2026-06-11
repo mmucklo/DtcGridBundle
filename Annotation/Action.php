@@ -2,8 +2,11 @@
 
 namespace Dtc\GridBundle\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
+
 /**
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target("ANNOTATION")
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
@@ -29,21 +32,10 @@ class Action implements Annotation
      */
     public $onclick;
 
-    /**
-     * @param array $data Doctrine annotation values (BC)
-     */
-    public function __construct(
-        array $data = [],
-        $label = null,
-        $route = null,
-        $buttonClass = null,
-        $onclick = null
-    ) {
-        foreach ($data as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->$key = $value;
-            }
-        }
+    public function __construct($label = null, $route = null, $buttonClass = null, $onclick = null)
+    {
+        // Only assign non-null values so subclass property defaults
+        // (ShowAction/DeleteAction labels and routes) survive omitted args.
         if (null !== $label) {
             $this->label = $label;
         }

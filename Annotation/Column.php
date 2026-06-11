@@ -2,8 +2,11 @@
 
 namespace Dtc\GridBundle\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
+
 /**
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target("PROPERTY")
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
@@ -34,36 +37,24 @@ class Column implements Annotation
      */
     public $order;
 
-    /**
-     * @param array $data Doctrine annotation values (BC)
-     */
-    public function __construct(
-        array $data = [],
-        $label = null,
-        $sortable = null,
-        $searchable = null,
-        $formatter = null,
-        $order = null
-    ) {
-        foreach ($data as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->$key = $value;
-            }
+    public function __construct($label = null, $sortable = false, $searchable = false, $formatter = null, $order = null)
+    {
+        if (null !== $label && !is_string($label)) {
+            throw new \InvalidArgumentException('Column "label" must be a string, got '.gettype($label));
         }
-        if (null !== $label) {
-            $this->label = $label;
+        if (!is_bool($sortable)) {
+            throw new \InvalidArgumentException('Column "sortable" must be a bool, got '.gettype($sortable));
         }
-        if (null !== $sortable) {
-            $this->sortable = $sortable;
+        if (!is_bool($searchable)) {
+            throw new \InvalidArgumentException('Column "searchable" must be a bool, got '.gettype($searchable));
         }
-        if (null !== $searchable) {
-            $this->searchable = $searchable;
+        if (null !== $order && !is_int($order)) {
+            throw new \InvalidArgumentException('Column "order" must be an int, got '.gettype($order));
         }
-        if (null !== $formatter) {
-            $this->formatter = $formatter;
-        }
-        if (null !== $order) {
-            $this->order = $order;
-        }
+        $this->label = $label;
+        $this->sortable = $sortable;
+        $this->searchable = $searchable;
+        $this->formatter = $formatter;
+        $this->order = $order;
     }
 }
