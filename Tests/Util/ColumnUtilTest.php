@@ -36,10 +36,14 @@ class ColumnUtilTest extends TestCase
 
     public function testPopulateCacheFileNoColumns()
     {
+        // Even with no columns the file must return the full structure:
+        // ColumnSource treats an include result without a 'columns' key as
+        // a corrupt cache (this used to be a "return false" sentinel whose
+        // reader was removed in the 3.x column refactor).
         $filename = ColumnUtil::createCacheFilename($this->tmpDir, 'App\\Entity\\Empty');
         ColumnUtil::populateCacheFile($filename, []);
         $result = include $filename;
-        self::assertFalse($result);
+        self::assertSame(['columns' => [], 'sort' => []], $result);
     }
 
     public function testPopulateCacheFileWithColumns()

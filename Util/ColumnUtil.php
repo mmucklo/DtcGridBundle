@@ -46,35 +46,35 @@ class ColumnUtil
         $columns = isset($classInfo['columns']) ? $classInfo['columns'] : [];
         $sort = isset($classInfo['sort']) ? $classInfo['sort'] : [];
 
-        if ($columns) {
-            $output = "<?php\nreturn array('columns' => array(\n";
-            foreach ($columns as $field => $info) {
-                $class = $info['class'];
-                $output .= "'$field' => new $class(";
-                $first = true;
-                foreach ($info['arguments'] as $argument) {
-                    if ($first) {
-                        $first = false;
-                    } else {
-                        $output .= ',';
-                    }
-                    $output .= var_export($argument, true);
-                }
-                $output .= '),';
-            }
-            $output .= "), 'sort' => array(";
-            foreach ($sort as $key => $value) {
-                $output .= "'$key'".' => ';
-                if (null === $value) {
-                    $output .= 'null,';
+        // Always emit the full structure: ColumnSource::getCachedColumnInfo
+        // treats an include result without a 'columns' key as corruption.
+        // (A "return false" negative-cache sentinel was written here until
+        // 8.0.0, but its only reader was removed in the 3.x column refactor.)
+        $output = "<?php\nreturn array('columns' => array(\n";
+        foreach ($columns as $field => $info) {
+            $class = $info['class'];
+            $output .= "'$field' => new $class(";
+            $first = true;
+            foreach ($info['arguments'] as $argument) {
+                if ($first) {
+                    $first = false;
                 } else {
-                    $output .= "'$value',";
+                    $output .= ',';
                 }
+                $output .= var_export($argument, true);
             }
-            $output .= "));\n";
-        } else {
-            $output = "<?php\nreturn false;\n";
+            $output .= '),';
         }
+        $output .= "), 'sort' => array(";
+        foreach ($sort as $key => $value) {
+            $output .= "'$key'".' => ';
+            if (null === $value) {
+                $output .= 'null,';
+            } else {
+                $output .= "'$value',";
+            }
+        }
+        $output .= "));\n";
         file_put_contents($filename, $output);
     }
 

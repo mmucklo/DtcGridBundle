@@ -330,6 +330,10 @@ class ColumnSource
                 'arguments' => $actionArgs, ];
         }
 
+        if (!$gridColumns) {
+            throw new \InvalidArgumentException($reflectionClass->getName().' has a Grid annotation or attribute but no Column definitions, and reflection-based columns are not available for it');
+        }
+
         $this->sortGridColumns($gridColumns);
 
         if ($sort) {

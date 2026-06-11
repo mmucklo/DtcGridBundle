@@ -4,6 +4,8 @@
    * Drop PHP 5.6/7.0/7.1 support; minimum is now PHP 7.2. Tested on PHP 7.2 - 8.4.
    * Add support for Symfony 7 and Symfony 8; declared range is `^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0`.
    * Remove the abandoned, unused `sensio/framework-extra-bundle` dependency.
+   * **BC break:** Remove `ColumnExtractionTrait`, unused since the 3.x column refactor moved its logic into the `ColumnSource` service.
+   * A Grid annotation/attribute with no Column definitions (and reflection unavailable) now throws a clear configuration error instead of writing a `return false` cache file and failing every request with "Bad column cache".
    * **BC break:** Remove the deprecated-since-3.0.0 console commands: `dtc:grid:source:generate` (with the `Dtc\GridBundle\Generator` classes) relied on bundle shortcut notation and Doctrine entity-namespace aliases, which were removed in modern Symfony/Doctrine — use `@Grid`/`#[Grid]` auto-detection instead; `dtc:grid:source:list` always printed an empty list because grid sources are registered lazily per request.
    * **BC break:** DataTables default integration assets switched from Bootstrap 3 (`dataTables.bootstrap.min.*`) to Bootstrap 4 (`dataTables.bootstrap4.min.*`) to match the default Bootstrap 4 theme. Override `dtc_grid.datatables.css`/`js` if you rely on the old behavior.
    * Replace Travis CI with GitHub Actions; add PHPStan + PHP CS Fixer linting and an end-to-end grid screenshot job.
