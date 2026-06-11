@@ -13,9 +13,12 @@ use PHPUnit\Framework\TestCase;
  */
 class NamedArgAttributeTest extends TestCase
 {
-    public function testGridInstantiatesViaNamedArgs()
+    public function testGridInstantiatesViaDataArray()
     {
-        $grid = new Grid(actions: null, sort: new Sort(column: 'name', direction: 'ASC'));
+        // Grid deliberately has no named params: actions/sort can't be
+        // attribute arguments (constant-expression rule), so only the
+        // Doctrine annotation reader's array form constructs it with values.
+        $grid = new Grid(['sort' => new Sort(column: 'name', direction: 'ASC')]);
         self::assertInstanceOf(Grid::class, $grid);
         self::assertInstanceOf(Sort::class, $grid->sort);
         self::assertSame('name', $grid->sort->column);

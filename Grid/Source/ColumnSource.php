@@ -426,7 +426,7 @@ class ColumnSource
             $order1 = $columnParts1[5];
             $order2 = $columnParts2[5];
 
-            return $order1 > $order2;
+            return $order1 <=> $order2;
         });
 
         if ($unordered) {

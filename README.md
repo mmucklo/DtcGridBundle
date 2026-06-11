@@ -349,7 +349,9 @@ class User {
 ### PHP 8 Attributes
 
 On PHP 8.0+ you can use native attributes instead of Doctrine annotations. The
-`#[Grid]` and `#[Column]` attributes mirror their annotation equivalents:
+`#[Grid]` and `#[Column]` attributes mirror their annotation equivalents. If a
+class carries both, the attributes take precedence and the annotations are
+ignored:
 
 ```php
 <?php

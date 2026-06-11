@@ -49,6 +49,9 @@ jobs:
             ${{ runner.os }}-php-${{ matrix.php }}-${{ matrix.dependencies }}-
             ${{ runner.os }}-php-${{ matrix.php }}-
 
+      # composer.json sets config.audit.block-insecure=false: composer >= 2.9.8
+      # otherwise refuses to resolve the legacy Symfony/Doctrine versions this
+      # matrix intentionally tests against (dev-only; consumers are unaffected).
       - name: Install dependencies (highest)
         if: matrix.dependencies == 'highest'
         run: composer update --no-interaction --no-progress --prefer-dist

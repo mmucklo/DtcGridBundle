@@ -25,27 +25,20 @@ class Grid implements Annotation
     public $sortMulti;
 
     /**
-     * @param array $data Doctrine annotation values (BC)
+     * Actions and sort cannot be passed as attribute arguments (PHP attribute
+     * arguments must be constant expressions) — use the class-level
+     * #[ShowAction]/#[DeleteAction]/#[Action]/#[Sort] attributes instead.
+     * The array form exists for the Doctrine annotation reader, which passes
+     * the parsed @Grid values as a single array.
+     *
+     * @param array $data Doctrine annotation values
      */
-    public function __construct(
-        array $data = [],
-        $actions = null,
-        $sort = null,
-        $sortMulti = null
-    ) {
+    public function __construct(array $data = [])
+    {
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->$key = $value;
             }
-        }
-        if (null !== $actions) {
-            $this->actions = $actions;
-        }
-        if (null !== $sort) {
-            $this->sort = $sort;
-        }
-        if (null !== $sortMulti) {
-            $this->sortMulti = $sortMulti;
         }
     }
 }
