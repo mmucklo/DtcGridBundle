@@ -4,19 +4,7 @@
 
 If you want to simple grid with built in Grid Source, no customizations to grid columns, it's recommended to follow the instructions in the [README.md](/README.md) at the root of this project.
 
-## Grid Generator
-
-For customizing is recommended to use the generator:
-
-	bin/console dtc:grid:source:generate <entity_or_document> [--columns]
-
-  * Use switch --columns if you want to customize columns, which will generate a custom columns twig file.
-
-You can use symfony's console to view registered grid sources:
-
-	bin/console dtc:grid:source:list
-
-Otherwise see one of these:
+See one of these:
     
     * [jQuery Datatables](/Resources/doc/DatatablesRenderer.md)
     * [jqGrid](/Resources/doc/jqGridRenderer.md)

@@ -23,23 +23,6 @@ services:
                 datatables.local.js: '%dtc_grid.datatables.local.js%'
                 datatables.class: '%dtc_grid.datatables.class%'
                 datatables.options: '%dtc_grid.datatables.options%'
-    dtc_grid.command.source_list:
-        public: true
-        class: Dtc\GridBundle\Command\SourceListCommand
-        calls:
-            - [ "setGridSourceManager", ['@dtc_grid.manager.source'] ]
-        tags:
-            - { name: console.command }
-    dtc_grid.command.generate_grid_source:
-        public: true
-        class: Dtc\GridBundle\Command\GenerateGridSourceCommand
-        calls:
-            - [ "setRegistry", ['@?doctrine'] ]
-            - [ "setMongoDBRegistry", ['@?doctrine_mongodb'] ]
-            - [ "setEntityManager", ['@?doctrine.orm.default_entity_manager'] ]
-            - [ "setDocumentManager", ['@?doctrine_mongodb.odm.default_document_manager'] ]
-        tags:
-            - { name: console.command }
     dtc_grid.column.source:
         public: true
         class: Dtc\GridBundle\Grid\Source\ColumnSource
@@ -58,14 +41,6 @@ services:
         class: Dtc\GridBundle\Twig\Extension\TwigExtension
         tags:
             - { name: twig.extension }
-    dtc_grid.command.source.list:
-        class: Dtc\GridBundle\Command\SourceListCommand
-        tags:
-            - { name: 'console.command' }
-    dtc_grid.command.source.generate:
-        class: Dtc\GridBundle\Command\GenerateGridSourceCommand
-        tags:
-            - { name: 'console.command' }
     dtc_grid.controller.grid:
         public: true
         class: Dtc\GridBundle\Controller\GridController

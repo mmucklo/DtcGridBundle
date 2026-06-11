@@ -65,13 +65,9 @@ class ColumnSource
      *
      * @throws \Exception
      */
-    private function getCachedColumnInfo($cacheFilename, $classMetadata, ?Reader $reader = null)
+    private function getCachedColumnInfo($cacheFilename, $classMetadata)
     {
-        $params = [$classMetadata, $cacheFilename];
-        if ($reader) {
-            $params[] = $reader;
-        }
-        if (call_user_func_array([$this, 'shouldIncludeColumnCache'], $params)) {
+        if ($this->shouldIncludeColumnCache($classMetadata, $cacheFilename)) {
             $columnInfo = include $cacheFilename;
             if (!isset($columnInfo['columns'])) {
                 throw new \Exception("Bad column cache, missing columns: {$cacheFilename}");
@@ -103,11 +99,7 @@ class ColumnSource
         $cacheFilename = ColumnUtil::createCacheFilename($this->cacheDir, $name);
 
         // Try to include them from the cached file if exists.
-        $params = [$cacheFilename, $classMetadata];
-        if ($reader) {
-            $params[] = $reader;
-        }
-        $columnInfo = call_user_func_array([$this, 'getCachedColumnInfo'], $params);
+        $columnInfo = $this->getCachedColumnInfo($cacheFilename, $classMetadata);
 
         if (!$columnInfo) {
             $columnInfo = $this->readAndCacheGridAttributes($cacheFilename, $classMetadata, $allowReflection);
@@ -143,7 +135,7 @@ class ColumnSource
      *
      * @throws \Exception
      */
-    private function shouldIncludeColumnCache($metadata, $columnCacheFilename, ?Reader $reader = null)
+    private function shouldIncludeColumnCache($metadata, $columnCacheFilename)
     {
         if (!is_file($columnCacheFilename) || !is_readable($columnCacheFilename)) {
             return false;
@@ -219,7 +211,7 @@ class ColumnSource
 
         ColumnUtil::populateCacheFile($cacheFilename, $columnInfo);
 
-        return $this->getCachedColumnInfo($cacheFilename, $metadata, $reader);
+        return $this->getCachedColumnInfo($cacheFilename, $metadata);
     }
 
     /**
