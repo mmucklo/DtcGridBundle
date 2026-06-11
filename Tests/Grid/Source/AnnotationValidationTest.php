@@ -16,7 +16,10 @@ class AnnotationValidationTest extends ColumnSourceTestCase
 {
     public function testWrongTypeForSortableThrows()
     {
-        $this->expectException(AnnotationException::class);
+        // doctrine/annotations 1.13.3+/2.x wrap constructor exceptions in
+        // AnnotationException; 1.13.0 lets them propagate raw. The contract
+        // is "fails loudly with a clear message", whichever the wrapper.
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('must be a bool');
         $this->buildColumnSourceInfo(InvalidColumnTypeEntity::class, false, new AnnotationReader(), false);
     }
