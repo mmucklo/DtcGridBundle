@@ -10,18 +10,11 @@ require_once __DIR__.'/../../vendor/autoload.php';
 
 use Dtc\GridBundle\Tests\App\Entity\Product;
 use Dtc\GridBundle\Tests\App\Kernel;
+use Dtc\GridBundle\Tests\TempDir;
 
 // Clear previous cache/db
 $cacheDir = sys_get_temp_dir().'/dtc_grid_test';
-if (is_dir($cacheDir)) {
-    $it = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($cacheDir, RecursiveDirectoryIterator::SKIP_DOTS),
-        RecursiveIteratorIterator::CHILD_FIRST
-    );
-    foreach ($it as $item) {
-        $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
-    }
-}
+TempDir::remove($cacheDir);
 
 $kernel = new Kernel('test', true);
 $kernel->boot();

@@ -42,38 +42,50 @@ class Grid implements Annotation
     public function __construct($actions = null, $sort = null, $sortMulti = null)
     {
         if (null !== $actions) {
-            if ($actions instanceof Action) {
-                $actions = [$actions];
-            }
-            if (!is_array($actions)) {
-                throw new \InvalidArgumentException('Grid "actions" must be an Action or an array of Action instances, got '.gettype($actions));
-            }
-            foreach ($actions as $action) {
-                if (!$action instanceof Action) {
-                    throw new \InvalidArgumentException('Grid "actions" elements must be Action instances, got '.(is_object($action) ? get_class($action) : gettype($action)));
-                }
-            }
-            $this->actions = $actions;
+            $this->actions = self::normalizeList($actions, Action::class, 'actions');
         }
         if (null !== $sort) {
             if (!$sort instanceof Sort) {
-                throw new \InvalidArgumentException('Grid "sort" must be a Sort instance, got '.(is_object($sort) ? get_class($sort) : gettype($sort)));
+                throw new \InvalidArgumentException('Grid "sort" must be a Sort instance, got '.self::describeType($sort));
             }
             $this->sort = $sort;
         }
         if (null !== $sortMulti) {
-            if ($sortMulti instanceof Sort) {
-                $sortMulti = [$sortMulti];
-            }
-            if (!is_array($sortMulti)) {
-                throw new \InvalidArgumentException('Grid "sortMulti" must be a Sort or an array of Sort instances, got '.gettype($sortMulti));
-            }
-            foreach ($sortMulti as $sortItem) {
-                if (!$sortItem instanceof Sort) {
-                    throw new \InvalidArgumentException('Grid "sortMulti" elements must be Sort instances, got '.(is_object($sortItem) ? get_class($sortItem) : gettype($sortItem)));
-                }
-            }
-            $this->sortMulti = $sortMulti;
+            $this->sortMulti = self::normalizeList($sortMulti, Sort::class, 'sortMulti');
         }
+    }
+
+    /**
+     * Normalize a single instance or array of $class into a validated array.
+     *
+     * @param string $class
+     * @param string $param
+     *
+     * @return array
+     */
+    private static function normalizeList($value, $class, $param)
+    {
+        $short = false !== ($pos = strrpos($class, '\\')) ? substr($class, $pos + 1) : $class;
+        if ($value instanceof $class) {
+            $value = [$value];
+        }
+        if (!is_array($value)) {
+            throw new \InvalidArgumentException('Grid "'.$param.'" must be a '.$short.' or an array of '.$short.' instances, got '.self::describeType($value));
+        }
+        foreach ($value as $item) {
+            if (!$item instanceof $class) {
+                throw new \InvalidArgumentException('Grid "'.$param.'" elements must be '.$short.' instances, got '.self::describeType($item));
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * @return string
+     */
+    private static function describeType($value)
+    {
+        return is_object($value) ? get_class($value) : gettype($value);
     }
 }

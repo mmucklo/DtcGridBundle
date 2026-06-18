@@ -9,7 +9,7 @@ use Dtc\GridBundle\Tests\Fixtures\AnnotatedGridEntity;
 
 /**
  * Drives the real Doctrine annotation reader path (getColumnSourceInfo ->
- * readGridAnnotations -> buildColumnInfoFromGrid) against a fixture entity.
+ * collectGrid/collectColumns -> buildColumnInfoFromGrid) against a fixture.
  * This is the bundle's original public API: it must keep working on every
  * supported doctrine/annotations version.
  */

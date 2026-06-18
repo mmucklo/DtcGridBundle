@@ -25,8 +25,8 @@ jobs:
         run: |
           SRC="refs/screenshots/${{ github.head_ref }}"
           DST="refs/screenshots/closed/pr-${{ github.event.pull_request.number }}"
-          if git fetch origin "${SRC}:refs/tmp-screenshots"; then
-            git push origin "refs/tmp-screenshots:${DST}" --force
+          if git fetch origin "${SRC}"; then
+            git push origin "FETCH_HEAD:${DST}" --force
             git push origin ":${SRC}"
           else
             echo "No screenshots ref to archive"

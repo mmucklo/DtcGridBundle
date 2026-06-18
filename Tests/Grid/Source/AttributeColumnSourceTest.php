@@ -8,7 +8,7 @@ use Dtc\GridBundle\Tests\Fixtures\AttributeGridEntity;
 
 /**
  * Drives the real attribute-reading path (getColumnSourceInfo ->
- * readGridAttributes -> buildColumnInfoFromGrid) against a fixture entity,
+ * collectGrid/collectColumns -> buildColumnInfoFromGrid) against a fixture,
  * asserting columns, actions and sort all resolve from attributes.
  *
  * @requires PHP 8.0

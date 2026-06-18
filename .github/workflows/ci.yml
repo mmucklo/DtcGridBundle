@@ -139,9 +139,10 @@ jobs:
           ln -s "$(pwd)/Resources/public/js" Tests/App/public/bundles/dtcgrid/js
 
       # restore/save are split so the ~170MB browser download is persisted
-      # even when a later step (screenshot capture, push, comment) fails —
-      # plain actions/cache skips its save on job failure, which forfeits
-      # the download exactly when the job is flaky and retrying.
+      # even when a later step (screenshot capture, push, comment) fails. The
+      # save runs right after install and before those flaky steps, so plain
+      # success() semantics already cover it — no always(), which would also
+      # save a partial download if the install step itself died.
       - name: Restore Puppeteer cache
         id: puppeteer-cache
         uses: actions/cache/restore@v4
@@ -155,7 +156,7 @@ jobs:
         run: npm install "puppeteer@${PUPPETEER_VERSION}"
 
       - name: Save Puppeteer cache
-        if: always() && steps.puppeteer-cache.outputs.cache-hit != 'true'
+        if: steps.puppeteer-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: |
@@ -168,7 +169,9 @@ jobs:
           # Start PHP server in background
           php -S 127.0.0.1:8199 -t Tests/App/public Tests/App/public/index.php &
           SERVER_PID=$!
-          sleep 2
+          # Poll until the server accepts connections instead of a fixed sleep,
+          # which both wastes time and can flake on a slow runner.
+          curl --retry 20 --retry-delay 1 --retry-connrefused -sf -o /dev/null http://127.0.0.1:8199 || true
 
           node Tests/Screenshots/screenshot.mjs http://127.0.0.1:8199 Tests/Screenshots/output
 

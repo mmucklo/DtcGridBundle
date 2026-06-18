@@ -39,43 +39,86 @@ class ColumnUtil
     }
 
     /**
-     * @param string $filename
+     * Materialize a cache-shaped column info array (column specs with
+     * 'class'/'arguments') into instantiated GridColumn objects. This is the
+     * runtime twin of the code populateCacheFile() emits, kept here so the
+     * cache format is defined in one place.
+     *
+     * @return array ['columns' => array<GridColumn>, 'sort' => array]
      */
-    public static function populateCacheFile($filename, array $classInfo)
+    public static function instantiateColumnInfo(array $columnInfo)
+    {
+        $columns = [];
+        foreach ($columnInfo['columns'] as $field => $info) {
+            $class = $info['class'];
+            $columns[$field] = new $class(...$info['arguments']);
+        }
+
+        return ['columns' => $columns, 'sort' => isset($columnInfo['sort']) ? $columnInfo['sort'] : []];
+    }
+
+    /**
+     * @param string $filename
+     * @param string $source   'runtime' (read on request from annotations/attributes)
+     *                         or 'compile' (written from dtc_grid YAML at container build).
+     *                         The reader only resurrects a timestamp-stale cache when its
+     *                         source is 'compile', since YAML grids have no request-time
+     *                         regeneration path.
+     */
+    public static function populateCacheFile($filename, array $classInfo, $source = 'runtime')
     {
         $columns = isset($classInfo['columns']) ? $classInfo['columns'] : [];
         $sort = isset($classInfo['sort']) ? $classInfo['sort'] : [];
 
         // Always emit the full structure: ColumnSource::getCachedColumnInfo
         // treats an include result without a 'columns' key as corruption.
-        // (A "return false" negative-cache sentinel was written here until
-        // 8.0.0, but its only reader was removed in the 3.x column refactor.)
-        $output = "<?php\nreturn array('columns' => array(\n";
+        // Keys go through var_export too — they can be user-controlled (YAML
+        // column names) and a raw apostrophe would produce an unparseable file.
+        $output = "<?php\n\nreturn array('columns' => array(\n";
         foreach ($columns as $field => $info) {
             $class = $info['class'];
-            $output .= "'$field' => new $class(";
+            $output .= var_export((string) $field, true).' => new '.$class.'(';
             $first = true;
             foreach ($info['arguments'] as $argument) {
                 if ($first) {
                     $first = false;
                 } else {
-                    $output .= ',';
+                    $output .= ', ';
                 }
                 $output .= var_export($argument, true);
             }
-            $output .= '),';
+            $output .= "),\n";
         }
         $output .= "), 'sort' => array(";
         foreach ($sort as $key => $value) {
-            $output .= "'$key'".' => ';
-            if (null === $value) {
-                $output .= 'null,';
-            } else {
-                $output .= "'$value',";
-            }
+            $output .= var_export((string) $key, true).' => '.var_export($value, true).', ';
         }
-        $output .= "));\n";
-        file_put_contents($filename, $output);
+        $output .= '), '.var_export('source', true).' => '.var_export($source, true).");\n";
+
+        self::atomicWrite($filename, $output);
+    }
+
+    /**
+     * Write atomically so a concurrent request can never include() a
+     * half-written cache file (which would throw "Bad column cache").
+     *
+     * @param string $filename
+     * @param string $contents
+     */
+    private static function atomicWrite($filename, $contents)
+    {
+        $tmp = tempnam(dirname($filename), 'dtcgrid_');
+        if (false === $tmp) {
+            file_put_contents($filename, $contents);
+
+            return;
+        }
+        file_put_contents($tmp, $contents);
+        @chmod($tmp, 0666 & ~umask());
+        if (!@rename($tmp, $filename)) {
+            @unlink($tmp);
+            file_put_contents($filename, $contents);
+        }
     }
 
     /**
@@ -89,7 +132,7 @@ class ColumnUtil
         $classes = self::extractClassesFromFile($filename);
         foreach ($classes as $class => $columnInfo) {
             $filename = ColumnUtil::createCacheFilename($cacheDir, $class);
-            self::populateCacheFile($filename, $columnInfo);
+            self::populateCacheFile($filename, $columnInfo, 'compile');
         }
     }
 

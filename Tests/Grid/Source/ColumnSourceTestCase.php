@@ -8,6 +8,7 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Persistence\ObjectManager;
 use Dtc\GridBundle\Grid\Source\ColumnSource;
+use Dtc\GridBundle\Tests\TempDir;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,22 +33,7 @@ abstract class ColumnSourceTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        self::removeDirectory($this->cacheDir);
-    }
-
-    protected static function removeDirectory($dir)
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-        foreach ($iterator as $item) {
-            $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
-        }
-        rmdir($dir);
+        TempDir::remove($this->cacheDir);
     }
 
     /**
