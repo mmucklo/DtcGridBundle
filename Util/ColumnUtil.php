@@ -67,40 +67,22 @@ class ColumnUtil
      */
     public static function populateCacheFile($filename, array $classInfo, $source = 'runtime')
     {
-        $columns = isset($classInfo['columns']) ? $classInfo['columns'] : [];
-        $sort = isset($classInfo['sort']) ? $classInfo['sort'] : [];
+        // Cache the column *specs* (class + constructor arguments), not
+        // instantiated objects: a plain var_export'd array is materialized on
+        // read by instantiateColumnInfo(), so the format lives in one place and
+        // there is no hand-written code generation to keep parse-safe.
+        $spec = [
+            'columns' => isset($classInfo['columns']) ? $classInfo['columns'] : [],
+            'sort' => isset($classInfo['sort']) ? $classInfo['sort'] : [],
+            'source' => $source,
+        ];
 
-        // Always emit the full structure: ColumnSource::getCachedColumnInfo
-        // treats an include result without a 'columns' key as corruption.
-        // Keys go through var_export too — they can be user-controlled (YAML
-        // column names) and a raw apostrophe would produce an unparseable file.
-        $output = "<?php\n\nreturn array('columns' => array(\n";
-        foreach ($columns as $field => $info) {
-            $class = $info['class'];
-            $output .= var_export((string) $field, true).' => new '.$class.'(';
-            $first = true;
-            foreach ($info['arguments'] as $argument) {
-                if ($first) {
-                    $first = false;
-                } else {
-                    $output .= ', ';
-                }
-                $output .= var_export($argument, true);
-            }
-            $output .= "),\n";
-        }
-        $output .= "), 'sort' => array(";
-        foreach ($sort as $key => $value) {
-            $output .= var_export((string) $key, true).' => '.var_export($value, true).', ';
-        }
-        $output .= '), '.var_export('source', true).' => '.var_export($source, true).");\n";
-
-        self::atomicWrite($filename, $output);
+        self::atomicWrite($filename, "<?php\n\nreturn ".var_export($spec, true).";\n");
     }
 
     /**
      * Write atomically so a concurrent request can never include() a
-     * half-written cache file (which would throw "Bad column cache").
+     * half-written cache file.
      *
      * @param string $filename
      * @param string $contents

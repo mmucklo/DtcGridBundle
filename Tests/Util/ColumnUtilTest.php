@@ -62,19 +62,22 @@ class ColumnUtilTest extends TestCase
             'sort' => ['title' => 'ASC'],
         ];
         ColumnUtil::populateCacheFile($filename, $info, 'compile');
+        // The cache stores column specs (class + arguments), not objects;
+        // instantiateColumnInfo() materializes them.
         $result = include $filename;
         self::assertIsArray($result);
-        self::assertArrayHasKey('columns', $result);
-        self::assertArrayHasKey('sort', $result);
+        self::assertSame($info['columns'], $result['columns']);
         self::assertSame(['title' => 'ASC'], $result['sort']);
         self::assertSame('compile', $result['source']);
-        self::assertInstanceOf(\Dtc\GridBundle\Grid\Column\GridColumn::class, $result['columns']['title']);
+
+        $materialized = ColumnUtil::instantiateColumnInfo($result);
+        self::assertInstanceOf(\Dtc\GridBundle\Grid\Column\GridColumn::class, $materialized['columns']['title']);
     }
 
     public function testPopulateCacheFileEscapesKeysAndLabels()
     {
-        // Column keys can be user-controlled (YAML column names); a raw
-        // apostrophe in a single-quoted key would produce an unparseable file.
+        // Column keys can be user-controlled (YAML column names); var_export
+        // escapes a raw apostrophe that would otherwise break the cache file.
         $filename = ColumnUtil::createCacheFilename($this->tmpDir, 'App\\Entity\\Quoted');
         $info = [
             'columns' => [
@@ -89,7 +92,9 @@ class ColumnUtilTest extends TestCase
         $result = include $filename;
         self::assertArrayHasKey("owner's", $result['columns']);
         self::assertSame(["owner's" => 'ASC'], $result['sort']);
-        self::assertSame("Owner's Label", $result['columns']["owner's"]->getLabel());
+
+        $materialized = ColumnUtil::instantiateColumnInfo($result);
+        self::assertSame("Owner's Label", $materialized['columns']["owner's"]->getLabel());
     }
 
     public function testInstantiateColumnInfoMaterializesObjects()

@@ -56,6 +56,20 @@ class StaleCacheFallbackTest extends ColumnSourceTestCase
         self::assertNull($info);
     }
 
+    public function testLegacyAndSourcelessCachesAreTreatedAsMiss()
+    {
+        $cacheFilename = ColumnUtil::createCacheFilename($this->cacheDir, PlainEntity::class);
+
+        // Pre-8.0 empty-grid sentinel: include returns false (not an array).
+        file_put_contents($cacheFilename, "<?php\nreturn false;\n");
+        self::assertNull($this->buildColumnSourceInfo(PlainEntity::class, false, null, false));
+
+        // A populated cache predating the 'source' provenance key: still a miss
+        // (rebuilt in the new format) rather than a fatal or a wrong resurrect.
+        file_put_contents($cacheFilename, "<?php\nreturn array('columns' => array('name' => array('class' => '\\Dtc\\GridBundle\\Grid\\Column\\GridColumn', 'arguments' => array('name', 'Old'))), 'sort' => array());\n");
+        self::assertNull($this->buildColumnSourceInfo(PlainEntity::class, false, null, false));
+    }
+
     public function testEmptyColumnCacheIsTreatedAsMiss()
     {
         // A cache file with an empty column set (e.g. a dtc_grid YAML grid

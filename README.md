@@ -385,6 +385,13 @@ class User
 
 #### Actions and sort with attributes
 
+> **PHP 8.0 vs 8.1+:** the syntax for actions and sort differs by PHP version.
+> PHP 8.1 added "new in initializers", which lets you nest `new ShowAction()` /
+> `new Sort()` directly inside `#[Grid(...)]`. On PHP 8.0 that is a compile
+> error, so actions and sort must be declared as **separate class-level
+> attributes**. The separate-attribute form below works on *every* PHP 8
+> version, so prefer it if you need to support PHP 8.0.
+
 On PHP 8.1+ actions and sort can be nested directly inside `#[Grid]`:
 
 ```php

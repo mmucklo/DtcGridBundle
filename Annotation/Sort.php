@@ -12,6 +12,8 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Sort implements Annotation
 {
+    use ValidatesArguments;
+
     /**
      * @var string Default sort order
      */
@@ -24,6 +26,10 @@ class Sort implements Annotation
 
     public function __construct($direction = null, $column = null)
     {
+        self::assertOneOf($direction, ['ASC', 'DESC'], 'direction');
+        self::assertString($column, 'column');
+        // Only assign non-null values so the 'ASC' direction default survives
+        // an omitted argument.
         if (null !== $direction) {
             $this->direction = $direction;
         }

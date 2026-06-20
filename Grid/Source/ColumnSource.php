@@ -56,7 +56,7 @@ class ColumnSource
         // 1. Fresh cache (timestamp-checked in debug, trusted in production).
         $cached = $this->getCachedColumnInfo($cacheFilename, $classMetadata);
         if (null !== $cached) {
-            return $this->toColumnSourceInfo($cached, $classMetadata);
+            return $this->toColumnSourceInfo(ColumnUtil::instantiateColumnInfo($cached), $classMetadata);
         }
 
         // 2. Build from a Grid marker. The marker is taken from attributes if
@@ -79,7 +79,7 @@ class ColumnSource
         //    not resurrected, so removing a Grid marker takes effect.
         $staleCompile = $this->getCachedColumnInfo($cacheFilename, $classMetadata, true);
         if (null !== $staleCompile) {
-            return $this->toColumnSourceInfo($staleCompile, $classMetadata);
+            return $this->toColumnSourceInfo(ColumnUtil::instantiateColumnInfo($staleCompile), $classMetadata);
         }
 
         // 4. Reflection columns.
@@ -124,11 +124,12 @@ class ColumnSource
         }
 
         $columnInfo = include $cacheFilename;
-        if (!isset($columnInfo['columns'])) {
-            throw new \Exception("Bad column cache, missing columns: {$cacheFilename}");
-        }
-        if (!isset($columnInfo['sort'])) {
-            throw new \Exception("Bad column cache, missing sort: {$cacheFilename}");
+        // Treat anything that isn't a current-format spec as a miss so it is
+        // rebuilt rather than fataling: this covers a corrupt/partial file, a
+        // pre-8.0 `return false` cache, and any cache predating the 'source'
+        // provenance key.
+        if (!is_array($columnInfo) || !isset($columnInfo['columns'], $columnInfo['sort'], $columnInfo['source'])) {
+            return null;
         }
         // An empty column set is a miss, not a usable grid: fall through to the
         // readers/reflection rather than silently rendering a zero-column grid.
@@ -137,7 +138,7 @@ class ColumnSource
         }
         // The stale fallback only resurrects compile-time (YAML) caches; a
         // stale runtime cache must not outlive the config that produced it.
-        if ($staleCompileOnly && (!isset($columnInfo['source']) || 'compile' !== $columnInfo['source'])) {
+        if ($staleCompileOnly && 'compile' !== $columnInfo['source']) {
             return null;
         }
         if ($columnInfo['sort']) {
@@ -174,7 +175,7 @@ class ColumnSource
      *
      * @return bool
      */
-    private static function checkTimestamps($metadata, $columnCacheFilename)
+    public static function checkTimestamps($metadata, $columnCacheFilename)
     {
         $reflectionClass = $metadata->getReflectionClass();
         $filename = $reflectionClass->getFileName();

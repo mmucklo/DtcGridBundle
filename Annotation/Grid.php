@@ -12,6 +12,8 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Grid implements Annotation
 {
+    use ValidatesArguments;
+
     /**
      * @var array<Action>
      */
@@ -79,13 +81,5 @@ class Grid implements Annotation
         }
 
         return $value;
-    }
-
-    /**
-     * @return string
-     */
-    private static function describeType($value)
-    {
-        return is_object($value) ? get_class($value) : gettype($value);
     }
 }

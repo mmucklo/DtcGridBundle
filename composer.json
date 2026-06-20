@@ -38,6 +38,9 @@
         "friendsofphp/php-cs-fixer": "^3.0",
         "symfony/yaml": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0"
     },
+    "suggest": {
+        "doctrine/annotations": "Required only if you configure grids with Doctrine annotations (@Grid/@Column) instead of native PHP 8 attributes."
+    },
     "config": {
         "bin-dir": "bin",
         "allow-plugins": {

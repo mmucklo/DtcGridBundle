@@ -2,6 +2,7 @@
 
 namespace Dtc\GridBundle\Tests\Grid\Source;
 
+use Dtc\GridBundle\Annotation\Action;
 use Dtc\GridBundle\Annotation\Column;
 use Dtc\GridBundle\Annotation\Grid;
 use Dtc\GridBundle\Annotation\ShowAction;
@@ -34,6 +35,20 @@ class AttributeReaderTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"order" must be an int');
         new Column('Email', false, false, null, 'first');
+    }
+
+    public function testSortRejectsInvalidDirection()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"direction" must be one of ASC, DESC');
+        new Sort('UP');
+    }
+
+    public function testActionRejectsNonStringLabel()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"label" must be a string');
+        new Action(new \stdClass());
     }
 
     public function testGridNormalizesSingleActionToArray()

@@ -12,6 +12,8 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 class Column implements Annotation
 {
+    use ValidatesArguments;
+
     /**
      * @var string
      */
@@ -39,18 +41,11 @@ class Column implements Annotation
 
     public function __construct($label = null, $sortable = false, $searchable = false, $formatter = null, $order = null)
     {
-        if (null !== $label && !is_string($label)) {
-            throw new \InvalidArgumentException('Column "label" must be a string, got '.gettype($label));
-        }
-        if (!is_bool($sortable)) {
-            throw new \InvalidArgumentException('Column "sortable" must be a bool, got '.gettype($sortable));
-        }
-        if (!is_bool($searchable)) {
-            throw new \InvalidArgumentException('Column "searchable" must be a bool, got '.gettype($searchable));
-        }
-        if (null !== $order && !is_int($order)) {
-            throw new \InvalidArgumentException('Column "order" must be an int, got '.gettype($order));
-        }
+        self::assertString($label, 'label');
+        self::assertBool($sortable, 'sortable');
+        self::assertBool($searchable, 'searchable');
+        self::assertString($formatter, 'formatter');
+        self::assertInt($order, 'order');
         $this->label = $label;
         $this->sortable = $sortable;
         $this->searchable = $searchable;
