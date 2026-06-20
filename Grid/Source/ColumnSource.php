@@ -59,15 +59,12 @@ class ColumnSource
             return $this->toColumnSourceInfo(ColumnUtil::instantiateColumnInfo($cached), $classMetadata);
         }
 
-        // 2. Build from a Grid marker. The marker is taken from attributes if
-        //    present, else annotations; columns are merged per-property across
-        //    both sources (attribute winning per property) and class-level
-        //    action/sort attributes merge into a marker from either source, so
-        //    any partial migration keeps all its columns, actions and sort.
-        $grid = $this->collectGrid($reflectionClass, $reader);
-        if (null !== $grid) {
-            $columns = $this->collectColumns($reflectionClass, $reader);
-            $built = $this->buildColumnInfoFromGrid($reflectionClass, $grid, $columns, $classMetadata, $allowReflection);
+        // 2. Build from a Grid marker, composing the configuration sources
+        //    (attributes take precedence over annotations). See
+        //    resolveGridConfig() for the precedence/merge rules.
+        $config = $this->resolveGridConfig($reflectionClass, self::configSources($reader));
+        if (null !== $config) {
+            $built = $this->buildColumnInfoFromGrid($reflectionClass, $config['grid'], $config['columns'], $classMetadata, $allowReflection);
             ColumnUtil::populateCacheFile($cacheFilename, $built);
 
             return $this->toColumnSourceInfo(ColumnUtil::instantiateColumnInfo($built), $classMetadata);
@@ -194,84 +191,86 @@ class ColumnSource
     }
 
     /**
-     * Resolve the class-level Grid marker. Attributes take precedence over
-     * annotations; class-level #[Action]/#[Sort] attributes are merged into
-     * the marker (from either source) when it does not already define them.
+     * The configuration sources to consult, highest precedence first: PHP 8
+     * attributes (when available) then Doctrine annotations (when a reader is
+     * injected).
      *
-     * @return Grid|null null when the class carries no Grid marker
+     * @return Config\GridConfigSourceInterface[]
      */
-    private function collectGrid(\ReflectionClass $reflectionClass, ?Reader $reader)
+    private static function configSources(?Reader $reader)
+    {
+        $sources = [];
+        if (\PHP_VERSION_ID >= 80000) {
+            $sources[] = new Config\AttributeConfigSource();
+        }
+        if ($reader) {
+            $sources[] = new Config\AnnotationConfigSource($reader);
+        }
+
+        return $sources;
+    }
+
+    /**
+     * Compose the configuration sources into a single grid config:
+     *  - the Grid marker comes from the highest-precedence source that has one;
+     *  - class-level actions/sort are filled from the highest-precedence source
+     *    that declares them separately, unless the marker already carries them;
+     *  - columns are merged per property in declaration order, the
+     *    highest-precedence source with a column for that property winning.
+     * This keeps any partial migration (mixed attributes/annotations) working
+     * without losing columns, actions or sort.
+     *
+     * @param Config\GridConfigSourceInterface[] $sources highest precedence first
+     *
+     * @return array{grid: Grid, columns: array<string, Column>}|null null when no source has a Grid marker
+     */
+    private function resolveGridConfig(\ReflectionClass $reflectionClass, array $sources)
     {
         $grid = null;
-        if (\PHP_VERSION_ID >= 80000) {
-            $gridAttrs = $reflectionClass->getAttributes(Grid::class);
-            if (!empty($gridAttrs)) {
-                $grid = $gridAttrs[0]->newInstance();
+        foreach ($sources as $source) {
+            if (null !== ($grid = $source->getGrid($reflectionClass))) {
+                break;
             }
-        }
-        if (null === $grid && $reader) {
-            /** @var Grid|null $grid */
-            $grid = $reader->getClassAnnotation($reflectionClass, 'Dtc\GridBundle\Annotation\Grid');
         }
         if (null === $grid) {
             return null;
         }
 
-        // On PHP 8.0 actions/sort cannot be nested in #[Grid] (no `new` in
-        // attribute args), so they may be declared as separate class-level
-        // attributes; on 8.1+ a Grid that already nests them skips this.
-        if (\PHP_VERSION_ID >= 80000) {
-            if (null === $grid->actions) {
-                $actionAttrs = $reflectionClass->getAttributes(Action::class, \ReflectionAttribute::IS_INSTANCEOF);
-                if ($actionAttrs) {
-                    $grid->actions = array_map(function ($attr) {
-                        return $attr->newInstance();
-                    }, $actionAttrs);
+        if (null === $grid->actions) {
+            foreach ($sources as $source) {
+                $actions = $source->getActions($reflectionClass);
+                if ($actions) {
+                    $grid->actions = $actions;
+                    break;
                 }
             }
-            if (null === $grid->sort && null === $grid->sortMulti) {
-                $sortAttrs = $reflectionClass->getAttributes(Sort::class);
-                if (1 === count($sortAttrs)) {
-                    $grid->sort = $sortAttrs[0]->newInstance();
-                } elseif (count($sortAttrs) > 1) {
-                    $grid->sortMulti = array_map(function ($attr) {
-                        return $attr->newInstance();
-                    }, $sortAttrs);
+        }
+        if (null === $grid->sort && null === $grid->sortMulti) {
+            foreach ($sources as $source) {
+                $sorts = $source->getSorts($reflectionClass);
+                if (1 === count($sorts)) {
+                    $grid->sort = $sorts[0];
+                    break;
+                }
+                if (count($sorts) > 1) {
+                    $grid->sortMulti = $sorts;
+                    break;
                 }
             }
         }
 
-        return $grid;
-    }
-
-    /**
-     * Collect Column definitions in property-declaration order, taking the
-     * #[Column] attribute when present and the @Column annotation otherwise,
-     * so a property-by-property migration never drops the unconverted columns.
-     *
-     * @return array<string, Column> keyed by property name
-     */
-    private function collectColumns(\ReflectionClass $reflectionClass, ?Reader $reader)
-    {
-        $php8 = \PHP_VERSION_ID >= 80000;
         $columns = [];
         foreach ($reflectionClass->getProperties() as $property) {
-            $column = null;
-            if ($php8) {
-                $colAttrs = $property->getAttributes(Column::class);
-                if (!empty($colAttrs)) {
-                    $column = $colAttrs[0]->newInstance();
+            foreach ($sources as $source) {
+                $column = $source->getColumn($property);
+                if (null !== $column) {
+                    $columns[$property->getName()] = $column;
+                    break;
                 }
-            }
-            if (null === $column && $reader) {
-                $column = $reader->getPropertyAnnotation($property, 'Dtc\GridBundle\Annotation\Column');
-            }
-            if (null !== $column) {
-                $columns[$property->getName()] = $column;
             }
         }
 
-        return $columns;
+        return ['grid' => $grid, 'columns' => $columns];
     }
 
     /**
