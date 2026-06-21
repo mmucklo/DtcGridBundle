@@ -41,8 +41,10 @@ for (const { name, type, waitFor } of pages) {
         console.warn(`Warning: ${name} - timed out waiting for "${waitFor}"`);
     }
 
-    await page.screenshot({ path: `${outputDir}/${name}.png`, fullPage: false });
-    console.log(`Screenshot: ${name}.png`);
+    // WebP keeps these flat grid captures ~5x smaller than lossless PNG
+    // (~20KB vs ~130KB) while staying inline-renderable on GitHub.
+    await page.screenshot({ path: `${outputDir}/${name}.webp`, type: 'webp', quality: 75, fullPage: false });
+    console.log(`Screenshot: ${name}.webp`);
     await page.close();
 }
 

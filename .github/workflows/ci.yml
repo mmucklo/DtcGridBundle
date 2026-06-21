@@ -181,23 +181,28 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: grid-screenshots
-          path: Tests/Screenshots/output/*.png
+          path: Tests/Screenshots/output/*.webp
 
       - name: Push screenshots to separate ref
         id: push-screenshots
-        # Fork PRs get a read-only token with no secret access, so the push
-        # and PR comment below can't run. Skip them for forks.
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        # Only same-repo PRs: fork PRs get a read-only token, and a push to
+        # the default branch has no PR comment to attach images to.
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: |
-          SCREENSHOTS_REF="refs/screenshots/${{ github.head_ref || github.ref_name }}"
-          cp Tests/Screenshots/output/*.png /tmp/
+          # One ref per PR (keyed by number, not branch), force-pushed each
+          # run so a PR keeps exactly one current set of screenshots. The ref
+          # is never deleted, so the merged PR's comment images keep working
+          # with no archive workflow; refs/screenshots/* is not fetched by
+          # `git clone`, so none of this bloats consumer clones.
+          SCREENSHOTS_REF="refs/screenshots/pr-${{ github.event.pull_request.number }}"
+          cp Tests/Screenshots/output/*.webp /tmp/
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout --orphan screenshots-tmp
           git rm -rf . > /dev/null 2>&1
-          cp /tmp/*.png .
-          git add *.png
-          git commit -m "Grid screenshots for ${{ github.head_ref || github.ref_name }}"
+          cp /tmp/*.webp .
+          git add *.webp
+          git commit -m "Grid screenshots for PR #${{ github.event.pull_request.number }}"
           git push origin HEAD:${SCREENSHOTS_REF} --force
           # Pass the screenshot commit to the comment step explicitly rather
           # than relying on HEAD still pointing at the orphan branch there.
@@ -213,10 +218,10 @@ jobs:
           BODY="## Grid Screenshots
 
           **Table renderer:**
-          ![table](https://raw.githubusercontent.com/${REPO}/${REF_SHA}/table.png)
+          ![table](https://raw.githubusercontent.com/${REPO}/${REF_SHA}/table.webp)
 
           **DataTables renderer:**
-          ![datatables](https://raw.githubusercontent.com/${REPO}/${REF_SHA}/datatables.png)
+          ![datatables](https://raw.githubusercontent.com/${REPO}/${REF_SHA}/datatables.webp)
 
           _Auto-generated from [CI run](https://github.com/${REPO}/actions/runs/${{ github.run_id }})_"
 
