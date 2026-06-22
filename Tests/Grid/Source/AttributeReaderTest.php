@@ -37,6 +37,17 @@ class AttributeReaderTest extends TestCase
         new Column('Email', false, false, null, 'first');
     }
 
+    public function testColumnAcceptsStringAndArrayCallableFormatter()
+    {
+        // formatter is a callable: a string ('Class::method') or an array
+        // (['Class', 'method']) — both must be accepted, not type-rejected.
+        $stringFormatter = new Column('Price', false, false, 'App\\Formatter::price');
+        self::assertSame('App\\Formatter::price', $stringFormatter->formatter);
+
+        $arrayFormatter = new Column('Price', false, false, ['App\\Formatter', 'price']);
+        self::assertSame(['App\\Formatter', 'price'], $arrayFormatter->formatter);
+    }
+
     public function testSortRejectsInvalidDirection()
     {
         $this->expectException(\InvalidArgumentException::class);

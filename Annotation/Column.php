@@ -44,7 +44,9 @@ class Column implements Annotation
         self::assertString($label, 'label');
         self::assertBool($sortable, 'sortable');
         self::assertBool($searchable, 'searchable');
-        self::assertString($formatter, 'formatter');
+        // No type assertion on $formatter: it is a callable, which may be a
+        // string ('my_func', 'Class::method') OR an array (['Class','method'])
+        // — both are valid in annotations and attributes.
         self::assertInt($order, 'order');
         $this->label = $label;
         $this->sortable = $sortable;

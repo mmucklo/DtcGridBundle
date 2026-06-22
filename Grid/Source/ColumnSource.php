@@ -315,7 +315,9 @@ class ColumnSource
             throw new \InvalidArgumentException($reflectionClass->getName().' has a Grid annotation or attribute but no Column definitions, and reflection-based columns are not available for it');
         }
 
-        if (isset($actions)) {
+        // Truthy, not isset(): an explicit empty actions array must not build
+        // a stray, empty action column.
+        if ($actions) {
             $field = '\$-action';
             $actionArgs = [$field];
             $actionDefs = [];

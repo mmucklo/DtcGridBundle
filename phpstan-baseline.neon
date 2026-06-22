@@ -24,9 +24,3 @@ parameters:
 			count: 1
 			path: Grid/Pager/Pager.php
 
-		-
-			message: '#^Variable \$actions in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.variable
-			count: 1
-			path: Grid/Source/ColumnSource.php
-
