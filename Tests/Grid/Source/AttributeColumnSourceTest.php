@@ -6,6 +6,7 @@ use Dtc\GridBundle\Grid\Column\ActionGridColumn;
 use Dtc\GridBundle\Grid\Column\GridColumn;
 use Dtc\GridBundle\Tests\Fixtures\AttributeGridEntity;
 use Dtc\GridBundle\Tests\Fixtures\EmptyActionsGridEntity;
+use Dtc\GridBundle\Tests\Fixtures\InvalidSortDirectionEntity;
 
 /**
  * Drives the real attribute-reading path (getColumnSourceInfo ->
@@ -16,6 +17,17 @@ use Dtc\GridBundle\Tests\Fixtures\EmptyActionsGridEntity;
  */
 class AttributeColumnSourceTest extends ColumnSourceTestCase
 {
+    public function testInvalidSortDirectionThrowsWithEntityContext()
+    {
+        try {
+            $this->buildColumnSourceInfo(InvalidSortDirectionEntity::class);
+            self::fail('Expected an InvalidArgumentException for the invalid sort direction');
+        } catch (\InvalidArgumentException $e) {
+            self::assertStringContainsString('InvalidSortDirectionEntity', $e->getMessage(), 'Error must name the owning entity');
+            self::assertStringContainsString('invalid', $e->getMessage());
+        }
+    }
+
     public function testEmptyActionsListProducesNoActionColumn()
     {
         $info = $this->buildColumnSourceInfo(EmptyActionsGridEntity::class);

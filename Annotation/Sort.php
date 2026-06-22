@@ -12,8 +12,6 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Sort implements Annotation
 {
-    use ValidatesArguments;
-
     /**
      * @var string Default sort order
      */
@@ -24,10 +22,14 @@ class Sort implements Annotation
      */
     public $column;
 
+    /**
+     * Direction and column are validated by ColumnSource at build time, where
+     * the column list and the entity class name are available — so an invalid
+     * direction or unknown column is reported against the entity, not as a
+     * context-free constructor error.
+     */
     public function __construct($direction = null, $column = null)
     {
-        self::assertOneOf($direction, ['ASC', 'DESC'], 'direction');
-        self::assertString($column, 'column');
         // Only assign non-null values so the 'ASC' direction default survives
         // an omitted argument.
         if (null !== $direction) {

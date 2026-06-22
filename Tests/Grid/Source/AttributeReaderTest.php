@@ -48,11 +48,14 @@ class AttributeReaderTest extends TestCase
         self::assertSame(['App\\Formatter', 'price'], $arrayFormatter->formatter);
     }
 
-    public function testSortRejectsInvalidDirection()
+    public function testSortConstructsWithAnyDirection()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('"direction" must be one of ASC, DESC');
-        new Sort('UP');
+        // Sort does not validate direction at construction; ColumnSource does,
+        // at build time, where it can report against the owning entity. See
+        // InvalidSortDirectionEntity / the resolver test for that behavior.
+        $sort = new Sort('UP', 'name');
+        self::assertSame('UP', $sort->direction);
+        self::assertSame('name', $sort->column);
     }
 
     public function testActionRejectsNonStringLabel()
