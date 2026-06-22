@@ -33,3 +33,7 @@ bin/php-cs-fixer
 #
 bin
 .php_cs.cache
+
+# Screenshot output
+Tests/Screenshots/output/
+node_modules/

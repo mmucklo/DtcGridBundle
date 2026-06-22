@@ -2,13 +2,18 @@
 
 namespace Dtc\GridBundle\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
+
 /**
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target("PROPERTY")
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 class Column implements Annotation
 {
+    use ValidatesArguments;
+
     /**
      * @var string
      */
@@ -33,4 +38,20 @@ class Column implements Annotation
      * @var int
      */
     public $order;
+
+    public function __construct($label = null, $sortable = false, $searchable = false, $formatter = null, $order = null)
+    {
+        self::assertString($label, 'label');
+        self::assertBool($sortable, 'sortable');
+        self::assertBool($searchable, 'searchable');
+        // No type assertion on $formatter: it is a callable, which may be a
+        // string ('my_func', 'Class::method') OR an array (['Class','method'])
+        // — both are valid in annotations and attributes.
+        self::assertInt($order, 'order');
+        $this->label = $label;
+        $this->sortable = $sortable;
+        $this->searchable = $searchable;
+        $this->formatter = $formatter;
+        $this->order = $order;
+    }
 }

@@ -1,3 +1,20 @@
+8.0.0
+   * Add PHP 8 native attribute support for grid configuration (`#[Grid]`, `#[Column]`). Annotations remain fully supported; converting only part of a class (e.g. `#[Grid]` with `@Column` properties, or the reverse) also works.
+   * Support actions and sort as class-level attributes (`#[ShowAction]`, `#[DeleteAction]`, `#[Action]`, `#[Sort]`) on any PHP 8 version; on PHP 8.1+ they can also be nested directly: `#[Grid(actions: [new ShowAction()], sort: new Sort(column: 'name', direction: 'ASC'))]`.
+   * **BC break:** The annotation classes now use natural constructors via Doctrine's `@NamedArgumentConstructor` (positional attribute args like `#[Column('Name')]` work). Code constructing them directly with a values array (`new Grid(['sort' => ...])`) must switch to the real parameters. Misconfigured annotation values (unknown keys, wrong types such as `sortable="false"`) throw a clear exception.
+   * In debug mode, a stale column cache for a class with no Grid annotation/attribute is served only when it originated from a dtc_grid YAML file (cache written at container compile time, with no request-time regeneration path); a stale cache from a since-removed annotation/attribute is not resurrected, so removing a Grid marker takes effect.
+   * **BC break:** Remove the unused `ColumnSource::setDebug()` / `setCacheDir()` setters. The `dtc_grid.column.source` service is configured via constructor arguments; nothing in the bundle called the setters.
+   * **BC break:** Remove the `dtc_grid.command.source_list`, `dtc_grid.command.generate_grid_source`, `dtc_grid.command.source.list` and `dtc_grid.command.source.generate` service definitions along with their commands. If you referenced these service IDs directly, drop the references.
+   * Annotation usage (the non-attribute path) requires the consumer application to provide a Doctrine annotation reader (`doctrine/annotations`); it is a dev/optional dependency of the bundle. The native PHP 8 `#[Grid]`/`#[Column]` attribute path needs no extra package. `ColumnSource::checkTimestamps()` remains a public static helper.
+   * Drop PHP 5.6/7.0/7.1 support; minimum is now PHP 7.2. Tested on PHP 7.2 - 8.4.
+   * Add support for Symfony 7 and Symfony 8; declared range is `^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0`.
+   * Remove the abandoned, unused `sensio/framework-extra-bundle` dependency.
+   * **BC break:** Remove `ColumnExtractionTrait`, unused since the 3.x column refactor moved its logic into the `ColumnSource` service.
+   * A Grid annotation/attribute with no Column definitions (and reflection unavailable) now throws a clear configuration error instead of writing a `return false` cache file and failing every request with "Bad column cache".
+   * **BC break:** Remove the deprecated-since-3.0.0 console commands: `dtc:grid:source:generate` (with the `Dtc\GridBundle\Generator` classes) relied on bundle shortcut notation and Doctrine entity-namespace aliases, which were removed in modern Symfony/Doctrine — use `@Grid`/`#[Grid]` auto-detection instead; `dtc:grid:source:list` always printed an empty list because grid sources are registered lazily per request.
+   * **BC break:** DataTables default integration assets switched from Bootstrap 3 (`dataTables.bootstrap.min.*`) to Bootstrap 4 (`dataTables.bootstrap4.min.*`) to match the default Bootstrap 4 theme. Override `dtc_grid.datatables.css`/`js` if you rely on the old behavior.
+   * Replace Travis CI with GitHub Actions; add PHPStan + PHP CS Fixer linting and an end-to-end grid screenshot job.
+   * Expand test coverage.
 7.3.0
    * Support older symfony yaml libraries that don't have parseFile.
 7.2.2

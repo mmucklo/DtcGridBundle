@@ -2,6 +2,7 @@
 
 namespace Dtc\GridBundle\Tests\Util;
 
+use Dtc\GridBundle\Tests\TempDir;
 use Dtc\GridBundle\Util\ColumnUtil;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +18,7 @@ class ColumnUtilTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->removeDir($this->tmpDir);
+        TempDir::remove($this->tmpDir);
     }
 
     public function testCreateCacheFilename()
@@ -36,10 +37,16 @@ class ColumnUtilTest extends TestCase
 
     public function testPopulateCacheFileNoColumns()
     {
+        // Even with no columns the file must return the full structure:
+        // ColumnSource treats an include result without a 'columns' key as
+        // a corrupt cache (this used to be a "return false" sentinel whose
+        // reader was removed in the 3.x column refactor).
         $filename = ColumnUtil::createCacheFilename($this->tmpDir, 'App\\Entity\\Empty');
         ColumnUtil::populateCacheFile($filename, []);
         $result = include $filename;
-        self::assertFalse($result);
+        self::assertSame([], $result['columns']);
+        self::assertSame([], $result['sort']);
+        self::assertSame('runtime', $result['source']);
     }
 
     public function testPopulateCacheFileWithColumns()
@@ -54,37 +61,62 @@ class ColumnUtilTest extends TestCase
             ],
             'sort' => ['title' => 'ASC'],
         ];
-        ColumnUtil::populateCacheFile($filename, $info);
+        ColumnUtil::populateCacheFile($filename, $info, 'compile');
+        // The cache stores column specs (class + arguments), not objects;
+        // instantiateColumnInfo() materializes them.
         $result = include $filename;
         self::assertIsArray($result);
-        self::assertArrayHasKey('columns', $result);
-        self::assertArrayHasKey('sort', $result);
+        self::assertSame($info['columns'], $result['columns']);
         self::assertSame(['title' => 'ASC'], $result['sort']);
-        self::assertInstanceOf(\Dtc\GridBundle\Grid\Column\GridColumn::class, $result['columns']['title']);
+        self::assertSame('compile', $result['source']);
+
+        $materialized = ColumnUtil::instantiateColumnInfo($result);
+        self::assertInstanceOf(\Dtc\GridBundle\Grid\Column\GridColumn::class, $materialized['columns']['title']);
+    }
+
+    public function testPopulateCacheFileEscapesKeysAndLabels()
+    {
+        // Column keys can be user-controlled (YAML column names); var_export
+        // escapes a raw apostrophe that would otherwise break the cache file.
+        $filename = ColumnUtil::createCacheFilename($this->tmpDir, 'App\\Entity\\Quoted');
+        $info = [
+            'columns' => [
+                "owner's" => [
+                    'class' => '\\Dtc\\GridBundle\\Grid\\Column\\GridColumn',
+                    'arguments' => ["owner's", "Owner's Label", null, [], true, null],
+                ],
+            ],
+            'sort' => ["owner's" => 'ASC'],
+        ];
+        ColumnUtil::populateCacheFile($filename, $info);
+        $result = include $filename;
+        self::assertArrayHasKey("owner's", $result['columns']);
+        self::assertSame(["owner's" => 'ASC'], $result['sort']);
+
+        $materialized = ColumnUtil::instantiateColumnInfo($result);
+        self::assertSame("Owner's Label", $materialized['columns']["owner's"]->getLabel());
+    }
+
+    public function testInstantiateColumnInfoMaterializesObjects()
+    {
+        $info = [
+            'columns' => [
+                'title' => [
+                    'class' => '\\Dtc\\GridBundle\\Grid\\Column\\GridColumn',
+                    'arguments' => ['title', 'Title', null, [], true, null],
+                ],
+            ],
+            'sort' => ['title' => 'ASC'],
+        ];
+        $materialized = ColumnUtil::instantiateColumnInfo($info);
+        self::assertInstanceOf(\Dtc\GridBundle\Grid\Column\GridColumn::class, $materialized['columns']['title']);
+        self::assertSame('Title', $materialized['columns']['title']->getLabel());
+        self::assertSame(['title' => 'ASC'], $materialized['sort']);
     }
 
     public function testExtractClassesFromUnreadableFileThrows()
     {
         $this->expectException(\Exception::class);
         ColumnUtil::extractClassesFromFile($this->tmpDir.'/does-not-exist.yaml');
-    }
-
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-        foreach ($iterator as $item) {
-            if ($item->isDir()) {
-                rmdir($item->getPathname());
-            } else {
-                unlink($item->getPathname());
-            }
-        }
-        rmdir($dir);
     }
 }

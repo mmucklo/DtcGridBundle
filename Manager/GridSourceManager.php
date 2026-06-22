@@ -33,6 +33,10 @@ class GridSourceManager
      */
     protected $reflectionAllowedEntities;
 
+    protected $entityManager;
+
+    protected $documentManager;
+
     /**
      * GridSourceManager constructor.
      */
@@ -40,7 +44,6 @@ class GridSourceManager
     {
         $this->columnSource = $columnSource;
         $this->reflectionAllowedEntities = [];
-        $this->sources = [];
     }
 
     public function setReader(Reader $reader)

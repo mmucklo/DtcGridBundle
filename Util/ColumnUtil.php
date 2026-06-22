@@ -39,43 +39,68 @@ class ColumnUtil
     }
 
     /**
-     * @param string $filename
+     * Materialize a cache-shaped column info array (column specs with
+     * 'class'/'arguments') into instantiated GridColumn objects. This is the
+     * runtime twin of the code populateCacheFile() emits, kept here so the
+     * cache format is defined in one place.
+     *
+     * @return array ['columns' => array<GridColumn>, 'sort' => array]
      */
-    public static function populateCacheFile($filename, array $classInfo)
+    public static function instantiateColumnInfo(array $columnInfo)
     {
-        $columns = isset($classInfo['columns']) ? $classInfo['columns'] : [];
-        $sort = isset($classInfo['sort']) ? $classInfo['sort'] : [];
-
-        if ($columns) {
-            $output = "<?php\nreturn array('columns' => array(\n";
-            foreach ($columns as $field => $info) {
-                $class = $info['class'];
-                $output .= "'$field' => new $class(";
-                $first = true;
-                foreach ($info['arguments'] as $argument) {
-                    if ($first) {
-                        $first = false;
-                    } else {
-                        $output .= ',';
-                    }
-                    $output .= var_export($argument, true);
-                }
-                $output .= '),';
-            }
-            $output .= "), 'sort' => array(";
-            foreach ($sort as $key => $value) {
-                $output .= "'$key'".' => ';
-                if (null === $value) {
-                    $output .= 'null,';
-                } else {
-                    $output .= "'$value',";
-                }
-            }
-            $output .= "));\n";
-        } else {
-            $output = "<?php\nreturn false;\n";
+        $columns = [];
+        foreach ($columnInfo['columns'] as $field => $info) {
+            $class = $info['class'];
+            $columns[$field] = new $class(...$info['arguments']);
         }
-        file_put_contents($filename, $output);
+
+        return ['columns' => $columns, 'sort' => isset($columnInfo['sort']) ? $columnInfo['sort'] : []];
+    }
+
+    /**
+     * @param string $filename
+     * @param string $source   'runtime' (read on request from annotations/attributes)
+     *                         or 'compile' (written from dtc_grid YAML at container build).
+     *                         The reader only resurrects a timestamp-stale cache when its
+     *                         source is 'compile', since YAML grids have no request-time
+     *                         regeneration path.
+     */
+    public static function populateCacheFile($filename, array $classInfo, $source = 'runtime')
+    {
+        // Cache the column *specs* (class + constructor arguments), not
+        // instantiated objects: a plain var_export'd array is materialized on
+        // read by instantiateColumnInfo(), so the format lives in one place and
+        // there is no hand-written code generation to keep parse-safe.
+        $spec = [
+            'columns' => isset($classInfo['columns']) ? $classInfo['columns'] : [],
+            'sort' => isset($classInfo['sort']) ? $classInfo['sort'] : [],
+            'source' => $source,
+        ];
+
+        self::atomicWrite($filename, "<?php\n\nreturn ".var_export($spec, true).";\n");
+    }
+
+    /**
+     * Write atomically so a concurrent request can never include() a
+     * half-written cache file.
+     *
+     * @param string $filename
+     * @param string $contents
+     */
+    private static function atomicWrite($filename, $contents)
+    {
+        $tmp = tempnam(dirname($filename), 'dtcgrid_');
+        if (false === $tmp) {
+            file_put_contents($filename, $contents);
+
+            return;
+        }
+        file_put_contents($tmp, $contents);
+        @chmod($tmp, 0666 & ~umask());
+        if (!@rename($tmp, $filename)) {
+            @unlink($tmp);
+            file_put_contents($filename, $contents);
+        }
     }
 
     /**
@@ -89,7 +114,7 @@ class ColumnUtil
         $classes = self::extractClassesFromFile($filename);
         foreach ($classes as $class => $columnInfo) {
             $filename = ColumnUtil::createCacheFilename($cacheDir, $class);
-            self::populateCacheFile($filename, $columnInfo);
+            self::populateCacheFile($filename, $columnInfo, 'compile');
         }
     }
 

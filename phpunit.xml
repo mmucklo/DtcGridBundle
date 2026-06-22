@@ -1,7 +1,11 @@
-<phpunit bootstrap="vendor/autoload.php">
+<phpunit bootstrap="vendor/autoload.php" defaultTestSuite="default">
   <testsuites>
      <testsuite name="default">
          <directory>Tests</directory>
+         <exclude>Tests/Php8Only</exclude>
+     </testsuite>
+     <testsuite name="php8">
+         <directory>Tests/Php8Only</directory>
      </testsuite>
   </testsuites>
 </phpunit>

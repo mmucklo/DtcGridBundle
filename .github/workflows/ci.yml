@@ -17,9 +17,11 @@ jobs:
         php: ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
         dependencies: ['highest']
         include:
+          # Lowest-deps is tested on the minimum PHP only: the dependency floor
+          # (PHPUnit 8.5, kept for PHP 7.2) cannot run on PHP 8.1+, so a
+          # "lowest on newest PHP" cell is an impossible combination. Newest
+          # PHP is covered by 8.4/highest.
           - php: '7.2'
-            dependencies: 'lowest'
-          - php: '8.4'
             dependencies: 'lowest'
 
     steps:
@@ -47,6 +49,9 @@ jobs:
             ${{ runner.os }}-php-${{ matrix.php }}-${{ matrix.dependencies }}-
             ${{ runner.os }}-php-${{ matrix.php }}-
 
+      # composer.json sets config.audit.block-insecure=false: composer >= 2.9.8
+      # otherwise refuses to resolve the legacy Symfony/Doctrine versions this
+      # matrix intentionally tests against (dev-only; consumers are unaffected).
       - name: Install dependencies (highest)
         if: matrix.dependencies == 'highest'
         run: composer update --no-interaction --no-progress --prefer-dist
@@ -56,7 +61,11 @@ jobs:
         run: composer update --no-interaction --no-progress --prefer-dist --prefer-lowest --prefer-stable
 
       - name: Run PHPUnit
-        run: bin/phpunit
+        run: bin/phpunit --testsuite=default
+
+      - name: Run PHP 8+ tests
+        if: ${{ !startsWith(matrix.php, '7.') }}
+        run: bin/phpunit --testsuite=php8
 
   lint:
     name: Lint & static analysis
@@ -84,3 +93,144 @@ jobs:
 
       - name: PHPStan
         run: bin/phpstan analyse --no-progress --memory-limit=512M
+
+  screenshots:
+    name: Grid screenshots
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      PUPPETEER_VERSION: 24.0.0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, json
+          coverage: none
+          tools: composer:v2
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-8.4-highest-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-php-8.4-highest-
+            ${{ runner.os }}-php-8.4-
+
+      - name: Install dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      - name: Setup test app (DB + fixtures + assets)
+        run: |
+          php Tests/App/setup.php
+          mkdir -p Tests/App/public/bundles/dtcgrid
+          ln -s "$(pwd)/Resources/public/css" Tests/App/public/bundles/dtcgrid/css
+          ln -s "$(pwd)/Resources/public/js" Tests/App/public/bundles/dtcgrid/js
+
+      # restore/save are split so the ~170MB browser download is persisted
+      # even when a later step (screenshot capture, push, comment) fails. The
+      # save runs right after install and before those flaky steps, so plain
+      # success() semantics already cover it — no always(), which would also
+      # save a partial download if the install step itself died.
+      - name: Restore Puppeteer cache
+        id: puppeteer-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cache/puppeteer
+            ~/.npm
+          key: ${{ runner.os }}-puppeteer-${{ env.PUPPETEER_VERSION }}
+
+      - name: Install Puppeteer
+        run: npm install "puppeteer@${PUPPETEER_VERSION}"
+
+      - name: Save Puppeteer cache
+        if: steps.puppeteer-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cache/puppeteer
+            ~/.npm
+          key: ${{ runner.os }}-puppeteer-${{ env.PUPPETEER_VERSION }}
+
+      - name: Take screenshots
+        run: |
+          # Start PHP server in background
+          php -S 127.0.0.1:8199 -t Tests/App/public Tests/App/public/index.php &
+          SERVER_PID=$!
+          # Poll until the server accepts connections instead of a fixed sleep,
+          # which both wastes time and can flake on a slow runner.
+          curl --retry 20 --retry-delay 1 --retry-connrefused -sf -o /dev/null http://127.0.0.1:8199 || true
+
+          node Tests/Screenshots/screenshot.mjs http://127.0.0.1:8199 Tests/Screenshots/output
+
+          kill $SERVER_PID 2>/dev/null || true
+
+      - name: Upload screenshots as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: grid-screenshots
+          path: Tests/Screenshots/output/*.webp
+
+      - name: Push screenshots to separate ref
+        id: push-screenshots
+        # Only same-repo PRs: fork PRs get a read-only token, and a push to
+        # the default branch has no PR comment to attach images to.
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          # One ref per PR (keyed by number, not branch), force-pushed each
+          # run so a PR keeps exactly one current set of screenshots. The ref
+          # is never deleted, so the merged PR's comment images keep working
+          # with no archive workflow; refs/screenshots/* is not fetched by
+          # `git clone`, so none of this bloats consumer clones.
+          SCREENSHOTS_REF="refs/screenshots/pr-${{ github.event.pull_request.number }}"
+          cp Tests/Screenshots/output/*.webp /tmp/
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan screenshots-tmp
+          git rm -rf . > /dev/null 2>&1
+          cp /tmp/*.webp .
+          git add *.webp
+          git commit -m "Grid screenshots for PR #${{ github.event.pull_request.number }}"
+          git push origin HEAD:${SCREENSHOTS_REF} --force
+          # Pass the screenshot commit to the comment step explicitly rather
+          # than relying on HEAD still pointing at the orphan branch there.
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on PR with screenshots
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO="${{ github.repository }}"
+          REF_SHA="${{ steps.push-screenshots.outputs.sha }}"
+          BODY="## Grid Screenshots
+
+          **Table renderer:**
+          ![table](https://raw.githubusercontent.com/${REPO}/${REF_SHA}/table.webp)
+
+          **DataTables renderer:**
+          ![datatables](https://raw.githubusercontent.com/${REPO}/${REF_SHA}/datatables.webp)
+
+          _Auto-generated from [CI run](https://github.com/${REPO}/actions/runs/${{ github.run_id }})_"
+
+          # Update existing comment or create new one (--paginate: the
+          # comment may sit beyond the first 30 on a busy PR)
+          COMMENT_ID=$(gh api --paginate repos/${REPO}/issues/${{ github.event.pull_request.number }}/comments \
+            --jq '.[] | select(.body | startswith("## Grid Screenshots")) | .id' | tail -1)
+          if [ -n "$COMMENT_ID" ]; then
+            gh api repos/${REPO}/issues/comments/${COMMENT_ID} -X PATCH -f body="$BODY"
+          else
+            gh pr comment ${{ github.event.pull_request.number }} --body "$BODY"
+          fi

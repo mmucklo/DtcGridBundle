@@ -1,30 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Access to an undefined property Dtc\\GridBundle\\Command\\GenerateGridSourceCommand\:\:\$mongoDBRegistry\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Command/GenerateGridSourceCommand.php
-
-		-
-			message: '#^Parameter \$mongoDBRegistry of method Dtc\\GridBundle\\Command\\GenerateGridSourceCommand\:\:setMongoDBRegistry\(\) has invalid type Doctrine\\Bundle\\MongoDBBundle\\ManagerRegistry\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Command/GenerateGridSourceCommand.php
-
-		-
-			message: '#^Parameter \$registry of method Dtc\\GridBundle\\Command\\GenerateGridSourceCommand\:\:setRegistry\(\) has invalid type Doctrine\\Bundle\\DoctrineBundle\\Registry\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Command/GenerateGridSourceCommand.php
-
-		-
-			message: '#^Variable \$metadata might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: Command/GenerateGridSourceCommand.php
-
-		-
 			message: '#^Call to an undefined method Dtc\\GridBundle\\Controller\\GridController\:\:createNotFoundException\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -35,24 +11,6 @@ parameters:
 			identifier: variable.undefined
 			count: 3
 			path: Controller/GridController.php
-
-		-
-			message: '#^Call to static method dump\(\) on an unknown class Symfony\\Component\\Yaml\\Yaml\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Generator/GridSourceGenerator.php
-
-		-
-			message: '#^Call to static method parse\(\) on an unknown class Symfony\\Component\\Yaml\\Yaml\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Generator/GridSourceGenerator.php
-
-		-
-			message: '#^Class Doctrine\\ODM\\MongoDB\\Mapping\\ClassMetadataInfo not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Generator/GridSourceGenerator.php
 
 		-
 			message: '#^Parameter \$template of method Dtc\\GridBundle\\Grid\\Column\\TwigBlockGridColumn\:\:__construct\(\) has invalid type Twig_Template\.$#'
@@ -66,38 +24,3 @@ parameters:
 			count: 1
 			path: Grid/Pager/Pager.php
 
-		-
-			message: '#^Variable \$actions in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.variable
-			count: 1
-			path: Grid/Source/ColumnSource.php
-
-		-
-			message: '#^Access to an undefined property Dtc\\GridBundle\\Manager\\GridSourceManager\:\:\$documentManager\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Manager/GridSourceManager.php
-
-		-
-			message: '#^Access to an undefined property Dtc\\GridBundle\\Manager\\GridSourceManager\:\:\$entityManager\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Manager/GridSourceManager.php
-
-		-
-			message: '#^Access to an undefined property Dtc\\GridBundle\\Manager\\GridSourceManager\:\:\$sources\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Manager/GridSourceManager.php
-
-		-
-			message: '#^Call to static method parse\(\) on an unknown class Symfony\\Component\\Yaml\\Yaml\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Util/ColumnUtil.php
-
-		-
-			message: '#^Call to static method parseFile\(\) on an unknown class Symfony\\Component\\Yaml\\Yaml\.$#'
-			identifier: class.notFound
-			count: 1
-			path: Util/ColumnUtil.php

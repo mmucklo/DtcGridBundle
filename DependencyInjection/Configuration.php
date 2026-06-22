@@ -68,11 +68,11 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('class')->defaultNull()->end()
                         ->variableNode('css')
-                            ->defaultValue(['//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css'])
+                            ->defaultValue(['//cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css'])
                         ->end()
                         ->variableNode('js')
                             ->defaultValue(['//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js',
-                                '//cdn.datatables.net/1.10.20/js/dataTables.bootstrap.min.js', ])
+                                '//cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js', ])
                         ->end()
                         ->arrayNode('local')
                             ->children()

@@ -346,6 +346,88 @@ class User {
     protected $lastName;
 ```
 
+### PHP 8 Attributes
+
+On PHP 8.0+ you can use native attributes instead of Doctrine annotations. The
+`#[Grid]` and `#[Column]` attributes mirror their annotation equivalents. The
+two styles can be mixed while migrating: configuration is merged per property
+(and per class-level marker), with the attribute winning where a property
+declares both, so a partially converted class keeps all of its columns,
+actions and sort:
+
+```php
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Dtc\GridBundle\Annotation\Column as GridColumn;
+use Dtc\GridBundle\Annotation\Grid;
+
+#[ORM\Entity]
+#[Grid]
+class User
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    protected $id;
+
+    #[GridColumn(searchable: true)]
+    #[ORM\Column(type: 'string')]
+    protected $firstName;
+
+    #[GridColumn(label: 'Last', sortable: true, searchable: true)]
+    #[ORM\Column(type: 'string')]
+    protected $lastName;
+}
+```
+
+#### Actions and sort with attributes
+
+> **PHP 8.0 vs 8.1+:** the syntax for actions and sort differs by PHP version.
+> PHP 8.1 added "new in initializers", which lets you nest `new ShowAction()` /
+> `new Sort()` directly inside `#[Grid(...)]`. On PHP 8.0 that is a compile
+> error, so actions and sort must be declared as **separate class-level
+> attributes**. The separate-attribute form below works on *every* PHP 8
+> version, so prefer it if you need to support PHP 8.0.
+
+On PHP 8.1+ actions and sort can be nested directly inside `#[Grid]`:
+
+```php
+#[Grid(actions: [new ShowAction(), new DeleteAction()], sort: new Sort(column: 'lastName', direction: 'ASC'))]
+class User
+{
+    // ...
+}
+```
+
+On PHP 8.0, `new` is not allowed in attribute arguments, so add them as
+separate class-level attributes alongside `#[Grid]` instead (this form works
+on every PHP 8 version):
+
+```php
+use Dtc\GridBundle\Annotation\DeleteAction;
+use Dtc\GridBundle\Annotation\Grid;
+use Dtc\GridBundle\Annotation\ShowAction;
+use Dtc\GridBundle\Annotation\Action;
+use Dtc\GridBundle\Annotation\Sort;
+
+#[Grid]
+#[ShowAction]
+#[DeleteAction]
+#[Action(label: 'Custom', buttonClass: 'btn-info', onclick: "alert('custom-action')")]
+#[Sort(column: 'lastName', direction: 'ASC')]
+class User
+{
+    // ...
+}
+```
+
+Repeat `#[Sort]` to sort by multiple columns (equivalent to the annotation
+`sortMulti`). Annotations remain fully supported; attributes are an additive,
+opt-in alternative.
+
 ### Customize jQuery, Purl, DataTables
 
 Customization of the versions of jQuery, Purl, and DataTables can be done in config.yml

@@ -31,16 +31,24 @@
         "doctrine/persistence": "^1.3 || ^2.0 || ^3.0",
         "doctrine/dbal": "^2.13 || ^3.0",
         "doctrine/mongodb-odm": "^2.2",
+        "doctrine/doctrine-bundle": "^2.7",
         "phpunit/phpunit": "^8.5 || ^9.5",
         "phpstan/phpstan": "^1.10 || ^2.0",
         "phpstan/phpstan-phpunit": "^1.3 || ^2.0",
-        "friendsofphp/php-cs-fixer": "^3.0"
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "symfony/yaml": "^3.4 || ^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0"
+    },
+    "suggest": {
+        "doctrine/annotations": "Required only if you configure grids with Doctrine annotations (@Grid/@Column) instead of native PHP 8 attributes."
     },
     "config": {
         "bin-dir": "bin",
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "symfony/flex": true
+        },
+        "audit": {
+            "block-insecure": false
         }
     },
     "autoload": {
